@@ -1,5 +1,8 @@
 <?php
 
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
@@ -12,30 +15,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 include "../../config/db.php";
 
+// ✅ GET JSON DATA
 $data = json_decode(file_get_contents("php://input"), true);
 
-$name       = $data['name'] ?? '';
-$email      = $data['email'] ?? '';
-$password   = $data['password'] ?? '';
-$role       = $data['role'] ?? '';
-$company_id = intval($data['company_id'] ?? 0);
+$name         = trim($data['name'] ?? '');
+$email        = trim($data['email'] ?? '');
+$password     = trim($data['password'] ?? '');
+$role         = trim($data['role'] ?? '');
+$company_id   = intval($data['company_id'] ?? 0);
 $requested_by = intval($data['requested_by'] ?? 0);
 
+// ✅ VALIDATION
 if (!$name || !$email || !$password || !$role) {
 
     echo json_encode([
-        "status"=>false,
-        "message"=>"All fields required"
+        "status" => false,
+        "message" => "All fields required"
     ]);
 
     exit;
 }
 
-if (!in_array($role, ['superadmin','cashier','admin','user'])) {
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 
     echo json_encode([
-        "status"=>false,
-        "message"=>"Invalid role"
+        "status" => false,
+        "message" => "Invalid email format"
+    ]);
+
+    exit;
+}
+
+if (!in_array($role, ['superadmin', 'cashier', 'admin', 'user'])) {
+
+    echo json_encode([
+        "status" => false,
+        "message" => "Invalid role"
     ]);
 
     exit;
@@ -44,55 +59,51 @@ if (!in_array($role, ['superadmin','cashier','admin','user'])) {
 if (($role == 'cashier' || $role == 'admin') && !$company_id) {
 
     echo json_encode([
-        "status"=>false,
-        "message"=>"Company ID required"
+        "status" => false,
+        "message" => "Company ID required"
     ]);
 
     exit;
 }
 
-$check = mysqli_query($conn,
-"SELECT id FROM users WHERE email='$email'");
+// ✅ CHECK EMAIL EXISTS
+$check = mysqli_query(
+    $conn,
+    "SELECT id FROM users WHERE email='$email'"
+);
 
 if (mysqli_num_rows($check) > 0) {
 
     echo json_encode([
-        "status"=>false,
-        "message"=>"Email already exists"
+        "status" => false,
+        "message" => "Email already exists"
     ]);
 
     exit;
 }
 
+// ✅ HASH PASSWORD
 $hashed = password_hash($password, PASSWORD_DEFAULT);
 
-
 // ✅ CASHIER LIMIT CHECK
-
 if ($role == 'cashier') {
 
-    $countRes = mysqli_query($conn, "
-
-        SELECT COUNT(*) as total
-
-        FROM users
-
-        WHERE company_id='$company_id'
-        AND role='cashier'
-
-    ");
+    $countRes = mysqli_query(
+        $conn,
+        "SELECT COUNT(*) as total
+         FROM users
+         WHERE company_id='$company_id'
+         AND role='cashier'"
+    );
 
     $countRow = mysqli_fetch_assoc($countRes);
 
     // ✅ LIMIT = 3
-
     if ($countRow['total'] >= 3) {
 
-        // SAVE REQUEST
-
-        mysqli_query($conn, "
-
-            INSERT INTO cashier_requests
+        mysqli_query(
+            $conn,
+            "INSERT INTO cashier_requests
             (
                 company_id,
                 requested_by,
@@ -100,7 +111,6 @@ if ($role == 'cashier') {
                 email,
                 password
             )
-
             VALUES
             (
                 '$company_id',
@@ -108,29 +118,26 @@ if ($role == 'cashier') {
                 '$name',
                 '$email',
                 '$hashed'
-            )
-
-        ");
+            )"
+        );
 
         echo json_encode([
-            "status"=>false,
-            "request_sent"=>true,
-            "message"=>"Cashier limit reached. Request sent to Super Admin."
+            "status" => false,
+            "request_sent" => true,
+            "message" => "Cashier limit reached. Request sent to Super Admin."
         ]);
 
         exit;
     }
 }
 
-
-// ✅ NORMAL REGISTER
-
+// ✅ START TRANSACTION
 mysqli_begin_transaction($conn);
 
 try {
 
+    // ✅ INSERT USER
     $sql = "
-
         INSERT INTO users
         (
             name,
@@ -139,7 +146,6 @@ try {
             role,
             company_id
         )
-
         VALUES
         (
             '$name',
@@ -148,25 +154,21 @@ try {
             '$role',
             '$company_id'
         )
-
     ";
 
     if (!mysqli_query($conn, $sql)) {
         throw new Exception("User insert failed");
     }
 
+    // ✅ UPDATE COMPANY IF ADMIN
     if ($role == 'admin') {
 
         $update = "
-
             UPDATE companies SET
-
             owner_name='$name',
             owner_email='$email',
             owner_password='$hashed'
-
             WHERE id='$company_id'
-
         ";
 
         if (!mysqli_query($conn, $update)) {
@@ -174,11 +176,12 @@ try {
         }
     }
 
+    // ✅ COMMIT
     mysqli_commit($conn);
 
     echo json_encode([
-        "status"=>true,
-        "message"=>"User registered successfully"
+        "status" => true,
+        "message" => "User registered successfully"
     ]);
 
 } catch (Exception $e) {
@@ -186,8 +189,9 @@ try {
     mysqli_rollback($conn);
 
     echo json_encode([
-        "status"=>false,
-        "message"=>$e->getMessage()
+        "status" => false,
+        "message" => $e->getMessage()
     ]);
 }
+
 ?>

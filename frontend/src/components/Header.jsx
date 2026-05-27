@@ -117,6 +117,18 @@ export default function Header() {
             </div>
           </Link>
 
+          {/* Navigation */}
+          {isAuthenticated && user?.role === 'user' && (
+            <nav className="hidden items-center gap-4 lg:flex">
+              <Link
+                to="/products"
+                className="text-sm font-semibold text-slate-700 hover:text-indigo-600 transition"
+              >
+                Products
+              </Link>
+            </nav>
+          )}
+
           {/* Search Bar */}
           <form onSubmit={handleSearch} className="hidden flex-1 mx-8 md:block">
             <div className="relative">
@@ -293,6 +305,17 @@ export default function Header() {
             </form>
 
             {/* Categories Mobile */}
+            {isAuthenticated && user?.role === 'user' && (
+              <div className="mb-4 space-y-2 border-b border-slate-200 pb-4">
+                <Link
+                  to="/products"
+                  className="block text-sm font-semibold text-slate-700 hover:text-indigo-600 transition"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Browse Products
+                </Link>
+              </div>
+            )}
             {isAuthenticated && categories.length > 0 && (
               <div className="mb-4 border-b border-slate-200 pb-4">
                 <p className="mb-2 text-xs font-semibold uppercase text-slate-500">Categories</p>

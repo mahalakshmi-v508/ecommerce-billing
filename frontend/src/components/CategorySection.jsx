@@ -59,19 +59,23 @@ export default function CategorySection({ selectedCategory, onCategoryChange, lo
               ))}
             </div>
           ) : (
-            categories.map((category) => (
-              <button
-                key={category.id}
-                onClick={() => onCategoryChange(category.id)}
-                className={`flex-shrink-0 rounded-lg px-6 py-3 font-semibold text-sm transition whitespace-nowrap ${
-                  selectedCategory === category.id
-                    ? 'bg-indigo-600 text-white'
-                    : 'border border-slate-200 bg-white text-slate-700 hover:border-indigo-300'
-                }`}
-              >
-                {category.name}
-              </button>
-            ))
+            categories.map((category) => {
+              const categoryKey = String(category.id)
+              const isSelected = selectedCategory !== null && String(selectedCategory) === categoryKey
+              return (
+                <button
+                  key={categoryKey}
+                  onClick={() => onCategoryChange(categoryKey)}
+                  className={`flex-shrink-0 rounded-lg px-6 py-3 font-semibold text-sm transition whitespace-nowrap ${
+                    isSelected
+                      ? 'bg-indigo-600 text-white'
+                      : 'border border-slate-200 bg-white text-slate-700 hover:border-indigo-300'
+                  }`}
+                >
+                  {category.name}
+                </button>
+              )
+            })
           )}
         </div>
       </div>

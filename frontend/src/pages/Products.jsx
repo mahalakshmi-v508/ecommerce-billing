@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
-import { getProducts, getProductsByCategory } from '../services/productService.js'
+import { getProducts } from '../services/productService.js'
 import CategorySection from '../components/CategorySection.jsx'
 import ProductCard from '../components/ProductCard.jsx'
 import ProductSkeleton from '../components/ProductSkeleton.jsx'
@@ -9,12 +10,22 @@ import toast from 'react-hot-toast'
 
 export default function Products() {
   const { user } = useAuth()
+  const { categoryId } = useParams()
+  const navigate = useNavigate()
   const [products, setProducts] = useState([])
   const [filteredProducts, setFilteredProducts] = useState([])
-  const [selectedCategory, setSelectedCategory] = useState(null)
+  const [selectedCategory, setSelectedCategory] = useState(categoryId ? String(categoryId) : null)
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState('newest')
   const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (categoryId) {
+      setSelectedCategory(String(categoryId))
+    } else {
+      setSelectedCategory(null)
+    }
+  }, [categoryId])
 
   useEffect(() => {
     loadProducts()
@@ -84,6 +95,12 @@ export default function Products() {
     setSearchQuery(value)
   }
 
+  const handleCategoryChange = (categoryId) => {
+    const nextCategory = categoryId ? String(categoryId) : null
+    setSelectedCategory(nextCategory)
+    navigate(nextCategory ? `/category/${nextCategory}` : '/products')
+  }
+
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
@@ -125,7 +142,7 @@ export default function Products() {
         {/* Categories */}
         <CategorySection
           selectedCategory={selectedCategory}
-          onCategoryChange={setSelectedCategory}
+          onCategoryChange={handleCategoryChange}
           loading={loading}
         />
 

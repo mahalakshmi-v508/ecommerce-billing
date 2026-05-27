@@ -43,6 +43,14 @@ export default function Home() {
             </p>
           </div>
         </div>
+        <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
+          <button
+            onClick={() => navigate('/products')}
+            className="inline-flex items-center justify-center rounded-full bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700"
+          >
+            Browse Products
+          </button>
+        </div>
       </div>
     </div>
   )

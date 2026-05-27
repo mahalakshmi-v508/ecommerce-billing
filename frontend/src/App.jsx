@@ -6,6 +6,7 @@ import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
 import Home from './pages/Home.jsx'
 import Products from './pages/Products.jsx'
+import ProductDetails from './pages/ProductDetails.jsx'
 import RoleDashboard from './pages/RoleDashboard.jsx'
 import Cart from './pages/Cart.jsx'
 import Wishlist from './pages/Wishlist.jsx'
@@ -35,6 +36,22 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['user']}>
                 <Products />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/category/:categoryId"
+            element={
+              <ProtectedRoute allowedRoles={['user']}>
+                <Products />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/product/:productId"
+            element={
+              <ProtectedRoute allowedRoles={['user']}>
+                <ProductDetails />
               </ProtectedRoute>
             }
           />
