@@ -1,29 +1,113 @@
 import api from './api.js'
 
+/*
+|--------------------------------------------------------------------------
+| GET ALL PRODUCTS
+|--------------------------------------------------------------------------
+*/
+
 export const getProducts = async (companyId) => {
-  const { data } = await api.post('/product/get.php', {
-    company_id: companyId,
-  })
-  return data
+
+  try {
+
+    const { data } = await api.get(
+      '/product/get.php',
+      {
+        params: {
+          company_id: companyId,
+        },
+      }
+    )
+
+    return data
+
+  } catch (error) {
+
+    console.error('Error fetching products:', error)
+
+    return {
+      status: false,
+      message: 'Failed to fetch products',
+      data: [],
+    }
+  }
 }
+
+/*
+|--------------------------------------------------------------------------
+| GET PRODUCTS BY CATEGORY
+|--------------------------------------------------------------------------
+*/
+
+export const getProductsByCategory = async (
+  companyId,
+  categoryId
+) => {
+
+  try {
+
+    // GET ALL PRODUCTS
+    const response = await getProducts(companyId)
+
+    if (!response.status) {
+      return response
+    }
+
+    // FILTER CATEGORY
+    const filteredProducts =
+      response.data.filter(
+        (product) =>
+          parseInt(product.category_id) ===
+          parseInt(categoryId)
+      )
+
+    return {
+      status: true,
+      data: filteredProducts,
+    }
+
+  } catch (error) {
+
+    console.error(
+      'Error fetching category products:',
+      error
+    )
+
+    return {
+      status: false,
+      message: 'Failed to fetch category products',
+      data: [],
+    }
+  }
+}
+
+/*
+|--------------------------------------------------------------------------
+| GET PRODUCT BY ID
+|--------------------------------------------------------------------------
+*/
 
 export const getProductById = async (id) => {
-  const { data } = await api.get('/product/get_by_id.php', {
-    params: { id },
-  })
-  return data
-}
 
-export const getProductsByCategory = async (companyId, categoryId) => {
-  const response = await getProducts(companyId)
-  if (!response.status) {
-    return response
+  try {
+
+    const { data } = await api.get(
+      '/product/get_by_id.php',
+      {
+        params: { id },
+      }
+    )
+
+    return data
+
+  } catch (error) {
+
+    console.error('Error fetching product:', error)
+
+    return {
+      status: false,
+      message: 'Failed to fetch product',
+      data: null,
+    }
   }
-
-  const filteredProducts = response.data.filter((product) => parseInt(product.category_id) === parseInt(categoryId))
-  return {
-    status: true,
-    data: filteredProducts,
-  }
 }
-

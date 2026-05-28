@@ -14,3 +14,34 @@ export const getAllCategories = async (companyId) => {
   return data
 }
 
+
+/*
+|--------------------------------------------------------------------------
+| GET CATEGORY BY ID
+|--------------------------------------------------------------------------
+*/
+
+export const getCategoryById = async (id) => {
+
+  try {
+
+    const { data } = await api.get(
+      '/category/get_by_id.php',
+      {
+        params: { id },
+      }
+    )
+
+    return data
+
+  } catch (error) {
+
+    console.error('Error fetching category:', error)
+
+    return {
+      status: false,
+      message: 'Failed to fetch category',
+      data: null,
+    }
+  }
+}

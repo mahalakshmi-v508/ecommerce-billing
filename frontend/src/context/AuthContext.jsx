@@ -36,6 +36,8 @@ export function AuthProvider({ children }) {
   const login = async ({ email, password }) => {
     try {
       const response = await loginUser({ email, password })
+      console.log('Login response:', response)
+      
       if (!response.status) {
         throw new Error(response.message || 'Unable to login')
       }
@@ -46,11 +48,13 @@ export function AuthProvider({ children }) {
         role: response.role,
       }
 
+      console.log('Saving auth user:', authUser)
       saveAuth(authToken, authUser)
       toast.success('Login successful! Redirecting...')
       return authUser
     } catch (error) {
       const errorMessage = error.message || 'Login failed'
+      console.error('Login error:', error)
       toast.error(errorMessage)
       throw error
     }

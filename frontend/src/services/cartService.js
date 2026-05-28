@@ -1,65 +1,177 @@
-const CART_KEY = 'ecommerce_cart'
-const WISHLIST_KEY = 'ecommerce_wishlist'
+import api from './api'
 
-export const getCartItems = () => {
-  const cart = localStorage.getItem(CART_KEY)
-  return cart ? JSON.parse(cart) : []
+/*
+|--------------------------------------------------------------------------
+| CART
+|--------------------------------------------------------------------------
+*/
+
+/* GET CART ITEMS */
+
+export const getCartItems = async (
+  user_id
+) => {
+
+  const response = await api.get(
+    `/cart/get_cart.php?user_id=${user_id}`
+  )
+
+  return response.data
 }
 
-export const getCartCount = () => {
-  const items = getCartItems()
-  return items.reduce((total, item) => total + (item.quantity || 1), 0)
+/* GET CART COUNT */
+
+export const getCartCount = async (
+  user_id
+) => {
+
+  const response =
+    await getCartItems(user_id)
+
+  const items =
+    response.data || []
+
+  return items.reduce(
+    (total, item) =>
+      total + parseInt(item.quantity || 1),
+    0
+  )
 }
 
-export const addToCart = (product) => {
-  const cart = getCartItems()
-  const existingItem = cart.find((item) => item.id === product.id)
+/* ADD TO CART */
 
-  if (existingItem) {
-    existingItem.quantity = (existingItem.quantity || 1) + (product.quantity || 1)
-  } else {
-    cart.push({ ...product, quantity: product.quantity || 1 })
-  }
+export const addToCart = async (
+  user_id,
+  product_id,
+  quantity = 1
+) => {
 
-  localStorage.setItem(CART_KEY, JSON.stringify(cart))
-  return getCartCount()
+  const response = await api.post(
+    '/cart/add_to_cart.php',
+    {
+      user_id,
+      product_id,
+      quantity,
+    }
+  )
+
+  return response.data
+}
+/* UPDATE CART QUANTITY */
+
+export const updateCartQuantity = async (
+  cart_id,
+  quantity
+) => {
+
+  const response = await api.post(
+    '/cart/update_cart_quantity.php',
+    {
+      cart_id,
+      quantity,
+    }
+  )
+
+  return response.data
+}
+/* REMOVE FROM CART */
+
+export const removeFromCart = async (
+  cart_id
+) => {
+
+  const response = await api.post(
+    '/cart/remove_from_cart.php',
+    {
+      cart_id,
+    }
+  )
+
+  return response.data
 }
 
-export const removeFromCart = (productId) => {
-  let cart = getCartItems()
-  cart = cart.filter((item) => item.id !== productId)
-  localStorage.setItem(CART_KEY, JSON.stringify(cart))
+/* CLEAR CART */
+
+export const clearCart = async (
+  user_id
+) => {
+
+  const response = await api.post(
+    '/cart/clear_cart.php',
+    {
+      user_id,
+    }
+  )
+
+  return response.data
 }
 
-export const getWishlistItems = () => {
-  const wishlist = localStorage.getItem(WISHLIST_KEY)
-  return wishlist ? JSON.parse(wishlist) : []
+/*
+|--------------------------------------------------------------------------
+| WISHLIST
+|--------------------------------------------------------------------------
+*/
+
+/* GET WISHLIST */
+
+export const getWishlistItems = async (
+  user_id
+) => {
+
+  const response = await api.get(
+    `/cart/get_wishlist.php?user_id=${user_id}`
+  )
+
+  return response.data.data || []
 }
 
-export const addToWishlist = (product) => {
-  const wishlist = getWishlistItems()
-  const exists = wishlist.find((item) => item.id === product.id)
+/* ADD TO WISHLIST */
 
-  if (!exists) {
-    wishlist.push(product)
-    localStorage.setItem(WISHLIST_KEY, JSON.stringify(wishlist))
-  }
+export const addToWishlist = async (
+  user_id,
+  product_id
+) => {
 
-  return wishlist.length
+  const response = await api.post(
+    '/cart/add_to_wishlist.php',
+    {
+      user_id,
+      product_id,
+    }
+  )
+
+  return response.data
 }
 
-export const removeFromWishlist = (productId) => {
-  let wishlist = getWishlistItems()
-  wishlist = wishlist.filter((item) => item.id !== productId)
-  localStorage.setItem(WISHLIST_KEY, JSON.stringify(wishlist))
-  return wishlist.length
+/* REMOVE FROM WISHLIST */
+
+export const removeFromWishlist = async (
+  wishlist_id
+) => {
+
+  const response = await api.post(
+    '/cart/remove_from_wishlist.php',
+    {
+      wishlist_id,
+    }
+  )
+
+  return response.data
 }
 
-export const isInWishlist = (productId) => {
-  const wishlist = getWishlistItems()
-  return wishlist.some((item) => item.id === productId)
-}
+/* CHECK WISHLIST */
 
-export const clearCart = () => {
-  localStorage.removeItem(CART_KEY)
+export const isInWishlist = async (
+  user_id,
+  product_id
+) => {
+
+  const items =
+    await getWishlistItems(user_id)
+
+  return items.some(
+    (item) =>
+      parseInt(item.product_id) ===
+      parseInt(product_id)
+  )
 }

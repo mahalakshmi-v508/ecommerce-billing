@@ -14,7 +14,7 @@ include __DIR__ . '/../../config/db.php';
 
 $company_id = $_GET['company_id'] ?? 0;
 
-if (!$company_id) {
+if ($company_id === '' || $company_id === null) {
 
     echo json_encode([
         "status" => false,

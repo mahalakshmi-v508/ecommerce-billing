@@ -5,6 +5,7 @@ import Footer from './components/Footer.jsx'
 import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
 import Home from './pages/Home.jsx'
+import Categories from './pages/Categories.jsx'
 import Products from './pages/Products.jsx'
 import ProductDetails from './pages/ProductDetails.jsx'
 import RoleDashboard from './pages/RoleDashboard.jsx'
@@ -27,7 +28,15 @@ function App() {
             path="/"
             element={
               <ProtectedRoute allowedRoles={['user']}>
-                <Home />
+                <Categories />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/categories"
+            element={
+              <ProtectedRoute allowedRoles={['user']}>
+                <Categories />
               </ProtectedRoute>
             }
           />
@@ -35,15 +44,7 @@ function App() {
             path="/products"
             element={
               <ProtectedRoute allowedRoles={['user']}>
-                <Products />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/category/:categoryId"
-            element={
-              <ProtectedRoute allowedRoles={['user']}>
-                <Products />
+                <Categories />
               </ProtectedRoute>
             }
           />

@@ -3,7 +3,7 @@
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Access-Control-Allow-Methods: POST, OPTIONS");
+header("Access-Control-Allow-Methods: GET, OPTIONS");
 
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     http_response_code(200);
@@ -12,21 +12,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 
 include __DIR__ . '/../../config/db.php';
 
-$company_id = $_GET['company_id'] ?? 0;
-
-if (!$company_id) {
-    echo json_encode([
-        "status"=>false,
-        "message"=>"company_id required"
-    ]);
-    exit;
-}
+/*
+|--------------------------------------------------------------------------
+| GET ALL CATEGORIES
+|--------------------------------------------------------------------------
+*/
 
 $result = mysqli_query($conn, "
-SELECT * FROM categories 
-WHERE company_id='$company_id'
-AND is_deleted=0
-
+SELECT * FROM categories
+WHERE is_deleted = 0
+ORDER BY id DESC
 ");
 
 $data = [];
@@ -36,7 +31,8 @@ while ($row = mysqli_fetch_assoc($result)) {
 }
 
 echo json_encode([
-    "status"=>true,
-    "data"=>$data
+    "status" => true,
+    "data" => $data
 ]);
+
 ?>

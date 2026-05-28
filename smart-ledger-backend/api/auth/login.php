@@ -42,9 +42,11 @@ $user = mysqli_fetch_assoc($user_q);
 
 if ($user && password_verify($password, $user['password'])) {
 
+    $userRole = !empty($user['role']) ? $user['role'] : 'user';
+
     echo json_encode([
         "status" => true,
-        "role" => $user['role'],
+        "role" => $userRole,
         "data" => [
             "id" => $user['id'],
             "name" => $user['name'],
