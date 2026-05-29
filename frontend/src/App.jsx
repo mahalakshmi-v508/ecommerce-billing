@@ -14,6 +14,7 @@ import Wishlist from './pages/Wishlist.jsx'
 import Orders from './pages/Orders.jsx'
 import Profile from './pages/Profile.jsx'
 import ProtectedRoute from './routes/ProtectedRoute.jsx'
+import PaymentPage from './pages/PaymentPage.jsx'
 
 function App() {
   return (
@@ -64,6 +65,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/wishlist"
             element={
@@ -104,6 +106,14 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+  path="/payment"
+  element={
+    <ProtectedRoute>
+      <PaymentPage />
+    </ProtectedRoute>
+  }
+/>
           <Route
             path="/cashier/dashboard"
             element={

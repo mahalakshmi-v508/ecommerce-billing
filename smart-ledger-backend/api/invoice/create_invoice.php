@@ -90,15 +90,9 @@ if ($payment_type == "credit") {
 }
 
 /* ── DUE DATE (CUSTOMER CREDIT DAYS) ── */
-
 $due_date = NULL;
-
 if ($payment_type == "credit") {
-
     $credit_days = 0;
-
-    // 🔥 GET CUSTOMER CREDIT DAYS
-
     $creditQry = $conn->query("
         SELECT credit_days
         FROM customers
@@ -108,29 +102,17 @@ if ($payment_type == "credit") {
     ");
 
     if ($creditQry && $creditQry->num_rows > 0) {
-
         $creditData = $creditQry->fetch_assoc();
-
         $credit_days = intval($creditData['credit_days']);
-
     }
-
-    // 🔥 DEFAULT 0 DAYS → TODAY
 
     if ($credit_days > 0) {
-
-        $due_date = date(
-            'Y-m-d',
-            strtotime("+$credit_days days")
-        );
-
+        $due_date = date('Y-m-d', strtotime("+$credit_days days"));
     } else {
-
         $due_date = date('Y-m-d');
-
     }
-
 }
+
 /* ── STOCK CHECK ── */
 foreach ($products as $item) {
     $product_id = intval($item['product_id']);
@@ -138,14 +120,17 @@ foreach ($products as $item) {
 
     $check = $conn->query("
         SELECT stock FROM products
-        WHERE id='$product_id' AND company_id='$company_id' AND is_deleted=0
+        WHERE id='$product_id' AND is_deleted=0
     ");
-    if ($check->num_rows == 0) {
-        echo json_encode(["status" => false, "message" => "Invalid product"]);
+    
+    if (!$check || $check->num_rows == 0) {
+        echo json_encode(["status" => false, "message" => "Invalid product ID: " . $product_id]);
         exit;
     }
-    if (floatval($check->fetch_assoc()['stock']) < $qty) {
-        echo json_encode(["status" => false, "message" => "Stock not enough"]);
+    
+    $row = $check->fetch_assoc();
+    if (floatval($row['stock']) < $qty) {
+        echo json_encode(["status" => false, "message" => "Stock not enough for product ID: " . $product_id]);
         exit;
     }
 }
@@ -172,7 +157,7 @@ INSERT INTO invoices (
 )";
 
 if (!$conn->query($sql)) {
-    echo json_encode(["status" => false, "message" => $conn->error]);
+    echo json_encode(["status" => false, "message" => "Invoice insert failed: " . $conn->error]);
     exit;
 }
 
@@ -206,8 +191,6 @@ foreach ($products as $item) {
 
 /* ── UPDATE CUSTOMER: advance_balance + loyalty_points + pending_amount ── */
 if ($customer_id > 0) {
-
-    /* ── advance_balance & loyalty (non-credit only) ── */
     if ($payment_type != "credit") {
         $conn->query("
             UPDATE customers
@@ -225,21 +208,13 @@ if ($customer_id > 0) {
         }
     }
 
-    /* ── PENDING AMOUNT: recalculate fresh from all invoices ──
-       Sum every balance_amount that is still not_paid or partial.
-       This is always recalculated so it stays accurate even after
-       payment edits or partial payments elsewhere.
-    ── */
-  /* ── UPDATE CUSTOMER PENDING AMOUNT ── */
-
-$total_pending = $balance_amount;
-
-$conn->query("
-    UPDATE customers
-    SET pending_amount = '$total_pending'
-    WHERE id = '$customer_id'
-    AND company_id = '$company_id'
-");
+    $total_pending = $balance_amount;
+    $conn->query("
+        UPDATE customers
+        SET pending_amount = '$total_pending'
+        WHERE id = '$customer_id'
+        AND company_id = '$company_id'
+    ");
 }
 
 /* ── FETCH LAST INVOICE DETAILS TO RETURN IN RESPONSE ── */
