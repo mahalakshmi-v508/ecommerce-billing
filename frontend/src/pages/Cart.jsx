@@ -67,44 +67,43 @@ export default function Cart() {
   |--------------------------------------------------------------------------
   */
 
-  const handleQuantity = async (
-    cart_id,
-    currentQty,
-    type
-  ) => {
+const handleQuantity = async (
+  cart_id,
+  currentQty,
+  type
+) => {
 
-    let newQty =
-      type === 'increase'
-        ? currentQty + 1
-        : currentQty - 1
+  let newQty =
+    type === 'increase'
+      ? currentQty + 1
+      : currentQty - 1
 
-    /* STOP BELOW 1 */
-
-    if(newQty < 1){
-
-      return
-    }
-
-    try {
-
-      const response =
-        await updateCartQuantity(
-          cart_id,
-          newQty
-        )
-
-      console.log(response)
-
-      if(response.status){
-
-        loadCart()
-      }
-
-    } catch(error){
-
-      console.log(error)
-    }
+  if(newQty < 1){
+    return
   }
+
+  try {
+
+    const response =
+      await updateCartQuantity(
+        cart_id,
+        newQty
+      )
+
+    if(response.status){
+
+      loadCart()
+
+      window.dispatchEvent(
+        new Event('cartUpdated')
+      )
+    }
+
+  } catch(error){
+
+    console.log(error)
+  }
+}
 
   /*
   |--------------------------------------------------------------------------
@@ -112,27 +111,31 @@ export default function Cart() {
   |--------------------------------------------------------------------------
   */
 
-  const handleRemove = async (
-    cart_id
-  ) => {
+const handleRemove = async (
+  cart_id
+) => {
 
-    try {
+  try {
 
-      const response =
-        await removeFromCart(
-          cart_id
-        )
+    const response =
+      await removeFromCart(
+        cart_id
+      )
 
-      if(response.status){
+    if(response.status){
 
-        loadCart()
-      }
+      loadCart()
 
-    } catch(error){
-
-      console.log(error)
+      window.dispatchEvent(
+        new Event('cartUpdated')
+      )
     }
+
+  } catch(error){
+
+    console.log(error)
   }
+}
 
   /*
   |--------------------------------------------------------------------------

@@ -353,14 +353,14 @@ export default function Header() {
 
               <nav className="flex items-center gap-4">
 
-                <Link
+                {/* <Link
                   to="/products"
                   className="text-sm font-semibold text-slate-700 hover:text-indigo-600"
                 >
 
                   Products
 
-                </Link>
+                </Link> */}
 
               </nav>
 
