@@ -17,12 +17,23 @@ export default function Cart() {
 
   /*
   |------------------------------------------------------------------
-  | LOAD CART
+  | LOAD CART WITH GLOBAL SYNC
   |------------------------------------------------------------------
   */
   useEffect(() => {
     if (user?.id) {
       loadCart()
+    }
+
+    // FIXED: Global listener added inside the Cart component context directly
+    const handleCartRefresh = () => {
+      if (user?.id) loadCart();
+    }
+
+    window.addEventListener('cartUpdated', handleCartRefresh)
+    
+    return () => {
+      window.removeEventListener('cartUpdated', handleCartRefresh)
     }
   }, [user])
 
@@ -32,23 +43,17 @@ export default function Cart() {
       console.log('Cart Response:', response)
 
       if (response.status) {
-        /*
-        |--------------------------------------------------------------
-        | FIXES APPLIED HERE
-        |--------------------------------------------------------------
-        | database fallback structural checking
-        */
         const updatedCart = (response.data || []).map((item) => {
-          // Real database product ID context verification
           const actualProductId = item.id || item.product_id;
-          
           return {
             ...item,
             product_id: actualProductId
           }
         })
-
         setCartItems(updatedCart)
+      } else {
+        // Handle database return exception empty array states gracefully
+        setCartItems([])
       }
     } catch (error) {
       console.log(error)
@@ -124,12 +129,10 @@ export default function Cart() {
   return (
     <div className="min-h-screen bg-slate-100 p-6">
       <div className="mx-auto max-w-5xl">
-        {/* TITLE */}
         <h1 className="mb-8 text-4xl font-extrabold text-slate-800">
           Shopping Cart
         </h1>
 
-        {/* EMPTY */}
         {cartItems.length === 0 ? (
           <div className="rounded-2xl bg-white p-12 text-center shadow-sm">
             <h2 className="text-2xl font-bold text-slate-700">
@@ -141,16 +144,13 @@ export default function Cart() {
           </div>
         ) : (
           <div className="space-y-6">
-            {/* ITEMS */}
             {cartItems.map((item, index) => {
-              // Fallback element tracking
               const uniqueKey = item.product_id || item.id || index;
               return (
                 <div
                   key={uniqueKey}
                   className="flex items-center justify-between rounded-2xl bg-white p-6 shadow-sm"
                 >
-                  {/* LEFT */}
                   <div>
                     <h2 className="text-2xl font-bold text-slate-800">
                       {item.product_name}
@@ -159,9 +159,7 @@ export default function Cart() {
                       ₹{parseFloat(item.price || 0).toFixed(2)}
                     </p>
 
-                    {/* QUANTITY */}
                     <div className="mt-5 flex items-center gap-4">
-                      {/* DECREASE */}
                       <button
                         onClick={() =>
                           handleQuantity(
@@ -175,12 +173,10 @@ export default function Cart() {
                         -
                       </button>
 
-                      {/* QTY */}
                       <span className="text-2xl font-bold text-slate-700">
                         {item.quantity}
                       </span>
 
-                      {/* INCREASE */}
                       <button
                         onClick={() =>
                           handleQuantity(
@@ -196,13 +192,11 @@ export default function Cart() {
                     </div>
                   </div>
 
-                  {/* RIGHT */}
                   <div className="text-right">
                     <p className="text-3xl font-extrabold text-indigo-600">
                       ₹{(parseFloat(item.price || 0) * parseInt(item.quantity || 0)).toFixed(2)}
                     </p>
 
-                    {/* REMOVE */}
                     <button
                       onClick={() => handleRemove(item.id)}
                       className="mt-5 rounded-xl bg-slate-900 px-6 py-3 text-sm font-semibold text-white hover:bg-slate-700"
@@ -214,7 +208,6 @@ export default function Cart() {
               );
             })}
 
-            {/* TOTAL */}
             <div className="rounded-3xl bg-gradient-to-r from-indigo-600 to-violet-600 p-8 text-white shadow-xl">
               <div className="flex items-center justify-between">
                 <h2 className="text-4xl font-bold">Total</h2>
@@ -223,7 +216,6 @@ export default function Cart() {
                 </span>
               </div>
 
-              {/* CHECKOUT */}
               <button
                 onClick={() =>
                   navigate('/payment', {

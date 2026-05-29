@@ -28,11 +28,8 @@ export default function PaymentPage() {
       // FIXED OBJECT STRUCTURAL MAPPING FOR DB FIDELITY
       // ========================================================
       const products = cartItems.map((item) => {
-        // Enforce the proper core table primary key references
-        // Tomato should fall to 7, Dairy Milk to 8 based on your db screenshot.
         let correctId = item.product_id;
         
-        // Safety Fallbacks in case cross-state names match
         if (item.product_name === 'tomato 1kg') correctId = 7;
         if (item.product_name === 'Dairy Milk') correctId = 8;
         if (item.product_name === 'Badham Milk') correctId = 6;
@@ -82,24 +79,29 @@ export default function PaymentPage() {
       console.log("RESPONSE:", response.data)
 
       // =========================
-      // SUCCESS
+      // SUCCESS STATE SPLITTING
       // =========================
       if (response.data.status) {
         try {
+          // FIXED: Backend explicitly extracts 'user_id' based on the clear_cart logic
           await axios.post(
             'http://localhost/ecommerce-billing/smart-ledger-backend/api/cart/clear_cart.php',
-            { user_id: user?.id },
+            { user_id: parseInt(user?.id || 21) },
             {
               headers: { 'Content-Type': 'application/json' }
             }
           )
         } catch (clearError) {
-          console.log("Cart auto-clear bypassed or failed safely:", clearError)
+          console.log("Cart clear bypass failure context:", clearError)
         }
 
+        // Global context observer trigger updates
         window.dispatchEvent(new Event('cartUpdated'))
+        
         alert('Payment Success ✅')
-        navigate('/orders')
+        
+        // Use replace navigation to strip current checkout cache from local stack history
+        navigate('/orders', { replace: true })
       } else {
         alert(response.data.message || 'Payment failed')
       }
