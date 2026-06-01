@@ -1,6 +1,22 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { updateProfile } from '../services/profileService'
+import { 
+  User, 
+  Mail, 
+  Lock, 
+  Shield, 
+  Fingerprint,
+  Save,
+  X,
+  Edit2,
+  CheckCircle,
+  AlertCircle,
+  Smartphone,
+  Calendar,
+  Award
+} from 'lucide-react'
+import toast from 'react-hot-toast'
 
 export default function Profile() {
   const { user, setUser } = useAuth()
@@ -8,29 +24,38 @@ export default function Profile() {
   const [email, setEmail] = useState(user?.email || '')
   const [password, setPassword] = useState('')
   const [editing, setEditing] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const handleUpdate = async () => {
+    if (!name.trim() || !email.trim()) {
+      toast.error('Name and email are required')
+      return
+    }
+
+    setLoading(true)
     try {
       const response = await updateProfile({
         id: user.id,
         name,
         email,
-        password
+        password: password || undefined
       })
 
       if (response.status) {
         const updatedUser = { ...user, name, email }
         localStorage.setItem('auth_user', JSON.stringify(updatedUser))
         setUser(updatedUser)
-        alert('Profile Updated Successfully ✨')
+        toast.success('Profile Updated Successfully! ✨')
         setEditing(false)
         setPassword('')
       } else {
-        alert(response.message)
+        toast.error(response.message || 'Failed to update profile')
       }
     } catch (error) {
       console.log(error)
-      alert('Something went wrong')
+      toast.error('Something went wrong')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -41,141 +66,252 @@ export default function Profile() {
     setEditing(false)
   }
 
+  // Member since (mock data - replace with actual from backend)
+  const memberSince = new Date().getFullYear()
+  const orderCount = 24 // Replace with actual data
+  const reviewCount = 12 // Replace with actual data
+
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 py-12 px-4 sm:px-6 lg:px-8 font-sans antialiased relative">
-      {/* Subtle structural top light beam matching your brand */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[250px] bg-gradient-to-b from-blue-500/10 via-transparent to-transparent blur-3xl pointer-events-none" />
-
-      <div className="mx-auto max-w-4xl space-y-6 relative z-10">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 py-8 px-4">
+      <div className="max-w-6xl mx-auto">
         
-        {/* PREMIUM LIGHT HEADER CARD */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
-            <div className="flex items-center gap-6">
-              {/* Profile Avatar Frame matching SmartLedger Branding */}
-              <div className="relative shrink-0">
-                <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-blue-600 border border-blue-700 text-2xl font-bold text-white shadow-md shadow-blue-200">
-                  {user?.name?.charAt(0).toUpperCase() || 'U'}
-                </div>
-                <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-emerald-500 rounded-full border-4 border-white" />
-              </div>
-
-              <div className="space-y-1">
-                <h1 className="text-2xl font-bold text-slate-900 tracking-tight">{user?.name || 'User Profile'}</h1>
-                <p className="text-xs text-slate-500 font-medium tracking-wide">{user?.email || 'Manage account overview and settings'}</p>
-              </div>
-            </div>
-            
-            {!editing && (
-              <button
-                onClick={() => setEditing(true)}
-                className="w-full sm:w-auto px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200/60 transition-all duration-150"
-              >
-                Edit Profile
-              </button>
-            )}
+        {/* Header Section */}
+        <div className="mb-8 text-center">
+          <div className="inline-flex items-center gap-3 bg-white/80 backdrop-blur-sm rounded-full px-6 py-3 shadow-lg mb-4">
+            <User className="w-8 h-8 text-purple-600" />
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              My Profile
+            </h1>
           </div>
+          <p className="text-gray-600 mt-2">Manage your account information and preferences</p>
         </div>
 
-        {/* BRIGHT BENTO GRID FORM */}
-        <div className="grid gap-5 md:grid-cols-6">
+        <div className="grid lg:grid-cols-3 gap-8">
           
-          {/* FULL NAME */}
-          <div className="md:col-span-3 rounded-2xl border border-slate-200 bg-white p-5 focus-within:border-blue-500/50 focus-within:ring-4 focus-within:ring-blue-500/5 transition-all duration-150 shadow-sm">
-            <label className="block text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-2">
-              Full Name
-            </label>
-            <input
-              type="text"
-              value={name}
-              disabled={!editing}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Your Name"
-              className="w-full bg-slate-50/50 disabled:bg-transparent text-slate-800 font-medium border border-slate-200 disabled:border-transparent rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 transition-all duration-150"
-            />
-          </div>
-
-          {/* EMAIL ADDRESS */}
-          <div className="md:col-span-3 rounded-2xl border border-slate-200 bg-white p-5 focus-within:border-blue-500/50 focus-within:ring-4 focus-within:ring-blue-500/5 transition-all duration-150 shadow-sm">
-            <label className="block text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-2">
-              Email Address
-            </label>
-            <input
-              type="email"
-              value={email}
-              disabled={!editing}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@domain.com"
-              className="w-full bg-slate-50/50 disabled:bg-transparent text-slate-800 font-medium border border-slate-200 disabled:border-transparent rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 transition-all duration-150"
-            />
-          </div>
-
-          {/* NEW PASSWORD */}
-          <div className="md:col-span-4 rounded-2xl border border-slate-200 bg-white p-5 focus-within:border-blue-500/50 focus-within:ring-4 focus-within:ring-blue-500/5 transition-all duration-150 shadow-sm">
-            <label className="block text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-2">
-              New Password
-            </label>
-            <input
-              type="password"
-              value={password}
-              disabled={!editing}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder={editing ? "Enter secure password" : "••••••••••••"}
-              className="w-full bg-slate-50/50 disabled:bg-transparent text-slate-800 border border-slate-200 disabled:border-transparent rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 transition-all duration-150"
-            />
-            {editing && (
-              <p className="text-[10px] text-slate-400 mt-2">Leave blank to retain current security credentials.</p>
-            )}
-          </div>
-
-          {/* SYSTEM ROLE */}
-          <div className="md:col-span-2 rounded-2xl border border-slate-200 bg-white p-5 flex flex-col justify-between shadow-sm">
-            <div>
-              <label className="block text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-2">
-                System Role
-              </label>
-              <span className="inline-flex items-center px-2.5 py-1 bg-slate-100 border border-slate-200 text-slate-600 text-[11px] font-semibold rounded-lg uppercase tracking-wider">
-                {user?.role || 'User'}
-              </span>
+          {/* Left Column - Profile Card & Stats */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Profile Card */}
+            <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+              <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-6 text-center">
+                <div className="relative inline-block">
+                  <div className="w-28 h-28 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center border-4 border-white shadow-lg">
+                    <span className="text-5xl font-bold text-white">
+                      {user?.name?.charAt(0).toUpperCase() || 'U'}
+                    </span>
+                  </div>
+                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white" />
+                </div>
+                <h2 className="text-xl font-bold text-white mt-4">{user?.name || 'User'}</h2>
+                <p className="text-purple-100 text-sm mt-1">{user?.role || 'Customer'}</p>
+              </div>
+              
+              <div className="p-6 space-y-4">
+                <div className="flex items-center gap-3 text-gray-600">
+                  <Mail className="w-4 h-4 text-purple-600" />
+                  <span className="text-sm">{user?.email}</span>
+                </div>
+                <div className="flex items-center gap-3 text-gray-600">
+                  <Shield className="w-4 h-4 text-purple-600" />
+                  <span className="text-sm capitalize">Role: {user?.role || 'Customer'}</span>
+                </div>
+                <div className="flex items-center gap-3 text-gray-600">
+                  <Calendar className="w-4 h-4 text-purple-600" />
+                  <span className="text-sm">Member since {memberSince}</span>
+                </div>
+                <div className="pt-4 border-t border-gray-100">
+                  <div className="flex justify-between text-center">
+                    <div>
+                      <p className="text-2xl font-bold text-purple-600">{orderCount}</p>
+                      <p className="text-xs text-gray-500">Orders</p>
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-pink-600">{reviewCount}</p>
+                      <p className="text-xs text-gray-500">Reviews</p>
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-orange-600">100%</p>
+                      <p className="text-xs text-gray-500">Rating</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <p className="text-[10px] text-slate-400 mt-2">System access rules apply.</p>
-          </div>
 
-          {/* ACCESS ID SPEC */}
-          <div className="md:col-span-6 rounded-xl border border-slate-200 bg-slate-100/50 p-4 flex items-center justify-between gap-3 text-[11px]">
-            <div className="flex items-center gap-2">
-              <span className="font-bold tracking-wider text-slate-400 uppercase text-[9px]">Reference ID:</span>
-              <span className="font-mono text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200 shadow-2xs">{user?.id || 'sys_null_id'}</span>
+            {/* Account Status Card */}
+            <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl p-6 shadow-lg">
+              <div className="flex items-center gap-3 mb-3">
+                <CheckCircle className="w-6 h-6 text-green-600" />
+                <h3 className="font-bold text-gray-800">Account Status</h3>
+              </div>
+              <p className="text-sm text-gray-600 mb-3">
+                Your account is verified and active
+              </p>
+              <div className="flex items-center gap-2 text-xs text-gray-500">
+                <Fingerprint className="w-3 h-3" />
+                <span>2FA Available</span>
+              </div>
             </div>
-            <span className="text-[9px] text-slate-400 font-bold tracking-wider uppercase">READ-ONLY</span>
           </div>
 
+          {/* Right Column - Edit Form */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-2xl shadow-xl p-8">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                  <User className="w-6 h-6 text-purple-600" />
+                  Personal Information
+                </h2>
+                {!editing && (
+                  <button
+                    onClick={() => setEditing(true)}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm font-semibold hover:shadow-lg transition-all hover:scale-105"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                    Edit Profile
+                  </button>
+                )}
+              </div>
+
+              <div className="space-y-6">
+                {/* Full Name */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <User className="w-4 h-4 inline mr-2 text-purple-600" />
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    value={name}
+                    disabled={!editing}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Your full name"
+                    className={`w-full px-4 py-3 rounded-xl border transition-all duration-200 ${
+                      editing 
+                        ? 'border-purple-300 focus:border-purple-600 focus:ring-2 focus:ring-purple-200 bg-white' 
+                        : 'border-gray-200 bg-gray-50 text-gray-600'
+                    } focus:outline-none`}
+                  />
+                </div>
+
+                {/* Email Address */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <Mail className="w-4 h-4 inline mr-2 text-purple-600" />
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    value={email}
+                    disabled={!editing}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="your@email.com"
+                    className={`w-full px-4 py-3 rounded-xl border transition-all duration-200 ${
+                      editing 
+                        ? 'border-purple-300 focus:border-purple-600 focus:ring-2 focus:ring-purple-200 bg-white' 
+                        : 'border-gray-200 bg-gray-50 text-gray-600'
+                    } focus:outline-none`}
+                  />
+                </div>
+
+                {/* Password */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <Lock className="w-4 h-4 inline mr-2 text-purple-600" />
+                    {editing ? 'New Password' : 'Password'}
+                  </label>
+                  <input
+                    type="password"
+                    value={password}
+                    disabled={!editing}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder={editing ? "Enter new password (optional)" : "••••••••"}
+                    className={`w-full px-4 py-3 rounded-xl border transition-all duration-200 ${
+                      editing 
+                        ? 'border-purple-300 focus:border-purple-600 focus:ring-2 focus:ring-purple-200 bg-white' 
+                        : 'border-gray-200 bg-gray-50 text-gray-600'
+                    } focus:outline-none`}
+                  />
+                  {editing && (
+                    <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" />
+                      Leave blank to keep current password
+                    </p>
+                  )}
+                </div>
+
+                {/* User ID (Read-only) */}
+                <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4">
+                  <label className="block text-xs font-semibold text-gray-500 uppercase mb-2">
+                    <Fingerprint className="w-3 h-3 inline mr-1" />
+                    User ID
+                  </label>
+                  <code className="text-sm font-mono text-purple-700">
+                    {user?.id || 'user_123456'}
+                  </code>
+                  <p className="text-xs text-gray-400 mt-2">This identifier is unique and cannot be changed</p>
+                </div>
+
+                {/* Loyalty Badge */}
+                <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl">
+                  <Award className="w-10 h-10 text-yellow-600" />
+                  <div>
+                    <p className="font-semibold text-gray-800">Gold Member</p>
+                    <p className="text-xs text-gray-600">You've earned 2,500 loyalty points</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons when editing */}
+              {editing && (
+                <div className="flex gap-3 mt-8 pt-6 border-t border-gray-100">
+                  <button
+                    onClick={handleCancel}
+                    disabled={loading}
+                    className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition-all disabled:opacity-50"
+                  >
+                    <X className="w-4 h-4" />
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleUpdate}
+                    disabled={loading}
+                    className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold hover:shadow-lg transition-all hover:scale-105 disabled:opacity-50"
+                  >
+                    {loading ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                    ) : (
+                      <Save className="w-4 h-4" />
+                    )}
+                    Save Changes
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Security Tips Card */}
+            <div className="mt-6 bg-white rounded-2xl shadow-lg p-6">
+              <h3 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
+                <Shield className="w-5 h-5 text-purple-600" />
+                Security Tips
+              </h3>
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  Use a strong, unique password
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  Enable two-factor authentication
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  Never share your login credentials
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
-
-        {/* FLOATING ACTION INTERACTION BAR */}
-        {editing && (
-          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-4xl bg-white/95 border border-slate-200 p-3.5 rounded-xl shadow-xl backdrop-blur-md flex items-center justify-between gap-4 z-50">
-            <div className="flex items-center gap-2 pl-1 text-slate-500 text-xs font-medium tracking-wide hidden sm:flex">
-              <span className="h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse" />
-              Unsaved modifications pending validation
-            </div>
-            <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-              <button
-                onClick={handleCancel}
-                className="w-1/2 sm:w-auto px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-600 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl transition-all duration-150"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleUpdate}
-                className="w-1/2 sm:w-auto px-5 py-2 text-xs font-bold uppercase tracking-wider text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-md shadow-blue-200 transition-all duration-150"
-              >
-                Save Changes
-              </button>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   )
-}
+} 
