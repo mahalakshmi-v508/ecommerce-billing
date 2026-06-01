@@ -50,39 +50,28 @@ export default function PaymentPage() {
       // =========================
       // PAYLOAD
       // =========================
-      const payload = {
-        company_id: 1,
+const payload = {
+  company_id: parseInt(user?.company_id || 0),
+  customer_id: parseInt(user?.id || 21),
 
-        customer_id: parseInt(user?.id || 21),
+  customer_name: user?.name || 'Guest',
+  customer_phone: user?.phone || '9876543210',
 
-        customer_name: user?.name || 'Guest',
+  cashier_id: parseInt(user?.cashier_id || 0),
 
-        customer_phone: user?.phone || '9876543210',
+  products,
+  sub_total: totalAmount,
+  gst_total: 0,
+  total_amount: totalAmount,
 
-        cashier_id: 1,
+  payment_method: paymentMethod,
 
-        products,
+  payment_type: paymentMethod === 'credit' ? 'credit' : 'cash',
 
-        sub_total: totalAmount,
+  gst_type: 'without_gst',
 
-        gst_total: 0,
-
-        total_amount: totalAmount,
-
-        payment_method: paymentMethod,
-
-        payment_type:
-          paymentMethod === 'credit'
-            ? 'credit'
-            : 'cash',
-
-        gst_type: 'without_gst',
-
-        paid_amount:
-          paymentMethod === 'credit'
-            ? 0
-            : totalAmount,
-      }
+  paid_amount: paymentMethod === 'credit' ? 0 : totalAmount,
+}
 
       console.log('PAYLOAD:', payload)
 
