@@ -19,6 +19,8 @@ export default function PaymentPage() {
   // =========================
   const totalAmount = location.state?.totalAmount || 0
   const cartItems = location.state?.cartItems || []
+  const companyId = location.state?.company_id ?? cartItems[0]?.company_id ?? parseInt(user?.company_id || 0)
+  const cashierId = location.state?.cashier_id ?? parseInt(user?.cashier_id ?? user?.id ?? 0)
 
   // =========================
   // PAYMENT HANDLER
@@ -30,34 +32,24 @@ export default function PaymentPage() {
       // =========================
       // PRODUCT MAPPING
       // =========================
-      const products = cartItems.map((item) => {
-        let correctId = item.product_id
-
-        if (item.product_name === 'tomato 1kg') correctId = 7
-        if (item.product_name === 'Dairy Milk') correctId = 8
-        if (item.product_name === 'Badham Milk') correctId = 6
-        if (item.product_name === 'honey cake') correctId = 5
-        if (item.product_name === 'Demo Product') correctId = 9
-
-        return {
-          product_id: parseInt(correctId),
-          qty: parseInt(item.quantity || item.qty || 1),
-        }
-      })
+      const products = cartItems.map((item) => ({
+        product_id: parseInt(item.product_id || item.id || 0),
+        qty: parseInt(item.quantity || item.qty || 1),
+      }))
 
       console.log('VALIDATED PRODUCTS:', products)
 
       // =========================
       // PAYLOAD
       // =========================
-const payload = {
-  company_id: parseInt(user?.company_id || 0),
-  customer_id: parseInt(user?.id || 21),
+            const payload = {
+        company_id: companyId,
+        customer_id: parseInt(user?.id || 21),
 
-  customer_name: user?.name || 'Guest',
-  customer_phone: user?.phone || '9876543210',
+        customer_name: user?.name || 'Guest',
+        customer_phone: user?.phone || '9876543210',
 
-  cashier_id: parseInt(user?.cashier_id || 0),
+        cashier_id: cashierId,
 
   products,
   sub_total: totalAmount,

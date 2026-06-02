@@ -49,13 +49,11 @@ export default function Cart() {
       console.log('Cart Response:', response)
 
       if (response.status) {
-        const updatedCart = (response.data || []).map((item) => {
-          const actualProductId = item.id || item.product_id;
-          return {
-            ...item,
-            product_id: actualProductId
-          }
-        })
+        const updatedCart = (response.data || []).map((item) => ({
+          ...item,
+          product_id: item.product_id ?? item.id,
+          company_id: item.company_id ?? user?.company_id ?? 0,
+        }))
         setCartItems(updatedCart)
       } else {
         setCartItems([])
@@ -305,8 +303,11 @@ export default function Cart() {
                             product_id: item.product_id,
                             product_name: item.product_name,
                             price: item.price,
-                            quantity: item.quantity
-                          }))
+                            quantity: item.quantity,
+                            company_id: item.company_id,
+                          })),
+                          company_id: cartItems[0]?.company_id ?? user?.company_id ?? 0,
+                          cashier_id: user?.cashier_id ?? user?.id ?? 0,
                         }
                       })
                     }
