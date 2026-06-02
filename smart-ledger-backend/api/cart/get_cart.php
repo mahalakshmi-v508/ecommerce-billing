@@ -18,6 +18,8 @@ $query = mysqli_query($conn,"
 SELECT 
 cart.id,
 cart.quantity,
+products.id AS product_id,
+products.company_id AS company_id,
 products.product_name,
 products.price,
 products.stock
