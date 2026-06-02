@@ -204,7 +204,7 @@ export default function Categories() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 py-8 px-4">
+        <div className="min-h-screen bg-white py-8 px-4">
             <div className="max-w-7xl mx-auto">
                 {/* Header Section */}
                 <div className="mb-8 text-center">
