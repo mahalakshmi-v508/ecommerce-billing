@@ -78,14 +78,14 @@ export default function Footer() {
   ]
 
   return (
-    <footer className="bg-slate-950 text-slate-100">
+    <footer className="bg-gradient-to-br from-indigo-50 via-cyan-50 to-white text-slate-900">
       {/* Newsletter Section */}
-      <div className="border-b border-slate-800 bg-gradient-to-r from-indigo-900/30 to-cyan-900/30 px-4 py-12 sm:px-6 lg:px-8">
+      <div className="border-b border-indigo-100 bg-gradient-to-r from-indigo-50 via-cyan-50 to-white px-4 py-12 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
             <div>
-              <h3 className="text-2xl font-bold tracking-tight text-white">Subscribe to our newsletter</h3>
-              <p className="mt-2 text-sm text-slate-300">
+              <h3 className="text-2xl font-bold tracking-tight text-slate-900">Subscribe to our newsletter</h3>
+              <p className="mt-2 text-sm text-slate-600">
                 Get the latest updates, exclusive offers, and insights delivered to your inbox.
               </p>
             </div>
@@ -95,7 +95,7 @@ export default function Footer() {
                 placeholder="Enter your email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                className="flex-1 rounded-lg border border-slate-700 bg-slate-900/50 px-4 py-3 text-sm text-white outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+                className="flex-1 rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
                 required
               />
               <button
@@ -137,13 +137,13 @@ export default function Footer() {
 
             {/* Quick Links */}
             <div>
-              <h4 className="mb-4 text-sm font-semibold uppercase tracking-[0.1em] text-white">Quick Links</h4>
+              <h4 className="mb-4 text-sm font-semibold uppercase tracking-[0.1em] text-slate-900">Quick Links</h4>
               <ul className="space-y-2">
                 {quickLinks.map((link) => (
                   <li key={link.href}>
                     <a
                       href={link.href}
-                      className="text-sm text-slate-400 hover:text-indigo-400 transition"
+                      className="text-sm text-slate-600 hover:text-indigo-600 transition"
                     >
                       {link.label}
                     </a>
@@ -154,14 +154,14 @@ export default function Footer() {
 
             {/* Categories */}
             <div>
-              <h4 className="mb-4 text-sm font-semibold uppercase tracking-[0.1em] text-white">Categories</h4>
+              <h4 className="mb-4 text-sm font-semibold uppercase tracking-[0.1em] text-slate-900">Categories</h4>
               <ul className="space-y-2">
                 {categories.length > 0 ? (
                   categories.map((cat) => (
                     <li key={cat.id}>
                       <Link
                         to={`/category/${cat.id}`}
-                        className="text-sm text-slate-400 hover:text-indigo-400 transition"
+                        className="text-sm text-slate-600 hover:text-indigo-600 transition"
                       >
                         {cat.name}
                       </Link>
@@ -175,13 +175,13 @@ export default function Footer() {
 
             {/* Policies */}
             <div>
-              <h4 className="mb-4 text-sm font-semibold uppercase tracking-[0.1em] text-white">Policies</h4>
+              <h4 className="mb-4 text-sm font-semibold uppercase tracking-[0.1em] text-slate-900">Policies</h4>
               <ul className="space-y-2">
                 {policyLinks.map((link) => (
                   <li key={link.href}>
                     <a
                       href={link.href}
-                      className="text-sm text-slate-400 hover:text-indigo-400 transition"
+                      className="text-sm text-slate-600 hover:text-indigo-600 transition"
                     >
                       {link.label}
                     </a>
@@ -192,7 +192,7 @@ export default function Footer() {
           </div>
 
           {/* Divider */}
-          <div className="my-8 border-t border-slate-800" />
+          <div className="my-8 border-t border-slate-200" />
 
           {/* Bottom Section */}
           <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
@@ -205,7 +205,7 @@ export default function Footer() {
                     key={social.href}
                     href={social.href}
                     title={social.label}
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-700 text-lg hover:border-indigo-500 hover:bg-indigo-900/20 transition"
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 bg-white text-lg text-slate-700 hover:border-indigo-500 hover:bg-indigo-50 transition"
                   >
                     {social.icon}
                   </a>
@@ -214,7 +214,7 @@ export default function Footer() {
             </div>
 
             {/* Copyright */}
-            <div className="text-right text-sm text-slate-400 lg:text-left">
+            <div className="text-right text-sm text-slate-600 lg:text-left">
               <p className="mb-2">
                 © {currentYear} SmartLedger. All rights reserved.
               </p>
@@ -227,7 +227,7 @@ export default function Footer() {
       </div>
 
       {/* Security Badge */}
-      <div className="border-t border-slate-800 bg-slate-900/50 px-4 py-4 sm:px-6 lg:px-8">
+      <div className="border-t border-slate-200 bg-slate-50 px-4 py-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-wrap items-center justify-between gap-4 text-xs text-slate-500">
             <div className="flex items-center gap-4">
