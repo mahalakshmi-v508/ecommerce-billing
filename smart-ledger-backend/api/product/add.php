@@ -11,84 +11,122 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 
 include __DIR__ . '/../../config/db.php';
 
-$data = json_decode(file_get_contents("php://input"), true);
+/* FORM DATA */
 
-$name = trim($data['product_name'] ?? '');
-$category_id = intval($data['category_id'] ?? 0);
-$price = floatval($data['price'] ?? 0);
-$stock = intval($data['stock'] ?? 0);
-$barcode = trim($data['barcode'] ?? '');
-$unit = trim($data['unit'] ?? 'piece');
+$name = trim($_POST['product_name'] ?? '');
+$category_id = intval($_POST['category_id'] ?? 0);
+$price = floatval($_POST['price'] ?? 0);
+$stock = intval($_POST['stock'] ?? 0);
+$product_code = trim($_POST['product_code'] ?? '');
+$barcode = trim($_POST['barcode'] ?? '');
+$unit = trim($_POST['unit'] ?? 'piece');
+$gst = floatval($_POST['gst_percentage'] ?? 0);
+$company_id = intval($_POST['company_id'] ?? 0);
 
-if ($unit === '') {
-    $unit = 'piece';
+$imageName = '';
+
+/* IMAGE UPLOAD */
+
+if (
+    isset($_FILES['image']) &&
+    $_FILES['image']['error'] === 0
+) {
+
+    $uploadDir =
+        __DIR__ . '/../../uploads/products/';
+
+    if (!file_exists($uploadDir)) {
+        mkdir($uploadDir, 0777, true);
+    }
+
+    $ext = pathinfo(
+        $_FILES['image']['name'],
+        PATHINFO_EXTENSION
+    );
+
+    $imageName =
+        time() . "_" . rand(1000,9999) . "." . $ext;
+
+    move_uploaded_file(
+        $_FILES['image']['tmp_name'],
+        $uploadDir . $imageName
+    );
 }
 
-$gst = floatval($data['gst_percentage'] ?? 0);
-$company_id = intval($data['company_id'] ?? 0);
+/* VALIDATION */
 
 if (!$name || !$category_id || !$company_id) {
+
     echo json_encode([
         "status" => false,
         "message" => "Required fields missing"
     ]);
+
     exit;
 }
 
-$check = mysqli_query($conn, "
-    SELECT id
-    FROM categories
-    WHERE id='$category_id'
-    AND company_id='$company_id'
-    AND is_deleted=0
-    AND status='active'
-");
+/* CATEGORY CHECK */
 
-if (!$check) {
-    echo json_encode([
-        "status" => false,
-        "message" => mysqli_error($conn)
-    ]);
-    exit;
-}
+$check = mysqli_query(
+    $conn,
+    "SELECT id
+     FROM categories
+     WHERE id='$category_id'
+     AND company_id='$company_id'
+     AND is_deleted=0
+     AND status='active'"
+);
 
 if (mysqli_num_rows($check) == 0) {
+
     echo json_encode([
         "status" => false,
-        "message" => "Invalid category_id or company_id"
+        "message" => "Invalid category"
     ]);
+
     exit;
 }
 
-$sql = "INSERT INTO products
+/* INSERT */
+
+$sql = "
+INSERT INTO products
 (
     product_name,
+    product_code,
     category_id,
     price,
     stock,
     barcode,
     unit,
     gst_percentage,
-    company_id
+    company_id,
+    image
 )
 VALUES
 (
     '$name',
+    '$product_code',
     '$category_id',
     '$price',
     '$stock',
     '$barcode',
     '$unit',
     '$gst',
-    '$company_id'
-)";
+    '$company_id',
+    '$imageName'
+)
+";
 
 if (mysqli_query($conn, $sql)) {
+
     echo json_encode([
         "status" => true,
         "message" => "Product added successfully"
     ]);
+
 } else {
+
     echo json_encode([
         "status" => false,
         "message" => mysqli_error($conn)

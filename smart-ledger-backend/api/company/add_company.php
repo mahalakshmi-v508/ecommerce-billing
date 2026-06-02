@@ -73,12 +73,32 @@ if (mysqli_num_rows($check) > 0) {
 // 🔥 HASH PASSWORD
 $hashed_password = password_hash($owner_password, PASSWORD_DEFAULT);
 
+// 🔥 HANDLE LOGO FILE UPLOAD
+$logo_filename = '';
+if (!empty($logo)) {
+    // Create uploads directory if it doesn't exist
+    $upload_dir = __DIR__ . '/../../uploads/logos/';
+    if (!is_dir($upload_dir)) {
+        mkdir($upload_dir, 0755, true);
+    }
+    
+    // Handle base64 encoded image
+    if (strpos($logo, 'data:image') === 0) {
+        list($type, $logo) = explode(';', $logo);
+        list(, $logo) = explode(',', $logo);
+        $logo = base64_decode($logo);
+        $image_type = explode('/', $type)[1]; // extract image type
+        $logo_filename = 'logo_' . time() . '.' . $image_type;
+        file_put_contents($upload_dir . $logo_filename, $logo);
+    }
+}
+
 // 🔥 INSERT INTO COMPANIES (MATCH DB 🔥)
 $insertCompany = mysqli_query($conn, "
     INSERT INTO companies 
     (company_name, company_code, company_address, gstin, gst_type, phone, logo, owner_name, owner_email, owner_password)
     VALUES 
-    ('$company_name','$company_code','$company_address','$gstin','$gst_type','$phone','$logo','$owner_name','$owner_email','$hashed_password')
+    ('$company_name','$company_code','$company_address','$gstin','$gst_type','$phone','$logo_filename','$owner_name','$owner_email','$hashed_password')
 ");
 
 if (!$insertCompany) {
