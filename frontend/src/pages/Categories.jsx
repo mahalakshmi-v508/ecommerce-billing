@@ -219,7 +219,7 @@ export default function Categories() {
 
                 {/* Category Selection Section */}
                 <div className="mb-8 flex justify-center">
-                    <div className="inline-flex bg-amber-100 rounded-full p-2 gap-2 flex-wrap justify-center">
+                    <div className="inline-flex bg-white/60 rounded-full p-2 gap-2 flex-wrap justify-center backdrop-blur-sm">
                         {categories.map((category) => {
                             const isSelected = selectedCategory === category.id
                             return (
@@ -228,8 +228,8 @@ export default function Categories() {
                                     onClick={() => handleCategoryClick(category.id, category.company_id)}
                                     className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 focus:outline-none ${
                                         isSelected
-                                            ? 'bg-red-600 text-white shadow-lg'
-                                            : 'bg-transparent text-gray-700 hover:text-gray-900'
+                                            ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
+                                            : 'bg-transparent text-gray-700 hover:text-purple-600'
                                     }`}
                                 >
                                     {category.name}
@@ -302,7 +302,7 @@ export default function Categories() {
                                                 />
                                             ) : (
                                                 <div className="flex h-full flex-col items-center justify-center">
-                                                    <ShoppingBag className="w-12 h-12 text-purple-400 mb-2" />
+                                                    <ShoppingBag className="w-12 h-12 text-yellow-400 mb-2" />
                                                     <span className="text-xs font-semibold text-gray-400">No Image</span>
                                                 </div>
                                             )}
@@ -311,7 +311,7 @@ export default function Categories() {
                                         {/* Product Details */}
                                         <div className="p-5 space-y-4">
                                             <div>
-                                                <h3 className="text-lg font-bold text-gray-800 line-clamp-2 group-hover:text-purple-600 transition-colors">
+                                                <h3 className="text-lg font-bold text-gray-800 line-clamp-2 group-hover:text-red-600 transition-colors">
                                                     {product.product_name}
                                                 </h3>
                                                 <p className="text-xs text-gray-500 mt-1">
@@ -322,8 +322,8 @@ export default function Categories() {
                                             {/* Price and Stock */}
                                             <div className="flex items-center justify-between pt-3 border-t border-gray-200">
                                                 <div className="flex items-center gap-1">
-                                                    <IndianRupee className="w-5 h-5 text-purple-600 font-bold" />
-                                                    <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                                                    <IndianRupee className="w-5 h-5 text-red-600 font-bold" />
+                                                    <span className="text-2xl font-bold text-red-600">
                                                         {parseFloat(product.price || 0).toFixed(2)}
                                                     </span>
                                                 </div>
@@ -344,7 +344,7 @@ export default function Categories() {
                                                 className={`w-full rounded-xl py-3 text-sm font-bold transition-all duration-200 flex items-center justify-center gap-2 uppercase ${
                                                     isOutOfStock
                                                         ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                                        : 'bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 text-white hover:shadow-lg hover:scale-105 active:scale-95'
+                                                        : 'bg-red-600 text-white hover:bg-red-700 hover:shadow-lg hover:scale-105 active:scale-95'
                                                 }`}
                                             >
                                                 <CartIcon className="w-4 h-4" />
