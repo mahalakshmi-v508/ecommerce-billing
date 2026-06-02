@@ -323,7 +323,7 @@ export default function Header() {
 
   return (
 
-    <header className="sticky top-0 z-50 bg-white shadow-md">
+    <header className="sticky top-0 z-50 bg-gradient-to-br from-indigo-50 via-cyan-50 to-white shadow-md">
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
