@@ -11,6 +11,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 
 include __DIR__ . '/../../config/db.php';
 
+/* PARSE JSON PAYLOAD WHEN NEEDED */
+$contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+$rawInput = file_get_contents('php://input');
+
+if (
+    stripos($contentType, 'application/json') !== false &&
+    !empty($rawInput)
+) {
+    $jsonData = json_decode($rawInput, true);
+    if (json_last_error() === JSON_ERROR_NONE && is_array($jsonData)) {
+        $_POST = array_merge($_POST, $jsonData);
+    }
+}
+
 /* FORM DATA */
 
 $name = trim($_POST['product_name'] ?? '');
