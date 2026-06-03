@@ -5,6 +5,7 @@ import {
   getWishlistItems,
   removeFromWishlist,
 } from '../services/wishlistService.js'
+import { buildProductImageUrl } from '../services/api.js'
 import toast from 'react-hot-toast'
 import { 
   Heart, 
@@ -132,7 +133,7 @@ export default function Wishlist() {
                   <div className="relative h-56 overflow-hidden bg-gradient-to-br from-purple-100 to-pink-100">
                     {item.image ? (
                       <img
-                        src={item.image}
+                        src={buildProductImageUrl(item.image)}
                         alt={item.product_name}
                         className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-300"
                       />

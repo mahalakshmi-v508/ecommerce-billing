@@ -6,6 +6,7 @@ import {
   removeFromWishlist,
   isInWishlist,
 } from '../services/cartService.js'
+import { buildProductImageUrl } from '../services/api.js'
 import toast from 'react-hot-toast'
 
 export default function ProductCard({ product }) {
@@ -88,7 +89,7 @@ export default function ProductCard({ product }) {
           {product.image ? (
 
             <img
-              src={product.image}
+              src={buildProductImageUrl(product.image)}
               alt={product.product_name}
               className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
             />

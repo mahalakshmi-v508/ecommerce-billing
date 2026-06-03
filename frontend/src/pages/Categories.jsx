@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import { getAllCategories } from '../services/categoryService.js'
 import { getProducts, getProductsByCategory } from '../services/productService.js'
+import { buildProductImageUrl } from '../services/api.js'
 import LoadingSpinner from '../components/LoadingSpinner.jsx'
 import EmptyState from '../components/EmptyState.jsx'
 import toast from 'react-hot-toast'
@@ -295,7 +296,7 @@ export default function Categories() {
 
                                             {product.image ? (
                                                 <img
-                                                    src={product.image}
+                                                    src={buildProductImageUrl(product.image)}
                                                     alt={product.product_name}
                                                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                                                     loading="lazy"
