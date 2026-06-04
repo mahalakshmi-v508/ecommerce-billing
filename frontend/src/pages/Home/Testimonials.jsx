@@ -156,7 +156,7 @@ export default function Testimonials() {
   };
 
   return (
-    <section ref={sectionRef} className="relative py-24 px-6 overflow-hidden bg-gradient-to-b from-gray-50 to-white">
+    <section ref={sectionRef} className="relative pt-6 pb-24 px-6 overflow-hidden bg-gradient-to-b from-gray-50 to-white">
       {/* Background Decorations */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-20 right-20 w-72 h-72 bg-indigo-100/20 rounded-full blur-3xl"></div>
