@@ -31,7 +31,7 @@ $payment_type   = $conn->real_escape_string($data['payment_type'] ?? 'cash');
 $gst_type       = $conn->real_escape_string($data['gst_type'] ?? 'without_gst');
 $gst_no         = $conn->real_escape_string($data['gst_no'] ?? '');
 
-$invoice_no = "INV-" . time();
+$invoice_no = "";
 
 /* ── VALIDATION ── */
 if (!$customer_name || !preg_match('/^[0-9]{10}$/', $customer_phone)) {
@@ -162,6 +162,13 @@ if (!$conn->query($sql)) {
 }
 
 $invoice_id = $conn->insert_id;
+$invoice_no = "INV-" . str_pad($invoice_id, 6, "0", STR_PAD_LEFT);
+
+$update_invoice = $conn->query("UPDATE invoices SET invoice_no='$invoice_no' WHERE id='$invoice_id'");
+if (!$update_invoice) {
+    echo json_encode(["status" => false, "message" => "Invoice update failed: " . $conn->error]);
+    exit;
+}
 
 /* ── INSERT PAYMENT RECORD ── */
 $pay_sql = "
