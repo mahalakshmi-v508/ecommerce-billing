@@ -38,12 +38,13 @@ export default function Footer() {
         }
       `}</style>
 
-      <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
+      {/* pb-16 லிருந்து pb-8 ஆகக் குறைக்கப்பட்டுள்ளது */}
+      <div className="mx-auto max-w-7xl px-6 pt-16 pb-8 lg:px-8">
         
-        {/* மெயின் கிரிட் லேஅவுட் */}
-        <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4 pb-12 border-b border-slate-800/60">
+        {/* மெயின் கிரிட் லேஅவுட் - pb-12 லிருந்து pb-8 ஆகக் குறைக்கப்பட்டுள்ளது */}
+        <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4 pb-8 border-b border-slate-800/60">
           
-          {/* பிராண்ட் ப்ரொபைல் */}
+          {/* பிராண்ட் ப்ரொபை */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <span className="h-7 w-7 rounded-md bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center text-white text-sm font-bold">SL</span>
@@ -109,19 +110,14 @@ export default function Footer() {
                 </div>
               </li>
 
-              {/* Email - Perfect Clean Envelope (No Cuts!) */}
+              {/* Email - Envelope */}
               <li className="flex items-center gap-4 group">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-800/90 text-sky-400 shadow-md border border-slate-700/50">
                   <div className="relative w-5 h-5 flex items-center justify-center">
-                    
-                    {/* உறைக்குள் விழும் குட்டி லெட்டர் ஷீட் */}
                     <span className="absolute w-3 h-2 bg-sky-400/80 rounded-xs -top-0.5 z-0 animate-letter-drop"></span>
-                    
-                    {/* கட் ஆகாத சுத்தமான மாடர்ன் என்வலப் ஐகான் */}
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.2} stroke="currentColor" className="w-5 h-5 relative z-10 text-sky-400">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
                     </svg>
-
                   </div>
                 </div>
                 <div>
@@ -151,12 +147,12 @@ export default function Footer() {
 
         </div>
 
-        {/* பாட்டம் காப்பிரைட் */}
-        <div className="mt-10 flex flex-col items-center justify-center gap-2 text-center">
+        {/* பாட்டம் காப்பிரைட் - mt-10 லிருந்து mt-6 ஆகக் குறைக்கப்பட்டுள்ளது */}
+        <div className="mt-6 flex flex-col items-center justify-center gap-1.5 text-center">
           <p className="text-base text-slate-300 font-medium tracking-wide cursor-pointer select-none transition-all duration-300 ease-out hover:text-sky-400 hover:scale-105 origin-center">
             © {currentYear} <span className="font-bold text-white hover:text-sky-400 transition-colors">SmartLedger</span>. All rights reserved.
           </p>
-          <div className="flex items-center gap-1.5 text-[11px] text-slate-500 font-medium tracking-widest uppercase mt-1">
+          <div className="flex items-center gap-1.5 text-[11px] text-slate-500 font-medium tracking-widest uppercase mt-0.5">
             <span>Built with</span>
             <span className="text-sky-400 animate-pulse text-xs">✦</span>
             <span>React & Tailwind</span>
