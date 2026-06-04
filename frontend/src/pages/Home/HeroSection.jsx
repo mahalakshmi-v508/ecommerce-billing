@@ -71,11 +71,11 @@ export default function HeroSection({ navigate }) {
             <div className="relative h-full flex items-center justify-center text-center px-4">
               <div className="max-w-4xl mx-auto animate-fade-in-up">
                 {/* Badge */}
-                <div className="inline-block mb-6">
+                {/* <div className="inline-block mb-6">
                   <span className="bg-gradient-to-r from-pink-500 to-orange-500 text-white px-4 py-1.5 rounded-full text-sm font-semibold shadow-lg">
                     🎉 {slide.badge}
                   </span>
-                </div>
+                </div> */}
 
                 {/* Title */}
                 <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
