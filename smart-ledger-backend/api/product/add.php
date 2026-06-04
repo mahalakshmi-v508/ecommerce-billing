@@ -33,7 +33,6 @@ $price = floatval($_POST['price'] ?? 0);
 $stock = intval($_POST['stock'] ?? 0);
 $product_code = trim($_POST['product_code'] ?? '');
 $barcode = trim($_POST['barcode'] ?? '');
-$unit = trim($_POST['unit'] ?? 'piece');
 $gst = floatval($_POST['gst_percentage'] ?? 0);
 $company_id = intval($_POST['company_id'] ?? 0);
 
@@ -41,30 +40,48 @@ $imageName = '';
 
 /* IMAGE UPLOAD */
 
+$imageBase64 = '';
+if (!empty($jsonData['image']) && is_string($jsonData['image'])) {
+    $imageBase64 = $jsonData['image'];
+}
+
 if (
     isset($_FILES['image']) &&
     $_FILES['image']['error'] === 0
 ) {
 
-    $uploadDir =
-        __DIR__ . '/../../uploads/products/';
+    $uploadDir = __DIR__ . '/../../uploads/products/';
 
     if (!file_exists($uploadDir)) {
         mkdir($uploadDir, 0777, true);
     }
 
-    $ext = pathinfo(
-        $_FILES['image']['name'],
-        PATHINFO_EXTENSION
-    );
+    $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+    $imageName = time() . "_" . rand(1000,9999) . "." . $ext;
+    move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $imageName);
 
-    $imageName =
-        time() . "_" . rand(1000,9999) . "." . $ext;
+} elseif (!empty($imageBase64)) {
 
-    move_uploaded_file(
-        $_FILES['image']['tmp_name'],
-        $uploadDir . $imageName
-    );
+    $uploadDir = __DIR__ . '/../../uploads/products/';
+
+    if (!file_exists($uploadDir)) {
+        mkdir($uploadDir, 0777, true);
+    }
+
+    if (strpos($imageBase64, 'data:image') === 0) {
+        list($type, $imageBase64) = explode(';', $imageBase64);
+        list(, $imageBase64) = explode(',', $imageBase64);
+        $imageBase64 = base64_decode($imageBase64);
+        $ext = explode('/', $type)[1] ?? 'png';
+    } else {
+        $imageBase64 = base64_decode($imageBase64);
+        $ext = 'png';
+    }
+
+    if ($imageBase64 !== false) {
+        $imageName = time() . "_" . rand(1000,9999) . "." . $ext;
+        file_put_contents($uploadDir . $imageName, $imageBase64);
+    }
 }
 
 /* VALIDATION */
@@ -112,7 +129,6 @@ INSERT INTO products
     price,
     stock,
     barcode,
-    unit,
     gst_percentage,
     company_id,
     image
@@ -125,7 +141,6 @@ VALUES
     '$price',
     '$stock',
     '$barcode',
-    '$unit',
     '$gst',
     '$company_id',
     '$imageName'

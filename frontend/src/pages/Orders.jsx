@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getMyOrders } from "../services/orderService";
 
 const statusColors = {
@@ -53,23 +54,24 @@ const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedOrder, setExpandedOrder] = useState(null);
+  const navigate = useNavigate();
 
   const user = JSON.parse(localStorage.getItem("auth_user") || "{}");
 
   useEffect(() => {
-    fetchOrders();
-  }, []);
+    const fetchOrders = async () => {
+      try {
+        const res = await getMyOrders(user.id);
+        if (res.status) setOrders(res.orders);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const fetchOrders = async () => {
-    try {
-      const res = await getMyOrders(user.id);
-      if (res.status) setOrders(res.orders);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    fetchOrders();
+  }, [user.id]);
 
   const toggleExpand = (id) =>
     setExpandedOrder((prev) => (prev === id ? null : id));
@@ -511,10 +513,17 @@ const Orders = () => {
                       {getMethodIcon(order.payment_method)}{" "}
                       {order.payment_method || "N/A"}
                     </span>
+                    <button
+                      className="expand-btn"
+                      onClick={() => navigate(`/invoice/${order.invoice_no}`)}
+                      style={{ background: "#0f172a" }}
+                    >
+                      View Invoice
+                    </button>
                     {order.products?.length > 0 && (
                       <button
                         className={`expand-btn ${isOpen ? "open" : ""}`}
-                        onClick={() => toggleExpand(order.id)}
+onClick={() => navigate(`/invoice/${order.invoice_id}`)}
                       >
                         {isOpen ? "Hide" : "Products"} ({order.products.length})
                         <span className="arrow">▾</span>

@@ -32,7 +32,31 @@ export const getProducts = async (companyId) => {
     }
   }
 }
+export const addProduct = async (productData) => {
+  try {
+    const formData = new FormData()
 
+    Object.entries(productData).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        formData.append(key, value)
+      }
+    })
+
+    const { data } = await api.post('/product/add.php', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+
+    return data
+  } catch (error) {
+    console.error('Error creating product:', error)
+    return {
+      status: false,
+      message: 'Failed to add product',
+    }
+  }
+}
 /*
 |--------------------------------------------------------------------------
 | GET PRODUCTS BY CATEGORY

@@ -13,18 +13,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 
 include __DIR__ . '/../../config/db.php';
 
-$data = json_decode(file_get_contents("php://input"), true);
+$contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+$rawInput = file_get_contents('php://input');
 
-$id = intval($data['id'] ?? 0);
-$name = trim($data['product_name'] ?? '');
-$product_code = trim($data['product_code'] ?? '');
-$category_id = intval($data['category_id'] ?? 0);
-$price = floatval($data['price'] ?? 0);
-$stock = intval($data['stock'] ?? 0);
-$barcode = $data['barcode'] ?? '';
-$unit = $data['unit'] ?? 'piece';
-$gst = floatval($data['gst_percentage'] ?? 0);
-$company_id = intval($data['company_id'] ?? 0);
+if (
+    stripos($contentType, 'application/json') !== false &&
+    !empty($rawInput)
+) {
+    $jsonData = json_decode($rawInput, true);
+
+    if (json_last_error() === JSON_ERROR_NONE && is_array($jsonData)) {
+        $_POST = array_merge($_POST, $jsonData);
+    }
+}
+
+$id = intval($_POST['id'] ?? 0);
+$name = trim($_POST['product_name'] ?? '');
+$product_code = trim($_POST['product_code'] ?? '');
+$category_id = intval($_POST['category_id'] ?? 0);
+$price = floatval($_POST['price'] ?? 0);
+$stock = intval($_POST['stock'] ?? 0);
+$barcode = trim($_POST['barcode'] ?? '');
+$gst = floatval($_POST['gst_percentage'] ?? 0);
+$company_id = intval($_POST['company_id'] ?? 0);
 
 if (!$id || !$name || !$category_id || !$company_id) {
     echo json_encode(["status"=>false,"message"=>"Missing fields"]);
@@ -47,7 +58,6 @@ category_id='$category_id',
 price='$price',
 stock='$stock',
 barcode='$barcode',
-unit='$unit',
 gst_percentage='$gst'
 WHERE id='$id'";
 

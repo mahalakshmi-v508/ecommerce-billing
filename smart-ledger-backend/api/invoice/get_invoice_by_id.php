@@ -24,8 +24,33 @@ WHERE i.invoice_no='$invoice_no'
 if($result->num_rows > 0){
     $row = $result->fetch_assoc();
 
-    $row['products'] = json_decode($row['products']);
-    
+$products = json_decode($row['products'], true);
+
+foreach ($products as &$item) {
+
+    $pid = intval($item['product_id']);
+
+    $productQuery = $conn->query("
+        SELECT
+            product_name,
+            price,
+            gst_percentage
+        FROM products
+        WHERE id = '$pid'
+        LIMIT 1
+    ");
+
+    if ($productQuery && $productQuery->num_rows > 0) {
+
+        $product = $productQuery->fetch_assoc();
+
+        $item['name'] = $product['product_name'];
+        $item['price'] = $product['price'];
+        $item['gst'] = $product['gst_percentage'];
+    }
+}
+
+$row['products'] = $products;    
 
     echo json_encode([
         "status"=>true,

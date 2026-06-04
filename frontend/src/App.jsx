@@ -4,9 +4,7 @@ import Header from './components/Header.jsx'
 import Footer from './components/Footer.jsx'
 import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
-import Home from './pages/Home.jsx'
 import Categories from './pages/Categories.jsx'
-import Products from './pages/Products.jsx'
 import ProductDetails from './pages/ProductDetails.jsx'
 import RoleDashboard from './pages/RoleDashboard.jsx'
 import Cart from './pages/Cart.jsx'
@@ -15,6 +13,7 @@ import Orders from './pages/Orders.jsx'
 import Profile from './pages/Profile.jsx'
 import ProtectedRoute from './routes/ProtectedRoute.jsx'
 import PaymentPage from './pages/PaymentPage.jsx'
+import InvoicePreview from './pages/InvoicePreview.jsx'
 
 function App() {
   return (
@@ -54,6 +53,14 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['user']}>
                 <ProductDetails />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/invoice/:invoiceNo"
+            element={
+              <ProtectedRoute allowedRoles={['user']}>
+                <InvoicePreview />
               </ProtectedRoute>
             }
           />
