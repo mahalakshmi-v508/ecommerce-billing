@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useNavigate } from 'react-router-dom'
-import { 
-  ShoppingCart, 
-  Trash2, 
-  Plus, 
-  Minus, 
+import {
+  ShoppingCart,
+  Trash2,
+  Plus,
+  Minus,
   CreditCard,
   ShoppingBag,
   IndianRupee,
@@ -37,7 +37,7 @@ export default function Cart() {
     }
 
     window.addEventListener('cartUpdated', handleCartRefresh)
-    
+
     return () => {
       window.removeEventListener('cartUpdated', handleCartRefresh)
     }
@@ -107,6 +107,9 @@ export default function Cart() {
     0
   )
 
+  const gstAmount = total * 0.18
+  const grandTotal = total + gstAmount
+
   const itemCount = cartItems.reduce(
     (sum, item) => sum + parseInt(item.quantity || 0),
     0
@@ -168,7 +171,7 @@ export default function Cart() {
                 const uniqueKey = item.product_id || item.id || index;
                 const isUpdating = updatingId === item.id;
                 const isRemoving = removingId === item.id;
-                
+
                 return (
                   <div
                     key={uniqueKey}
@@ -198,7 +201,7 @@ export default function Cart() {
                                 <span className="text-sm text-gray-400">per item</span>
                               </div>
                             </div>
-                            
+
                             <div className="text-right">
                               <div className="flex items-center gap-2 text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                                 <IndianRupee className="w-5 h-5" />
@@ -217,7 +220,7 @@ export default function Cart() {
                               >
                                 <Minus className="w-5 h-5 mx-auto" />
                               </button>
-                              
+
                               <div className="relative">
                                 <span className="text-xl font-bold text-gray-800 min-w-[40px] text-center block">
                                   {item.quantity}
@@ -228,7 +231,7 @@ export default function Cart() {
                                   </div>
                                 )}
                               </div>
-                              
+
                               <button
                                 onClick={() => handleQuantity(item.id, parseInt(item.quantity || 1), 'increase')}
                                 disabled={isUpdating}
@@ -266,7 +269,7 @@ export default function Cart() {
                   <CreditCard className="w-6 h-6 text-purple-600" />
                   Order Summary
                 </h2>
-                
+
                 <div className="space-y-4 border-b border-gray-200 pb-4">
                   <div className="flex justify-between text-gray-600">
                     <span>Subtotal ({itemCount} items)</span>
@@ -281,7 +284,7 @@ export default function Cart() {
                     <span className="font-semibold">₹{(total * 0.18).toFixed(2)}</span>
                   </div>
                 </div>
-                
+
                 <div className="mt-6 pt-4">
                   <div className="flex justify-between items-center mb-6">
                     <span className="text-xl font-bold text-gray-800">Total Amount</span>
@@ -292,12 +295,14 @@ export default function Cart() {
                       <p className="text-xs text-gray-500 mt-1">Including ₹{(total * 0.18).toFixed(2)} GST</p>
                     </div>
                   </div>
-                  
+
                   <button
                     onClick={() =>
                       navigate('/payment', {
                         state: {
-                          totalAmount: total,
+                          totalAmount: grandTotal,
+                          subTotal: total,
+                          gstAmount: gstAmount,
                           cartItems: cartItems.map((item) => ({
                             id: item.id,
                             product_id: item.product_id,
@@ -316,7 +321,7 @@ export default function Cart() {
                     <CreditCard className="w-5 h-5" />
                     Proceed to Checkout
                   </button>
-                  
+
                   <button
                     onClick={() => navigate('/products')}
                     className="w-full mt-3 bg-gray-100 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
@@ -325,7 +330,7 @@ export default function Cart() {
                     Continue Shopping
                   </button>
                 </div>
-                
+
                 {/* Secure Payment Notice */}
                 <div className="mt-6 p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl">
                   <div className="flex items-center gap-2 text-sm text-gray-600">

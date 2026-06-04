@@ -40,6 +40,8 @@ SELECT
     i.customer_name,
     i.customer_phone,
     i.products,
+    i.sub_total,
+    i.gst_total,
     i.total_amount,
     i.paid_amount,
     i.balance_amount,

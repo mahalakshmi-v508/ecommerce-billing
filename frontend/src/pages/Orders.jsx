@@ -2,58 +2,9 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getMyOrders } from "../services/orderService";
 
-const statusColors = {
-  paid: { bg: "#e6f9f0", color: "#0a7a47", border: "#34d399" },
-  pending: { bg: "#fff7e6", color: "#b45309", border: "#fbbf24" },
-  failed: { bg: "#fef2f2", color: "#b91c1c", border: "#f87171" },
-  default: { bg: "#eff6ff", color: "#1d4ed8", border: "#60a5fa" },
-};
-
-const methodIcons = {
-  cash: "💵",
-  upi: "📱",
-  card: "💳",
-  online: "🌐",
-  default: "💰",
-};
-
-function getStatusStyle(status = "") {
-  const key = status.toLowerCase();
-  return statusColors[key] || statusColors.default;
-}
-
-function getMethodIcon(method = "") {
-  const key = method.toLowerCase();
-  return methodIcons[key] || methodIcons.default;
-}
-
-const avatarColors = [
-  ["#6366f1", "#ede9fe"],
-  ["#0ea5e9", "#e0f2fe"],
-  ["#10b981", "#d1fae5"],
-  ["#f59e0b", "#fef3c7"],
-  ["#ec4899", "#fce7f3"],
-];
-
-function getAvatarColor(index) {
-  return avatarColors[index % avatarColors.length];
-}
-
-function formatDate(dateStr) {
-  if (!dateStr) return "—";
-  const d = new Date(dateStr);
-  if (isNaN(d)) return dateStr;
-  return d.toLocaleDateString("en-IN", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}
-
 const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [expandedOrder, setExpandedOrder] = useState(null);
   const navigate = useNavigate();
 
   const user = JSON.parse(localStorage.getItem("auth_user") || "{}");
@@ -69,373 +20,74 @@ const Orders = () => {
         setLoading(false);
       }
     };
-
     fetchOrders();
   }, [user.id]);
 
-  const toggleExpand = (id) =>
-    setExpandedOrder((prev) => (prev === id ? null : id));
+  const getStatusBadge = (status) => {
+    const statusMap = {
+      paid: { color: "bg-green-100 text-green-800 border-green-300", icon: "✅" },
+      pending: { color: "bg-yellow-100 text-yellow-800 border-yellow-300", icon: "⏳" },
+      failed: { color: "bg-red-100 text-red-800 border-red-300", icon: "❌" },
+      refunded: { color: "bg-purple-100 text-purple-800 border-purple-300", icon: "↩️" },
+    };
+    const defaultStatus = { color: "bg-gray-100 text-gray-800 border-gray-300", icon: "📦" };
+    return statusMap[status?.toLowerCase()] || defaultStatus;
+  };
+
+  const getPaymentMethodIcon = (method) => {
+    const methods = {
+      cash: "💵 Cash",
+      upi: "📱 UPI",
+      card: "💳 Card",
+      online: "🌐 Online",
+      bank: "🏦 Bank",
+    };
+    return methods[method?.toLowerCase()] || "💰 " + (method || "N/A");
+  };
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "—";
+    const date = new Date(dateStr);
+    if (isNaN(date)) return dateStr;
+    return date.toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
   return (
-    <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap');
-
-        .orders-root {
-          font-family: 'DM Sans', sans-serif;
-          min-height: 100vh;
-          background: linear-gradient(135deg, #f0f4ff 0%, #fdf2fb 50%, #f0fdf9 100%);
-          padding: 2rem 1rem 4rem;
-        }
-
-        .orders-header {
-          max-width: 720px;
-          margin: 0 auto 2rem;
-        }
-
-        .orders-title {
-          font-family: 'Sora', sans-serif;
-          font-size: 2rem;
-          font-weight: 700;
-          background: linear-gradient(90deg, #6366f1, #ec4899, #0ea5e9);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          margin: 0 0 0.25rem;
-        }
-
-        .orders-subtitle {
-          font-size: 0.9rem;
-          color: #94a3b8;
-          margin: 0;
-        }
-
-        .orders-list {
-          max-width: 720px;
-          margin: 0 auto;
-          display: flex;
-          flex-direction: column;
-          gap: 1.25rem;
-        }
-
-        .order-card {
-          background: #ffffff;
-          border-radius: 20px;
-          box-shadow: 0 4px 24px rgba(99,102,241,0.08);
-          overflow: hidden;
-          border: 1px solid rgba(99,102,241,0.08);
-          transition: box-shadow 0.2s, transform 0.2s;
-        }
-
-        .order-card:hover {
-          box-shadow: 0 8px 32px rgba(99,102,241,0.15);
-          transform: translateY(-2px);
-        }
-
-        .order-card-top {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          padding: 1.25rem 1.5rem 0;
-        }
-
-        .order-avatar {
-          width: 48px;
-          height: 48px;
-          border-radius: 14px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-family: 'Sora', sans-serif;
-          font-weight: 700;
-          font-size: 1rem;
-          flex-shrink: 0;
-        }
-
-        .order-meta {
-          flex: 1;
-          min-width: 0;
-        }
-
-        .order-invoice {
-          font-family: 'Sora', sans-serif;
-          font-size: 1rem;
-          font-weight: 600;
-          color: #1e293b;
-          margin: 0 0 2px;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
-        .order-date {
-          font-size: 0.78rem;
-          color: #94a3b8;
-          margin: 0;
-        }
-
-        .order-status-badge {
-          font-size: 0.72rem;
-          font-weight: 600;
-          padding: 5px 14px;
-          border-radius: 100px;
-          border: 1.5px solid;
-          letter-spacing: 0.03em;
-          text-transform: capitalize;
-          white-space: nowrap;
-        }
-
-        .order-amounts {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 0.75rem;
-          padding: 1.25rem 1.5rem;
-        }
-
-        .amount-box {
-          background: #f8faff;
-          border-radius: 14px;
-          padding: 0.85rem 0.75rem;
-          text-align: center;
-          border: 1px solid #e8edff;
-        }
-
-        .amount-label {
-          font-size: 0.7rem;
-          color: #94a3b8;
-          font-weight: 500;
-          text-transform: uppercase;
-          letter-spacing: 0.06em;
-          margin: 0 0 4px;
-        }
-
-        .amount-value {
-          font-family: 'Sora', sans-serif;
-          font-size: 1.05rem;
-          font-weight: 700;
-          color: #1e293b;
-          margin: 0;
-        }
-
-        .amount-value.total { color: #6366f1; }
-        .amount-value.paid { color: #10b981; }
-        .amount-value.balance { color: #f59e0b; }
-
-        .order-footer {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 0 1.5rem 1.25rem;
-          gap: 0.75rem;
-          flex-wrap: wrap;
-        }
-
-        .payment-method-pill {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          background: #f1f5f9;
-          border-radius: 100px;
-          padding: 5px 14px;
-          font-size: 0.78rem;
-          color: #64748b;
-          font-weight: 500;
-        }
-
-        .expand-btn {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          background: linear-gradient(135deg, #6366f1, #8b5cf6);
-          color: #fff;
-          border: none;
-          border-radius: 100px;
-          padding: 7px 18px;
-          font-size: 0.78rem;
-          font-weight: 600;
-          cursor: pointer;
-          font-family: 'DM Sans', sans-serif;
-          transition: opacity 0.15s, transform 0.15s;
-          letter-spacing: 0.02em;
-        }
-
-        .expand-btn:hover {
-          opacity: 0.88;
-          transform: scale(1.03);
-        }
-
-        .expand-btn .arrow {
-          display: inline-block;
-          transition: transform 0.25s;
-        }
-
-        .expand-btn.open .arrow {
-          transform: rotate(180deg);
-        }
-
-        .products-section {
-          padding: 0 1.5rem 1.5rem;
-          border-top: 1px solid #f1f5f9;
-          animation: slideDown 0.22s ease;
-        }
-
-        @keyframes slideDown {
-          from { opacity: 0; transform: translateY(-8px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-
-        .products-title {
-          font-family: 'Sora', sans-serif;
-          font-size: 0.8rem;
-          font-weight: 600;
-          color: #94a3b8;
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
-          margin: 1rem 0 0.75rem;
-        }
-
-        .product-row {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          padding: 0.75rem;
-          border-radius: 14px;
-          background: #fafbff;
-          border: 1px solid #e8edff;
-          margin-bottom: 0.5rem;
-          transition: background 0.15s;
-        }
-
-        .product-row:hover {
-          background: #f0f4ff;
-        }
-
-        .product-icon {
-          width: 38px;
-          height: 38px;
-          border-radius: 10px;
-          background: linear-gradient(135deg, #e0e7ff, #ede9fe);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 1.1rem;
-          flex-shrink: 0;
-        }
-
-        .product-info {
-          flex: 1;
-          min-width: 0;
-        }
-
-        .product-name {
-          font-size: 0.88rem;
-          font-weight: 600;
-          color: #1e293b;
-          margin: 0 0 2px;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
-        .product-qty {
-          font-size: 0.75rem;
-          color: #94a3b8;
-          margin: 0;
-        }
-
-        .product-price {
-          font-family: 'Sora', sans-serif;
-          font-size: 0.95rem;
-          font-weight: 700;
-          color: #6366f1;
-          white-space: nowrap;
-        }
-
-        .empty-state {
-          max-width: 720px;
-          margin: 4rem auto;
-          text-align: center;
-        }
-
-        .empty-icon {
-          font-size: 4rem;
-          margin-bottom: 1rem;
-          display: block;
-        }
-
-        .empty-title {
-          font-family: 'Sora', sans-serif;
-          font-size: 1.4rem;
-          font-weight: 600;
-          color: #1e293b;
-          margin: 0 0 0.5rem;
-        }
-
-        .empty-desc {
-          color: #94a3b8;
-          font-size: 0.9rem;
-          margin: 0;
-        }
-
-        .skeleton-card {
-          background: #fff;
-          border-radius: 20px;
-          padding: 1.5rem;
-          box-shadow: 0 4px 24px rgba(99,102,241,0.06);
-        }
-
-        .skeleton-line {
-          background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
-          background-size: 200% 100%;
-          animation: shimmer 1.4s infinite;
-          border-radius: 8px;
-        }
-
-        @keyframes shimmer {
-          0% { background-position: 200% 0; }
-          100% { background-position: -200% 0; }
-        }
-
-        .divider {
-          height: 1px;
-          background: #f1f5f9;
-          margin: 0 1.5rem;
-        }
-
-        @media (max-width: 480px) {
-          .order-amounts { grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
-          .amount-box { padding: 0.65rem 0.4rem; }
-          .amount-value { font-size: 0.92rem; }
-          .orders-title { font-size: 1.5rem; }
-        }
-      `}</style>
-
-      <div className="orders-root">
-        <div className="orders-header">
-          <h1 className="orders-title">My Orders</h1>
-          <p className="orders-subtitle">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header Section */}
+        <div className="mb-8 text-center">
+          <div className="inline-block">
+            <div className="flex items-center gap-3 justify-center mb-2">
+              <span className="text-5xl">📋</span>
+              <h1 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                My Orders
+              </h1>
+            </div>
+            <div className="h-1 w-24 bg-gradient-to-r from-blue-500 to-pink-500 rounded-full mx-auto"></div>
+          </div>
+          <p className="text-gray-600 mt-3 text-lg">
             {loading
-              ? "Loading your orders..."
-              : `${orders.length} order${orders.length !== 1 ? "s" : ""} found`}
+              ? "Fetching your orders..."
+              : `✨ ${orders.length} order${orders.length !== 1 ? "s" : ""} found ✨`}
           </p>
         </div>
 
-        {/* Skeleton Loading */}
+        {/* Loading Skeleton */}
         {loading && (
-          <div className="orders-list">
+          <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div className="skeleton-card" key={i}>
-                <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-                  <div className="skeleton-line" style={{ width: 48, height: 48, borderRadius: 14 }} />
-                  <div style={{ flex: 1 }}>
-                    <div className="skeleton-line" style={{ height: 16, width: "55%", marginBottom: 8 }} />
-                    <div className="skeleton-line" style={{ height: 12, width: "30%" }} />
-                  </div>
-                </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginTop: 20 }}>
-                  {[1, 2, 3].map((j) => (
-                    <div className="skeleton-line" key={j} style={{ height: 60, borderRadius: 14 }} />
-                  ))}
+              <div key={i} className="bg-white rounded-2xl shadow-lg p-6 animate-pulse">
+                <div className="flex flex-wrap gap-4 justify-between items-center">
+                  <div className="h-6 bg-gray-200 rounded w-32"></div>
+                  <div className="h-6 bg-gray-200 rounded w-24"></div>
+                  <div className="h-6 bg-gray-200 rounded w-28"></div>
                 </div>
               </div>
             ))}
@@ -444,119 +96,160 @@ const Orders = () => {
 
         {/* Empty State */}
         {!loading && orders.length === 0 && (
-          <div className="empty-state">
-            <span className="empty-icon">🛍️</span>
-            <h2 className="empty-title">No Orders Yet</h2>
-            <p className="empty-desc">Your orders will appear here once you make a purchase.</p>
+          <div className="bg-white rounded-2xl shadow-xl p-12 text-center">
+            <div className="text-8xl mb-4">🛍️</div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">No Orders Yet</h2>
+            <p className="text-gray-500 mb-6">Your orders will appear here once you make a purchase.</p>
+            <button
+              onClick={() => navigate("/shop")}
+              className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-200"
+            >
+              Start Shopping 🚀
+            </button>
           </div>
         )}
 
-        {/* Order Cards */}
+        {/* Orders Table */}
         {!loading && orders.length > 0 && (
-          <div className="orders-list">
-            {orders.map((order, idx) => {
-              const [avatarFg, avatarBg] = getAvatarColor(idx);
-              const statusStyle = getStatusStyle(order.payment_status);
-              const isOpen = expandedOrder === order.id;
-              const initials = (order.invoice_no || "OR")
-                .replace(/[^a-zA-Z0-9]/g, "")
-                .slice(0, 2)
-                .toUpperCase();
+          <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+                  <tr>
+                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                      Invoice
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                      Date
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                      Total
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                      Paid
+                    </th>
 
-              return (
-                <div className="order-card" key={order.id}>
-                  {/* Top: Avatar + Invoice + Status */}
-                  <div className="order-card-top">
-                    <div
-                      className="order-avatar"
-                      style={{ background: avatarBg, color: avatarFg }}
-                    >
-                      {initials}
-                    </div>
-                    <div className="order-meta">
-                      <p className="order-invoice">{order.invoice_no}</p>
-                      <p className="order-date">
-                        🗓 {formatDate(order.created_at)}
-                      </p>
-                    </div>
-                    <span
-                      className="order-status-badge"
-                      style={{
-                        background: statusStyle.bg,
-                        color: statusStyle.color,
-                        borderColor: statusStyle.border,
-                      }}
-                    >
-                      {order.payment_status}
-                    </span>
-                  </div>
-
-                  {/* Amount Boxes */}
-                  <div className="order-amounts">
-                    <div className="amount-box">
-                      <p className="amount-label">Total</p>
-                      <p className="amount-value total">₹{order.total_amount}</p>
-                    </div>
-                    <div className="amount-box">
-                      <p className="amount-label">Paid</p>
-                      <p className="amount-value paid">₹{order.paid_amount}</p>
-                    </div>
-                    <div className="amount-box">
-                      <p className="amount-label">Balance</p>
-                      <p className="amount-value balance">₹{order.balance_amount}</p>
-                    </div>
-                  </div>
-
-                  {/* Footer: method + expand */}
-                  <div className="order-footer">
-                    <span className="payment-method-pill">
-                      {getMethodIcon(order.payment_method)}{" "}
-                      {order.payment_method || "N/A"}
-                    </span>
-                    <button
-                      className="expand-btn"
-                      onClick={() => navigate(`/invoice/${order.invoice_no}`)}
-                      style={{ background: "#0f172a" }}
-                    >
-                      View Invoice
-                    </button>
-                    {order.products?.length > 0 && (
-                      <button
-                        className={`expand-btn ${isOpen ? "open" : ""}`}
-onClick={() => navigate(`/invoice/${order.invoice_id}`)}
+                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                      GST
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                      Products
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                      Action
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {orders.map((order, idx) => {
+                    const statusBadge = getStatusBadge(order.payment_status);
+                    return (
+                      <tr
+                        key={order.id}
+                        className="hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 transition-all duration-200 group"
                       >
-                        {isOpen ? "Hide" : "Products"} ({order.products.length})
-                        <span className="arrow">▾</span>
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Products Section */}
-                  {isOpen && (
-                    <>
-                      <div className="divider" />
-                      <div className="products-section">
-                        <p className="products-title">Products</p>
-                        {order.products.map((item, i) => (
-                          <div className="product-row" key={i}>
-                            <div className="product-icon">🛒</div>
-                            <div className="product-info">
-                              <p className="product-name">{item.product_name}</p>
-                              <p className="product-qty">Qty: {item.qty}</p>
+                        {/* Invoice No */}
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-400 to-purple-400 flex items-center justify-center text-white font-bold text-xs">
+                              #{idx + 1}
                             </div>
-                            <span className="product-price">₹{item.price}</span>
+                            <span className="font-semibold text-gray-800">
+                              {order.invoice_no}
+                            </span>
                           </div>
-                        ))}
-                      </div>
-                    </>
-                  )}
+                        </td>
+
+                        {/* Date */}
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-600">
+                            <span className="block">{formatDate(order.created_at).split(",")[0]}</span>
+                            <span className="text-xs text-gray-400">
+                              {formatDate(order.created_at).split(",")[1]}
+                            </span>
+                          </div>
+                        </td>
+
+                        {/* Total */}
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-lg font-bold text-blue-600">
+                            ₹{order.total_amount?.toLocaleString()}
+                          </div>
+                        </td>
+
+                        {/* Paid */}
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-lg font-bold text-green-600">
+                            ₹{order.paid_amount?.toLocaleString()}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-semibold text-orange-600">
+                            ₹{Number(order.gst_total || 0).toFixed(2)}
+                          </div>
+                        </td>
+
+                        <td className="px-6 py-4">
+                          {order.products?.map((product, index) => (
+                            <div key={index} className="text-sm text-gray-700">
+                              {product.product_name} × {product.qty}
+                            </div>
+                          ))}
+                        </td>
+                        {/* Status */}
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold border ${statusBadge.color}`}>
+                            {statusBadge.icon} {order.payment_status}
+                          </span>
+                        </td>
+
+                        {/* Action */}
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <button
+                            onClick={() => navigate(`/invoice/${order.invoice_id || order.invoice_no}`)}
+                            className="group relative inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 text-white text-sm font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-200"
+                          >
+                            <span>📄</span>
+                            View Invoice
+                            <span className="absolute inset-0 rounded-xl bg-white opacity-0 group-hover:opacity-10 transition-opacity"></span>
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Order Summary Footer */}
+            <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-t border-gray-200">
+              <div className="flex flex-wrap justify-between items-center gap-4">
+                <div className="flex gap-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                    <span className="text-gray-600">Paid</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                    <span className="text-gray-600">Pending</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                    <span className="text-gray-600">Failed</span>
+                  </div>
                 </div>
-              );
-            })}
+                <div className="text-sm text-gray-500">
+                  Total Orders: <span className="font-bold text-gray-800">{orders.length}</span>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 };
 
