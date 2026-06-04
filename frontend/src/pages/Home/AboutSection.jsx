@@ -106,7 +106,7 @@ export default function AboutSection() {
           </div>
           
           <div className="text-center">
-            <div className="text-4xl md:text-5xl font-bold text-indigo-600 mb-2">98%</div>
+            <div className="text-4xl md:text-5xl font-bold text-slate-900 mb-2">98%</div>
             <div className="text-slate-500 text-sm font-medium">Satisfaction Rate</div>
           </div>
           
