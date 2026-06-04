@@ -1,37 +1,52 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
+
 import Header from './components/Header.jsx'
 import Footer from './components/Footer.jsx'
+
 import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
+import Home from './pages/Home/Home.jsx'
 import Categories from './pages/Categories.jsx'
 import ProductDetails from './pages/ProductDetails.jsx'
+
 import RoleDashboard from './pages/RoleDashboard.jsx'
 import Cart from './pages/Cart.jsx'
 import Wishlist from './pages/Wishlist.jsx'
 import Orders from './pages/Orders.jsx'
 import Profile from './pages/Profile.jsx'
-import ProtectedRoute from './routes/ProtectedRoute.jsx'
 import PaymentPage from './pages/PaymentPage.jsx'
 import InvoicePreview from './pages/InvoicePreview.jsx'
+import SearchResults from './pages/SearchResults.jsx'
+import Deals from './pages/Deals.jsx'
+
+import ProtectedRoute from './routes/ProtectedRoute.jsx'
 
 function App() {
   return (
     <BrowserRouter>
       <Toaster position="top-right" />
       <Header />
+
       <main className="min-h-[calc(100vh-200px)]">
+
         <Routes>
+
+          {/* AUTH */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+
+          {/* HOME */}
           <Route
             path="/"
             element={
               <ProtectedRoute allowedRoles={['user']}>
-                <Categories />
+                <Home />
               </ProtectedRoute>
             }
           />
+
+          {/* CATEGORIES */}
           <Route
             path="/categories"
             element={
@@ -40,14 +55,18 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* PRODUCTS (CATEGORY WISE) */}
           <Route
-            path="/products"
+            path="/products/:categoryId"
             element={
               <ProtectedRoute allowedRoles={['user']}>
-                <Categories />
+                <Products />
               </ProtectedRoute>
             }
           />
+
+          {/* PRODUCT DETAILS */}
           <Route
             path="/product/:productId"
             element={
@@ -56,6 +75,8 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* CART */}
           <Route
             path="/invoice/:invoiceNo"
             element={
@@ -73,6 +94,7 @@ function App() {
             }
           />
 
+          {/* WISHLIST */}
           <Route
             path="/wishlist"
             element={
@@ -81,6 +103,8 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* ORDERS */}
           <Route
             path="/orders"
             element={
@@ -89,6 +113,28 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* SEARCH */}
+          <Route
+            path="/search"
+            element={
+              <ProtectedRoute allowedRoles={['user']}>
+                <SearchResults />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* DEALS */}
+          <Route
+            path="/deals"
+            element={
+              <ProtectedRoute allowedRoles={['user']}>
+                <Deals />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* PROFILE */}
           <Route
             path="/profile"
             element={
@@ -97,6 +143,18 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* PAYMENT */}
+          <Route
+            path="/payment"
+            element={
+              <ProtectedRoute>
+                <PaymentPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* ADMIN ROUTES */}
           <Route
             path="/superadmin/dashboard"
             element={
@@ -105,6 +163,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/admin/dashboard"
             element={
@@ -113,14 +172,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route
-  path="/payment"
-  element={
-    <ProtectedRoute>
-      <PaymentPage />
-    </ProtectedRoute>
-  }
-/>
+
           <Route
             path="/cashier/dashboard"
             element={
@@ -129,9 +181,13 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* FALLBACK */}
           <Route path="*" element={<Navigate to="/login" replace />} />
+
         </Routes>
       </main>
+
       <Footer />
     </BrowserRouter>
   )
