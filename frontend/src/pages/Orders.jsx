@@ -72,11 +72,7 @@ const Orders = () => {
             </div>
             <div className="h-1 w-24 bg-gradient-to-r from-blue-500 to-pink-500 rounded-full mx-auto"></div>
           </div>
-          <p className="text-gray-600 mt-3 text-lg">
-            {loading
-              ? "Fetching your orders..."
-              : `✨ ${orders.length} order${orders.length !== 1 ? "s" : ""} found ✨`}
-          </p>
+          
         </div>
 
         {/* Loading Skeleton */}
