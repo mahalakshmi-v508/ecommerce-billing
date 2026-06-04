@@ -190,10 +190,89 @@ if (!$conn->query($pay_sql)) {
 }
 
 /* ── DEDUCT STOCK ── */
+/* ── DEDUCT STOCK + LOW STOCK NOTIFICATION ── */
+
 foreach ($products as $item) {
+
     $pid = intval($item['product_id']);
     $qty = floatval($item['qty']);
-    $conn->query("UPDATE products SET stock = stock - $qty WHERE id='$pid'");
+
+    /* GET CURRENT STOCK BEFORE DEDUCT */
+    $stockQry = $conn->query("
+        SELECT product_name, stock
+        FROM products
+        WHERE id='$pid'
+        LIMIT 1
+    ");
+
+    if (!$stockQry || $stockQry->num_rows == 0) {
+        continue;
+    }
+
+    $product = $stockQry->fetch_assoc();
+
+    $product_name = $product['product_name'];
+    $old_stock    = floatval($product['stock']);
+
+    /* DEDUCT STOCK */
+    $conn->query("
+        UPDATE products
+        SET stock = stock - $qty
+        WHERE id='$pid'
+    ");
+
+    /* GET UPDATED STOCK */
+    $newStockQry = $conn->query("
+        SELECT stock
+        FROM products
+        WHERE id='$pid'
+        LIMIT 1
+    ");
+
+    if (!$newStockQry || $newStockQry->num_rows == 0) {
+        continue;
+    }
+
+    $new_stock = floatval(
+        $newStockQry->fetch_assoc()['stock']
+    );
+
+    /*
+    NOTIFICATION ONLY WHEN:
+    OLD STOCK >= 20
+    AND
+    NEW STOCK < 20
+    */
+
+    if ($old_stock >= 20 && $new_stock < 20) {
+
+        $title = $conn->real_escape_string(
+            "Low Stock Alert"
+        );
+
+        $message = $conn->real_escape_string(
+            "Product '$product_name' stock is low ($new_stock units). Please reorder soon."
+        );
+
+        $conn->query("
+            INSERT INTO notifications
+            (
+                company_id,
+                product_id,
+                title,
+                message,
+                level
+            )
+            VALUES
+            (
+                '$company_id',
+                '$pid',
+                '$title',
+                '$message',
+                'warning'
+            )
+        ");
+    }
 }
 
 /* ── UPDATE CUSTOMER: advance_balance + loyalty_points + pending_amount ── */
