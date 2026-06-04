@@ -70,7 +70,7 @@ export default function WhyChooseUs() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-20 px-6 bg-gray-50">
+    <section ref={sectionRef} className="py-14 px-6 bg-gray-50">
       <div className="max-w-7xl mx-auto">
         {/* Section Header - Amazon/Flipkart style */}
         <div className="text-center mb-12">

@@ -113,7 +113,7 @@ export default function HowItWorks() {
   }, [isVisible, steps.length]);
 
   return (
-    <section ref={sectionRef} className="relative py-28 px-4 md:px-8 bg-[#F8FAFC] overflow-hidden font-sans">
+    <section ref={sectionRef} className="relative py-14 px-4 md:px-8 bg-[#F8FAFC] overflow-hidden">
       
       {/* Background Architectural Elements */}
       <div className="absolute inset-0 z-0 opacity-20 pointer-events-none">
@@ -125,14 +125,10 @@ export default function HowItWorks() {
         
         {/* Section Header */}
         <div className="flex flex-col items-center text-center mb-20">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-blue-100 bg-blue-50/60 backdrop-blur-sm text-xs font-bold tracking-wider text-[#1e3a8a] uppercase mb-4">
-            <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
-            Why Choose Us
-          </div>
-          <h2 className="text-3xl md:text-5xl font-black tracking-tight text-[#0f172a]">
+          <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-[#0f172a]">
             The Customer Journey Blueprint
           </h2>
-          <p className="mt-4 text-[#475569] max-w-xl text-base md:text-lg font-medium">
+          <p className="mt-4 text-slate-500 max-w-xl text-base md:text-lg leading-relaxed">
             An engineered lifecycle designed for absolute reliability, security, and elite speed.
           </p>
         </div>
@@ -180,7 +176,7 @@ export default function HowItWorks() {
                         {step.stepNumber}
                       </span>
                     </div>
-                    <p className={`text-xs mt-1 font-medium truncate transition-colors duration-200 ${
+                    <p className={`text-slate-500 text-xs mt-1 leading-relaxed truncate transition-colors duration-200 ${
                       isCurrent ? 'text-[#334155]' : 'text-gray-400'
                     }`}>
                       {step.description}
@@ -218,13 +214,13 @@ export default function HowItWorks() {
               {/* Dynamic Content Core Presentation Block */}
               <div className="flex-1 flex flex-col justify-center py-6">
                 <div key={activeStep} className="animate-fade-in-up">
-                  <div className="text-xs font-extrabold uppercase tracking-widest text-blue-600 mb-2 font-mono">
+                  <div className="text-xs font-bold uppercase tracking-widest text-blue-600 mb-2 font-mono">
                     {steps[activeStep].title} Stage
                   </div>
-                  <h4 className="text-2xl md:text-3xl font-black text-[#0f172a] tracking-tight leading-tight">
+                  <h4 className="text-2xl md:text-3xl font-bold text-[#0f172a] tracking-tight leading-tight">
                     {steps[activeStep].description}
                   </h4>
-                  <p className="mt-4 text-sm md:text-base text-[#475569] font-medium leading-relaxed max-w-xl">
+                  <p className="mt-4 text-sm md:text-base text-slate-500 leading-relaxed max-w-xl">
                     {steps[activeStep].detailedDesc}
                   </p>
                 </div>
@@ -247,18 +243,6 @@ export default function HowItWorks() {
             </div>
           </div>
 
-        </div>
-
-        {/* Global Action Engine Call-to-Action */}
-        <div className="mt-16 flex flex-col items-center">
-          <button className="group relative overflow-hidden px-10 py-4 bg-blue-600 text-white rounded-full font-bold text-sm tracking-wide shadow-xl shadow-blue-600/20 hover:shadow-blue-600/30 transition-all duration-300 transform hover:-translate-y-0.5">
-            <span className="relative flex items-center gap-2">
-              Start Your Journey
-              <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            </span>
-          </button>
         </div>
 
       </div>
