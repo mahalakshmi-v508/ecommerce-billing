@@ -65,18 +65,14 @@ const Orders = () => {
         <div className="mb-8 text-center">
           <div className="inline-block">
             <div className="flex items-center gap-3 justify-center mb-2">
-              <span className="text-5xl">📋</span>
+              {/* <span className="text-5xl">📋</span> */}
               <h1 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
                 My Orders
               </h1>
             </div>
             <div className="h-1 w-24 bg-gradient-to-r from-blue-500 to-pink-500 rounded-full mx-auto"></div>
           </div>
-          <p className="text-gray-600 mt-3 text-lg">
-            {loading
-              ? "Fetching your orders..."
-              : `✨ ${orders.length} order${orders.length !== 1 ? "s" : ""} found ✨`}
-          </p>
+          
         </div>
 
         {/* Loading Skeleton */}

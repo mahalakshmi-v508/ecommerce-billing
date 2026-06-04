@@ -73,7 +73,7 @@ export default function HeroSection({ navigate }) {
                 {/* Badge */}
                 {/* <div className="inline-block mb-6">
                   <span className="bg-gradient-to-r from-pink-500 to-orange-500 text-white px-4 py-1.5 rounded-full text-sm font-semibold shadow-lg">
-                    🎉 {slide.badge}
+                     {slide.badge}
                   </span>
                 </div> */}
 

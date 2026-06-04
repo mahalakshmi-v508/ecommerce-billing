@@ -18,9 +18,7 @@ export default function Testimonials() {
       avatar: "👩‍🎨",
       date: "2 days ago",
       verified: true,
-      purchase: "Women's Ethnic Wear",
-      color: "from-indigo-500 to-purple-500",
-      bgColor: "bg-indigo-50"
+      purchase: "Women's Ethnic Wear"
     },
     {
       id: 2,
@@ -32,9 +30,7 @@ export default function Testimonials() {
       avatar: "👨‍💻",
       date: "5 days ago",
       verified: true,
-      purchase: "Electronics Gadgets",
-      color: "from-purple-500 to-pink-500",
-      bgColor: "bg-purple-50"
+      purchase: "Electronics Gadgets"
     },
     {
       id: 3,
@@ -46,9 +42,7 @@ export default function Testimonials() {
       avatar: "👩‍👧",
       date: "1 week ago",
       verified: true,
-      purchase: "Home & Kitchen",
-      color: "from-pink-500 to-rose-500",
-      bgColor: "bg-pink-50"
+      purchase: "Home & Kitchen"
     },
     {
       id: 4,
@@ -60,9 +54,7 @@ export default function Testimonials() {
       avatar: "👨‍💼",
       date: "3 days ago",
       verified: true,
-      purchase: "Bulk Orders",
-      color: "from-green-500 to-emerald-500",
-      bgColor: "bg-green-50"
+      purchase: "Bulk Orders"
     },
     {
       id: 5,
@@ -74,9 +66,7 @@ export default function Testimonials() {
       avatar: "👩‍💻",
       date: "1 day ago",
       verified: true,
-      purchase: "Electronics",
-      color: "from-blue-500 to-cyan-500",
-      bgColor: "bg-blue-50"
+      purchase: "Electronics"
     },
     {
       id: 6,
@@ -88,9 +78,7 @@ export default function Testimonials() {
       avatar: "👨‍🎓",
       date: "4 days ago",
       verified: true,
-      purchase: "Fashion",
-      color: "from-orange-500 to-red-500",
-      bgColor: "bg-orange-50"
+      purchase: "Fashion"
     }
   ];
 
@@ -168,7 +156,7 @@ export default function Testimonials() {
   };
 
   return (
-    <section ref={sectionRef} className="relative py-24 px-6 overflow-hidden bg-gradient-to-b from-gray-50 to-white">
+    <section ref={sectionRef} className="relative pt-6 pb-24 px-6 overflow-hidden bg-gradient-to-b from-gray-50 to-white">
       {/* Background Decorations */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-20 right-20 w-72 h-72 bg-indigo-100/20 rounded-full blur-3xl"></div>
@@ -228,13 +216,15 @@ export default function Testimonials() {
                   className="w-full md:w-[calc(33.333%-16px)] flex-shrink-0"
                 >
                   <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden h-full transform hover:-translate-y-2">
-                    <div className={`absolute top-0 left-0 w-1 h-full bg-gradient-to-b ${testimonial.color}`}></div>
+                    {/* Same color bar for all cards */}
+                    <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-indigo-500 to-purple-500"></div>
                     
                     <div className="p-6">
                       {/* Header */}
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex items-center gap-3">
-                          <div className={`w-12 h-12 rounded-full bg-gradient-to-r ${testimonial.color} flex items-center justify-center text-xl shadow-md`}>
+                          {/* Same gradient for all avatars */}
+                          <div className="w-12 h-12 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center text-xl shadow-md">
                             {testimonial.avatar}
                           </div>
                           <div>
@@ -273,11 +263,7 @@ export default function Testimonials() {
               ))}
             </div>
           </div>
-
-         
         </div>
-
-        
       </div>
 
       <style jsx>{`
