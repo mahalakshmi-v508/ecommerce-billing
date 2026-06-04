@@ -15,7 +15,7 @@ export default function EcommerceHeader() {
   const [cartCount, setCartCount] = useState(0)
   const [wishlistCount, setWishlistCount] = useState(0)
   const [searchQuery, setSearchQuery] = useState('')
-  const [notificationsCount] = useState(3) // Can be dynamic later
+  
 
   // Refs for click outside detection
   const profileRef = useRef(null)
@@ -182,19 +182,7 @@ export default function EcommerceHeader() {
               </Link>
             )}
 
-            {/* Notifications */}
-            {isAuthenticated && (
-              <button className="relative text-slate-700 hover:text-indigo-600 transition-colors">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                </svg>
-                {notificationsCount > 0 && (
-                  <span className="absolute -right-2 -top-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-yellow-500 text-xs font-bold text-white">
-                    {notificationsCount}
-                  </span>
-                )}
-              </button>
-            )}
+          
 
             {/* User Profile */}
             {isAuthenticated && (

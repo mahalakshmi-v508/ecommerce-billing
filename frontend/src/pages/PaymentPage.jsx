@@ -3,10 +3,10 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
 import { createInvoice } from '../services/invoiceService'
 import { clearCart } from '../services/cartService'
-import { 
-  CreditCard, 
-  Wallet, 
-  CalendarDays, 
+import {
+  CreditCard,
+  Wallet,
+  CalendarDays,
   IndianRupee,
   ShoppingBag,
   CheckCircle,
@@ -27,6 +27,9 @@ export default function PaymentPage() {
 
   const totalAmount = location.state?.totalAmount || 0
   const cartItems = location.state?.cartItems || []
+  const subTotal = location.state?.subTotal || 0
+  const gstAmount = location.state?.gstAmount || 0
+
   const companyId = location.state?.company_id ?? cartItems[0]?.company_id ?? parseInt(user?.company_id || 0)
   const cashierId = location.state?.cashier_id ?? parseInt(user?.cashier_id ?? user?.id ?? 0)
 
@@ -61,6 +64,9 @@ export default function PaymentPage() {
   ]
 
   const handlePayment = async () => {
+    console.log("subTotal =", subTotal);
+console.log("gstAmount =", gstAmount);
+console.log("totalAmount =", totalAmount);
     try {
       setLoading(true)
 
@@ -69,21 +75,23 @@ export default function PaymentPage() {
         qty: parseInt(item.quantity || item.qty || 1),
       }))
 
-      const payload = {
-        company_id: companyId,
-        customer_id: parseInt(user?.id || 21),
-        customer_name: user?.name || 'Guest',
-        customer_phone: user?.phone || '9876543210',
-        cashier_id: cashierId,
-        products,
-        sub_total: totalAmount,
-        gst_total: 0,
-        total_amount: totalAmount,
-        payment_method: paymentMethod,
-        payment_type: paymentMethod === 'credit' ? 'credit' : 'cash',
-        gst_type: 'without_gst',
-        paid_amount: paymentMethod === 'credit' ? 0 : totalAmount,
-      }
+const payload = {
+  company_id: companyId,
+  customer_id: parseInt(user?.id || 21),
+  customer_name: user?.name || 'Guest',
+  customer_phone: user?.phone || '9876543210',
+  cashier_id: cashierId,
+  products,
+  sub_total: subTotal,
+  gst_total: gstAmount,
+  total_amount: totalAmount,
+  payment_method: paymentMethod,
+  payment_type: paymentMethod === 'credit' ? 'credit' : 'cash',
+  gst_type: 'with_gst',
+  paid_amount: paymentMethod === 'credit' ? 0 : totalAmount,
+}
+
+console.log("PAYLOAD =", payload);
 
       const response = await createInvoice(payload)
 
@@ -129,7 +137,7 @@ export default function PaymentPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 py-8 px-4">
       <div className="max-w-6xl mx-auto">
-        
+
         {/* Header */}
         <div className="mb-8 text-center">
           <div className="inline-flex items-center gap-3 bg-white/80 backdrop-blur-sm rounded-full px-6 py-3 shadow-lg mb-4">
@@ -143,7 +151,7 @@ export default function PaymentPage() {
 
         {/* Two Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          
+
           {/* LEFT COLUMN - Payment Section */}
           <div className="space-y-6">
             {/* Payment Methods Card */}
@@ -154,20 +162,20 @@ export default function PaymentPage() {
                   <h2 className="text-xl font-bold text-gray-800">Select Payment Method</h2>
                 </div>
               </div>
-              
+
               <div className="p-6 space-y-4">
                 {paymentMethods.map((method) => {
                   const Icon = method.icon
                   const isSelected = paymentMethod === method.id
-                  
+
                   return (
                     <label
                       key={method.id}
                       className={`
                         flex items-center justify-between p-4 rounded-xl border-2 cursor-pointer
                         transition-all duration-200
-                        ${isSelected 
-                          ? `border-purple-500 bg-gradient-to-r from-purple-50 to-pink-50 shadow-md` 
+                        ${isSelected
+                          ? `border-purple-500 bg-gradient-to-r from-purple-50 to-pink-50 shadow-md`
                           : 'border-gray-200 hover:border-purple-200'
                         }
                       `}
@@ -181,7 +189,7 @@ export default function PaymentPage() {
                           <p className="text-sm text-gray-500">{method.description}</p>
                         </div>
                       </div>
-                      
+
                       <div className={`
                         w-5 h-5 rounded-full border-2 flex items-center justify-center
                         ${isSelected ? 'border-purple-500' : 'border-gray-300'}
@@ -206,8 +214,8 @@ export default function PaymentPage() {
                       {paymentMethod === 'credit' && 'You will receive an invoice for credit payment'}
                     </p>
                     <p className="text-xs text-gray-500 mt-1">
-                      {paymentMethod === 'credit' 
-                        ? 'Payment due within 30 days' 
+                      {paymentMethod === 'credit'
+                        ? 'Payment due within 30 days'
                         : 'Secure transaction encrypted'}
                     </p>
                   </div>
@@ -250,7 +258,7 @@ export default function PaymentPage() {
                   </div>
                   <span className="text-sm opacity-90">{cartItems.length} items</span>
                 </div>
-                
+
                 {/* Total Amount */}
                 <div>
                   <p className="text-sm opacity-80">Total Amount</p>
@@ -279,24 +287,33 @@ export default function PaymentPage() {
 
                 {/* Price Breakup */}
                 <div className="mt-6 pt-4 border-t border-gray-200 space-y-2">
+
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-500">Subtotal</span>
-                    <span className="text-gray-800">₹{Number(totalAmount).toFixed(2)}</span>
+                    <span className="text-gray-800">
+                      ₹{Number(subTotal).toFixed(2)}
+                    </span>
                   </div>
+
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">GST (0%)</span>
-                    <span className="text-gray-800">₹0.00</span>
+                    <span className="text-gray-500">GST (18%)</span>
+                    <span className="text-gray-800">
+                      ₹{Number(gstAmount).toFixed(2)}
+                    </span>
                   </div>
+
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-500">Delivery Charges</span>
                     <span className="text-green-600">Free</span>
                   </div>
+
                   <div className="flex justify-between pt-3 border-t border-dashed border-gray-200">
                     <span className="font-bold text-gray-800">Grand Total</span>
                     <span className="text-xl font-extrabold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                       ₹{Number(totalAmount).toFixed(2)}
                     </span>
                   </div>
+
                 </div>
 
                 {/* Delivery Info */}
