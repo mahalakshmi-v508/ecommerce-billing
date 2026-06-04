@@ -2,9 +2,9 @@ import HeroSection from './HeroSection'
 import AboutSection from './AboutSection'
 import HowItWorks from './HowItWorks'
 import WhyChooseUs from './WhyChooseUs'
-import StatsSection from './StatsSection'
+
 import Testimonials from './Testimonials'
-import Newsletter from './Newsletter'
+
 
 import { useAuth } from '../../context/AuthContext.jsx'
 import { useNavigate } from 'react-router-dom'
@@ -24,11 +24,11 @@ export default function Home() {
 
       <WhyChooseUs />
 
-      <StatsSection />
+      
 
       <Testimonials />
 
-      <Newsletter />
+     
 
       
 
