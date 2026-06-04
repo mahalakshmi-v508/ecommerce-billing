@@ -65,7 +65,7 @@ const Orders = () => {
         <div className="mb-8 text-center">
           <div className="inline-block">
             <div className="flex items-center gap-3 justify-center mb-2">
-              <span className="text-5xl">📋</span>
+              {/* <span className="text-5xl">📋</span> */}
               <h1 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
                 My Orders
               </h1>
