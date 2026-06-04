@@ -40,7 +40,7 @@ export default function AboutSection() {
   ];
 
   return (
-    <section className="relative py-24 px-6 overflow-hidden bg-white">
+    <section className="relative py-14 px-6 overflow-hidden bg-white">
       {/* Background Subtle Geometrics */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl"></div>
@@ -53,13 +53,7 @@ export default function AboutSection() {
           
         {/* Section Header */}
         <div className="text-center mb-20">
-          <div className="inline-block mb-4">
-            <span className="bg-indigo-50 border border-indigo-100 text-indigo-700 px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider uppercase">
-              Why Choose Us
-            </span>
-          </div>
-          
-          <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-slate-900 mb-4">
+          <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-slate-900">
             About SmartCommerce
           </h2>
           
