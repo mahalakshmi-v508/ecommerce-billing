@@ -65,14 +65,13 @@ const Orders = () => {
         <div className="mb-8 text-center">
           <div className="inline-block">
             <div className="flex items-center gap-3 justify-center mb-2">
-              {/* <span className="text-5xl">📋</span> */}
-              <h1 className="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <h1 className="text-4xl md:text-5xl font-extrabold text-black">
                 My Orders
               </h1>
             </div>
-            <div className="h-1 w-24 bg-gradient-to-r from-blue-500 to-pink-500 rounded-full mx-auto"></div>
+
+            <div className="h-1 w-24 bg-black rounded-full mx-auto"></div>
           </div>
-          
         </div>
 
         {/* Loading Skeleton */}
@@ -100,7 +99,7 @@ const Orders = () => {
               onClick={() => navigate("/shop")}
               className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-200"
             >
-              Start Shopping 🚀
+              Start Shopping
             </button>
           </div>
         )}
@@ -119,6 +118,9 @@ const Orders = () => {
                       Date
                     </th>
                     <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                      Products
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
                       Total
                     </th>
                     <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
@@ -128,12 +130,7 @@ const Orders = () => {
                     <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
                       GST
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                      Products
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                      Status
-                    </th>
+
                     <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
                       Action
                     </th>
@@ -169,6 +166,14 @@ const Orders = () => {
                           </div>
                         </td>
 
+                        <td className="px-6 py-4">
+                          {order.products?.map((product, index) => (
+                            <div key={index} className="text-sm text-gray-700">
+                              {product.product_name}
+                            </div>
+                          ))}
+                        </td>
+
                         {/* Total */}
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-lg font-bold text-blue-600">
@@ -188,29 +193,17 @@ const Orders = () => {
                           </div>
                         </td>
 
-                        <td className="px-6 py-4">
-                          {order.products?.map((product, index) => (
-                            <div key={index} className="text-sm text-gray-700">
-                              {product.product_name} × {product.qty}
-                            </div>
-                          ))}
-                        </td>
-                        {/* Status */}
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold border ${statusBadge.color}`}>
-                            {statusBadge.icon} {order.payment_status}
-                          </span>
-                        </td>
+
 
                         {/* Action */}
                         <td className="px-6 py-4 whitespace-nowrap">
                           <button
                             onClick={() => navigate(`/invoice/${order.invoice_id || order.invoice_no}`)}
-                            className="group relative inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 text-white text-sm font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-200"
+                            className="group relative inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border-2 border-black text-black text-sm font-semibold hover:bg-black hover:text-white hover:shadow-lg transform hover:scale-105 transition-all duration-200"
                           >
-                            <span>📄</span>
+                            {/* <span>📄</span> */}
                             View Invoice
-                            <span className="absolute inset-0 rounded-xl bg-white opacity-0 group-hover:opacity-10 transition-opacity"></span>
+                            <span className="absolute inset-0 rounded-xl bg-black opacity-0 group-hover:opacity-5 transition-opacity"></span>
                           </button>
                         </td>
                       </tr>
