@@ -96,6 +96,7 @@ export default function EcommerceHeader() {
       { label: 'Dashboard', href: '/wholesaler/dashboard' },
       { label: 'Bulk Orders', href: '/wholesaler/orders' },
       { label: 'Profile', href: '/profile' },
+      { label: 'Wishlist', href: '/wishlist' }, // Added Wishlist for wholesaler dropdown too
     ],
   }
 
@@ -106,6 +107,7 @@ export default function EcommerceHeader() {
         { label: 'Dashboard', href: '/wholesaler/dashboard' },
         { label: 'Wholesale Products', href: '/wholesaler/products' },
         { label: 'Bulk Orders', href: '/wholesaler/orders' },
+        { label: 'Wishlist', href: '/wishlist' }, // Added here for mobile
         { label: 'Cart', href: '/cart' },
         { label: 'Profile', href: '/profile' },
       ]
@@ -235,12 +237,10 @@ export default function EcommerceHeader() {
           <div className="flex items-center gap-1 sm:gap-2">
             {isAuthenticated && (
               <>
-                {/* Wishlist Icon - Only for regular users if required, or common */}
-                {user?.role !== 'wholesaler' && (
-                  <IconButton to="/wishlist" count={wishlistCount} label="Wishlist">
-                    <Heart className="h-5 w-5" strokeWidth={1.5} />
-                  </IconButton>
-                )}
+                {/* Wishlist Icon - Now visible to EVERYONE (User & Wholesaler) */}
+                <IconButton to="/wishlist" count={wishlistCount} label="Wishlist">
+                  <Heart className="h-5 w-5" strokeWidth={1.5} />
+                </IconButton>
                 
                 {/* Cart Icon - Common for user and wholesaler */}
                 <IconButton to="/cart" count={cartCount} label="Cart">
