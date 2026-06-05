@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import {
-  ShoppingCart,
+  ShoppingBag,
   Trash2,
   Plus,
   Minus,
   CreditCard,
-  ShoppingBag,
   IndianRupee,
-  AlertCircle
+  ShieldCheck,
+  ArrowRight,
+  ChevronLeft
 } from 'lucide-react'
 
 import {
@@ -17,6 +18,7 @@ import {
   updateCartQuantity,
   removeFromCart
 } from '../services/cartService.js'
+import { buildProductImageUrl } from '../services/api.js'
 
 export default function Cart() {
   const { user } = useAuth()
@@ -117,55 +119,53 @@ export default function Cart() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-purple-600 border-t-transparent"></div>
-          <p className="mt-4 text-lg font-semibold text-purple-600">Loading your cart...</p>
-        </div>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="w-5 h-5 border-2 border-stone-900 border-t-transparent rounded-full animate-spin"></div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 py-8 px-4">
-      <div className="max-w-7xl mx-auto">
-        {/* Header Section */}
-        <div className="mb-8 text-center">
-          <div className="inline-flex items-center gap-3 bg-white/80 backdrop-blur-sm rounded-full px-6 py-3 shadow-lg mb-4">
-            <ShoppingBag className="w-8 h-8 text-purple-600" />
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              My Shopping Cart
+    <div className="min-h-screen bg-white text-stone-900 py-12 px-4 md:px-12 font-sans selection:bg-stone-100">
+      <div className="max-w-6xl mx-auto">
+        
+        {/* Sleek Minimal Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-stone-100 pb-6 mb-10 gap-4">
+          <div className="space-y-1">
+            <div className="text-xs font-semibold tracking-[0.2em] text-stone-400 uppercase">
+              Shopping Overview
+            </div>
+            <h1 className="text-3xl font-bold tracking-tight text-stone-900">
+              Shopping Bag <span className="text-xl font-normal text-stone-400 ml-1">/ {itemCount} Items</span>
             </h1>
           </div>
-          {cartItems.length > 0 && (
-            <p className="text-gray-600 mt-2">{itemCount} items in your cart</p>
-          )}
+          <Link 
+            to="/products" 
+            className="group inline-flex items-center gap-1 text-xs font-medium tracking-wider uppercase text-stone-500 hover:text-black transition-colors"
+          >
+            <ChevronLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
+            Continue Browsing
+          </Link>
         </div>
 
         {cartItems.length === 0 ? (
-          <div className="max-w-md mx-auto">
-            <div className="bg-white rounded-3xl shadow-xl p-12 text-center transform transition hover:scale-105">
-              <div className="inline-flex items-center justify-center w-32 h-32 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full mb-6">
-                <ShoppingCart className="w-16 h-16 text-purple-600" />
-              </div>
-              <h2 className="text-3xl font-bold text-gray-800 mb-3">
-                Your Cart is Empty
-              </h2>
-              <p className="text-gray-500 mb-8">
-                Looks like you haven't added any items yet
-              </p>
-              <button
-                onClick={() => navigate('/products')}
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 rounded-xl font-semibold hover:shadow-lg transition-all hover:scale-105"
-              >
-                <ShoppingBag className="w-5 h-5" />
-                Start Shopping
-              </button>
-            </div>
+          /* High-End Minimal Empty State */
+          <div className="text-center py-24 border border-stone-100 rounded-3xl bg-stone-50/40 max-w-md mx-auto p-8">
+            <ShoppingBag className="w-6 h-6 text-stone-300 mx-auto mb-4 stroke-[1.5]" />
+            <h2 className="text-base font-medium text-stone-700 mb-1">Your bag is empty</h2>
+            <p className="text-xs text-stone-400 max-w-xs mx-auto mb-8">Once you discover products you love, they'll be managed right here.</p>
+            <button
+              onClick={() => navigate('/products')}
+              className="inline-block px-6 py-3 bg-stone-900 text-white text-[11px] font-semibold tracking-widest uppercase rounded-full hover:bg-stone-800 transition-all shadow-sm"
+            >
+              Explore Products
+            </button>
           </div>
         ) : (
-          <div className="grid lg:grid-cols-3 gap-8">
-            {/* Cart Items Section */}
+          /* Main Checkout Studio Layout */
+          <div className="grid lg:grid-cols-3 gap-12 items-start">
+            
+            {/* Left Side: Dynamic Luxury Cart Items */}
             <div className="lg:col-span-2 space-y-4">
               {cartItems.map((item, index) => {
                 const uniqueKey = item.product_id || item.id || index;
@@ -175,127 +175,134 @@ export default function Cart() {
                 return (
                   <div
                     key={uniqueKey}
-                    className="group bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
+                    className="group relative bg-white border border-stone-100 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-6 transition-all duration-300 hover:shadow-lg"
                   >
-                    <div className="p-6">
-                      <div className="flex flex-col sm:flex-row gap-6">
-                        {/* Product Image Placeholder */}
-                        <div className="flex-shrink-0">
-                          <div className="w-32 h-32 bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl flex items-center justify-center">
-                            <ShoppingBag className="w-12 h-12 text-purple-600" />
+                    
+                    {/* Visual Segment & Identification */}
+                    <div className="flex items-center gap-5 w-full sm:w-auto">
+                      <div className="relative w-24 h-24 rounded-xl overflow-hidden bg-gray-100 border border-stone-100 flex-shrink-0">
+                        {item.image ? (
+                          <img
+                            src={buildProductImageUrl(item.image)}
+                            alt={item.product_name}
+                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center bg-gray-100 text-stone-300">
+                            <ShoppingBag className="w-6 h-6" />
                           </div>
-                        </div>
+                        )}
+                      </div>
 
-                        {/* Product Details */}
-                        <div className="flex-grow">
-                          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                            <div>
-                              <h3 className="text-xl font-bold text-gray-800 mb-2">
-                                {item.product_name}
-                              </h3>
-                              <div className="flex items-center gap-2 text-gray-600">
-                                <IndianRupee className="w-4 h-4" />
-                                <span className="text-lg font-semibold">
-                                  {parseFloat(item.price || 0).toFixed(2)}
-                                </span>
-                                <span className="text-sm text-gray-400">per item</span>
-                              </div>
-                            </div>
-
-                            <div className="text-right">
-                              <div className="flex items-center gap-2 text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                                <IndianRupee className="w-5 h-5" />
-                                {(parseFloat(item.price || 0) * parseInt(item.quantity || 0)).toFixed(2)}
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Quantity Controls */}
-                          <div className="flex items-center justify-between mt-6">
-                            <div className="flex items-center gap-3">
-                              <button
-                                onClick={() => handleQuantity(item.id, parseInt(item.quantity || 1), 'decrease')}
-                                disabled={isUpdating}
-                                className="w-10 h-10 rounded-xl bg-red-500 text-white font-bold hover:bg-red-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105"
-                              >
-                                <Minus className="w-5 h-5 mx-auto" />
-                              </button>
-
-                              <div className="relative">
-                                <span className="text-xl font-bold text-gray-800 min-w-[40px] text-center block">
-                                  {item.quantity}
-                                </span>
-                                {isUpdating && (
-                                  <div className="absolute -top-8 left-1/2 transform -translate-x-1/2">
-                                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-purple-600 border-t-transparent"></div>
-                                  </div>
-                                )}
-                              </div>
-
-                              <button
-                                onClick={() => handleQuantity(item.id, parseInt(item.quantity || 1), 'increase')}
-                                disabled={isUpdating}
-                                className="w-10 h-10 rounded-xl bg-green-500 text-white font-bold hover:bg-green-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105"
-                              >
-                                <Plus className="w-5 h-5 mx-auto" />
-                              </button>
-                            </div>
-
-                            <button
-                              onClick={() => handleRemove(item.id)}
-                              disabled={isRemoving}
-                              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              {isRemoving ? (
-                                <div className="animate-spin rounded-full h-4 w-4 border-2 border-red-600 border-t-transparent"></div>
-                              ) : (
-                                <Trash2 className="w-4 h-4" />
-                              )}
-                              <span className="text-sm font-medium">Remove</span>
-                            </button>
-                          </div>
+                      {/* Title Specs and Dynamic Price Elements */}
+                      <div className="space-y-1.5">
+                        <h3 className="text-sm font-semibold text-stone-800 tracking-tight line-clamp-1 group-hover:text-black transition-colors">
+                          {item.product_name}
+                        </h3>
+                        <div className="flex items-center gap-2 text-xs text-stone-400">
+                          <span className="flex items-center font-medium text-stone-700">
+                            <IndianRupee className="w-3 h-3 stroke-[2]" />
+                            {parseFloat(item.price || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                          </span>
+                          <span>•</span>
+                          <span>Unit Cost</span>
                         </div>
                       </div>
                     </div>
+
+                    {/* Operational Core (Controls + Accumulated Subtotals) */}
+                    <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto border-t sm:border-t-0 pt-3 sm:pt-0 border-stone-100/80">
+                      
+                      {/* Premium Quantizer Core */}
+                      <div className="flex items-center bg-white border border-stone-150 rounded-xl p-1 shadow-sm relative">
+                        <button
+                          onClick={() => handleQuantity(item.id, parseInt(item.quantity || 1), 'decrease')}
+                          disabled={isUpdating || parseInt(item.quantity || 1) <= 1}
+                          className="w-8 h-8 rounded-lg flex items-center justify-center text-stone-500 hover:text-black hover:bg-stone-50 disabled:opacity-30 disabled:hover:bg-transparent transition-all"
+                        >
+                          <Minus className="w-3.5 h-3.5 stroke-[2.5]" />
+                        </button>
+
+                        <div className="w-10 text-center text-xs font-bold text-stone-800">
+                          {isUpdating ? (
+                            <div className="w-3 h-3 border border-stone-900 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                          ) : (
+                            item.quantity
+                          )}
+                        </div>
+
+                        <button
+                          onClick={() => handleQuantity(item.id, parseInt(item.quantity || 1), 'increase')}
+                          disabled={isUpdating}
+                          className="w-8 h-8 rounded-lg flex items-center justify-center text-stone-500 hover:text-black hover:bg-stone-50 disabled:opacity-30 transition-all"
+                        >
+                          <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+                        </button>
+                      </div>
+
+                      {/* Precise Accumulation Summary */}
+                      <div className="text-right min-w-[80px]">
+                        <div className="flex items-center justify-end font-bold text-stone-900 text-sm tracking-tight">
+                          <IndianRupee className="w-3.5 h-3.5 stroke-[2.5]" />
+                          {(parseFloat(item.price || 0) * parseInt(item.quantity || 0)).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                        </div>
+                      </div>
+
+                      {/* Dismissal Action Button */}
+                      <button
+                        onClick={() => handleRemove(item.id)}
+                        disabled={isRemoving}
+                        title="Remove piece"
+                        className="w-8 h-8 rounded-lg text-stone-400 hover:text-red-500 hover:bg-red-50/50 flex items-center justify-center transition-all disabled:opacity-40"
+                      >
+                        {isRemoving ? (
+                          <div className="w-3 h-3 border border-red-500 border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                          <Trash2 className="w-4 h-4 stroke-[1.8]" />
+                        )}
+                      </button>
+
+                    </div>
+
                   </div>
                 );
               })}
             </div>
 
-            {/* Order Summary Section */}
+            {/* Right Side: High-End Architectural Invoice Widget */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-2xl shadow-xl p-6 sticky top-8">
-                <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-                  <CreditCard className="w-6 h-6 text-purple-600" />
-                  Order Summary
+              <div className="border border-stone-100 rounded-2xl p-6 bg-white shadow-sm sticky top-8 space-y-6">
+                <h2 className="text-sm font-bold tracking-wider uppercase text-stone-400 pb-2 border-b border-stone-100 flex items-center gap-2">
+                  Summary Invoice
                 </h2>
 
-                <div className="space-y-4 border-b border-gray-200 pb-4">
-                  <div className="flex justify-between text-gray-600">
-                    <span>Subtotal ({itemCount} items)</span>
-                    <span className="font-semibold">₹{total.toFixed(2)}</span>
+                {/* Ledger Breakdown Rows */}
+                <div className="space-y-3.5 text-xs">
+                  <div className="flex justify-between text-stone-500">
+                    <span>Subtotal Base ({itemCount} units)</span>
+                    <span className="font-semibold text-stone-800">₹{total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                   </div>
-                  <div className="flex justify-between text-gray-600">
-                    <span>Shipping</span>
-                    <span className="text-green-600">Free</span>
+                  <div className="flex justify-between text-stone-500">
+                    <span>Logistics Dispatch</span>
+                    <span className="text-emerald-600 font-medium uppercase tracking-wider text-[10px] bg-emerald-50 px-2 py-0.5 rounded-md">Complimentary</span>
                   </div>
-                  <div className="flex justify-between text-gray-600">
-                    <span>Tax (GST)</span>
-                    <span className="font-semibold">₹{(total * 0.18).toFixed(2)}</span>
+                  <div className="flex justify-between text-stone-500">
+                    <span>Tax Assessment (GST 18%)</span>
+                    <span className="font-semibold text-stone-800">₹{gstAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                  </div>
+                  
+                  <div className="border-t border-stone-100 my-4 pt-4 flex justify-between items-baseline">
+                    <span className="text-sm font-bold text-stone-900">Grand Valuation</span>
+                    <div className="text-right">
+                      <span className="text-2xl font-black tracking-tight text-stone-900">
+                        ₹{grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
-                <div className="mt-6 pt-4">
-                  <div className="flex justify-between items-center mb-6">
-                    <span className="text-xl font-bold text-gray-800">Total Amount</span>
-                    <div className="text-right">
-                      <span className="text-3xl font-extrabold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                        ₹{total.toFixed(2)}
-                      </span>
-                      <p className="text-xs text-gray-500 mt-1">Including ₹{(total * 0.18).toFixed(2)} GST</p>
-                    </div>
-                  </div>
-
+                {/* Premium Operational Control Triggers */}
+                <div className="space-y-3 pt-2">
                   <button
                     onClick={() =>
                       navigate('/payment', {
@@ -316,33 +323,29 @@ export default function Cart() {
                         }
                       })
                     }
-                    className="w-full bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 text-white py-4 rounded-xl font-bold text-lg hover:shadow-2xl transition-all hover:scale-105 flex items-center justify-center gap-2"
+                    className="w-full bg-stone-900 text-white py-3.5 rounded-xl font-semibold text-xs tracking-widest uppercase hover:bg-stone-800 transition-all shadow-sm active:scale-[0.99] flex items-center justify-center gap-2"
                   >
-                    <CreditCard className="w-5 h-5" />
-                    Proceed to Checkout
+                    <CreditCard className="w-4 h-4" />
+                    Proceed to Settlement
+                    <ArrowRight className="w-3.5 h-3.5 ml-0.5" />
                   </button>
 
                   <button
                     onClick={() => navigate('/products')}
-                    className="w-full mt-3 bg-gray-100 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
+                    className="w-full bg-white border border-stone-200 text-stone-600 py-3 rounded-xl font-semibold text-xs tracking-wider uppercase hover:text-black hover:border-stone-400 transition-all flex items-center justify-center gap-2"
                   >
-                    <ShoppingBag className="w-4 h-4" />
-                    Continue Shopping
+                    Continue Acquisition
                   </button>
                 </div>
 
-                {/* Secure Payment Notice */}
-                <div className="mt-6 p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl">
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <AlertCircle className="w-4 h-4 text-green-600" />
-                    <span>Secure payment gateway</span>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-2">
-                    Your payment information is encrypted and secure
-                  </p>
+                {/* Micro Guarantee Label */}
+                <div className="pt-2 flex items-center gap-2.5 text-[11px] text-stone-400 border-t border-stone-100">
+                  <ShieldCheck className="w-4 h-4 text-stone-400 flex-shrink-0" />
+                  <span>Encrypted end-to-end ledger verification system.</span>
                 </div>
               </div>
             </div>
+
           </div>
         )}
       </div>

@@ -5,8 +5,8 @@ import {
   getWishlistItems,
   removeFromWishlist,
 } from '../services/wishlistService.js'
+import { addToCart as addToCartService } from '../services/cartService.js'
 import { buildProductImageUrl } from '../services/api.js'
-import axios from 'axios' // API-க்கு நேரடியாக பயன்படுத்தப்படுகிறது
 import toast from 'react-hot-toast'
 import { 
   Heart, 
@@ -67,46 +67,32 @@ export default function Wishlist() {
   | ADD TO CART FUNCTION 
   |--------------------------------------------------------------------------
   */
-  const addToCart = async (item) => {
+  const handleAddToCart = async (item) => {
+    if (!user?.id) {
+      toast.error('Please login to add items to cart')
+      return
+    }
+
     try {
-      if (!user?.id) {
-        toast.error('Please login to add items to cart')
-        return
-      }
+      const response = await addToCartService(user.id, item.product_id, 1)
 
-      // குறிப்பு: உங்களது பேக்எண்ட் கார்ட் URL எதுவோ அதை இங்கே கொடுக்கவும் (எ.கா: /api/cart/add)
-      // உங்கள் பிராஜெக்டின் பேஸ் URL-ஐ (http://localhost:5000) மாற்றிக்கொள்ளலாம்.
-      const response = await axios.post('http://localhost:5000/api/cart/add', {
-        user_id: user.id,
-        product_id: item.product_id || item.id,
-        quantity: 1
-      })
-
-      // ஒருவேளை உங்கள் API வெற்றிகரமாக முடிந்தால் (உங்களுடைய API ரெஸ்பான்ஸிற்கு ஏற்ப மாற்றவும்)
-      if (response.data.status || response.status === 200 || response.status === 201) {
-        toast.success(`${item.product_name} added to bag`)
-        
-        // ஹெடரில் இருக்கும் கார்ட் கவுண்ட் உடனே அப்டேட் ஆக
+      if (response.status) {
+        toast.success(`${item.product_name} added to cart`)
         window.dispatchEvent(new Event('cartUpdated'))
-        
-        // கார்ட்டில் சேர்த்த பின் விஷ்லிஸ்டில் இருந்து நீக்க
+
         if (item.id) {
           await removeFromWishlist(item.id)
           await loadWishlist()
           window.dispatchEvent(new Event('wishlistUpdated'))
         }
 
-        // உடனடியாக கார்ட் பக்கத்திற்கு அழைத்துச் செல்லும்
         navigate('/cart')
       } else {
-        toast.error(response.data.message || 'Failed to add to cart')
+        toast.error(response.message || 'Failed to add to cart')
       }
     } catch (error) {
       console.error(error)
-      // ஏதேனும் API எர்ரர் வந்தாலும் கார்ட் பக்கத்திற்கு அழைத்துச் செல்ல தற்காலிக ஏற்பாடு
-      toast.success(`${item.product_name} added to bag`)
-      window.dispatchEvent(new Event('cartUpdated'))
-      navigate('/cart')
+      toast.error('Unable to add item to cart')
     }
   }
 
@@ -212,7 +198,7 @@ export default function Wishlist() {
                     
                     {/* CLAIM PIECE பொத்தான் */}
                     <button
-                      onClick={() => addToCart(item)}
+                      onClick={() => handleAddToCart(item)}
                       disabled={!isInStock}
                       className={`px-5 py-2.5 rounded-xl text-xs font-semibold tracking-wider uppercase transition-all ${
                         isInStock
@@ -220,7 +206,7 @@ export default function Wishlist() {
                           : 'bg-stone-100 text-stone-400 cursor-not-allowed'
                       }`}
                     >
-                      {isInStock ? 'Claim Piece' : 'Out of stock'}
+                      {isInStock ? 'Add to Cart' : 'Out of stock'}
                     </button>
 
                     {/* Sharp Round Dismissal */}

@@ -128,9 +128,9 @@ export default function EcommerceHeader() {
       <span className="relative flex h-10 w-10 items-center justify-center text-[#111] transition hover:opacity-60">
         {children}
         {count > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center bg-[#111] px-1 text-[10px] font-medium text-white">
-            {count > 9 ? '9+' : count}
-          </span>
+        <span className="absolute -right-1 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white">
+  {count > 9 ? '9+' : count}
+</span>
         )}
       </span>
     )
@@ -196,12 +196,12 @@ export default function EcommerceHeader() {
                   >
                     Categories
                   </Link>
-                  <Link
+                  {/* <Link
                     to="/deals"
                     className="text-sm font-medium text-[#111] transition hover:opacity-60"
                   >
                     Deals
-                  </Link>
+                  </Link> */}
                   <Link
                     to="/orders"
                     className="text-sm font-medium text-[#111] transition hover:opacity-60"
