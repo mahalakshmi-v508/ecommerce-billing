@@ -29,6 +29,8 @@ import WholesalerDashboard from './pages/wholesaler/WholesalerDashboard.jsx'
 import WholesalerProducts from './pages/wholesaler/WholesalerProducts.jsx'
 import WholesalerOrders from './pages/wholesaler/WholesalerOrders.jsx'
 
+import WholesalerHome from './pages/wholesaler/Home/Home.jsx'
+
 function App() {
   return (
     <BrowserRouter>
@@ -93,6 +95,14 @@ function App() {
               </ProtectedRoute>
             }
           />
+        <Route
+  path="/wholesaler/home"
+  element={
+    <ProtectedRoute allowedRoles={['wholesaler']}>
+      <WholesalerHome />
+    </ProtectedRoute>
+  }
+/>
 
           {/* WISHLIST */}
           <Route
