@@ -46,9 +46,21 @@ export default function ProductForm() {
   const [imagePreview, setImagePreview] = useState("");
   const { toasts, show, remove } = useToast();
 
-  const [form, setForm] = useState({
-    name: "", product_code: "", image: "", price: "", stock: "", gst: "", barcode: "", category_id: "", unit: ""
-  });
+ const [companyType, setCompanyType] = useState("");
+
+const [form, setForm] = useState({
+  name: "",
+  product_code: "",
+  image: "",
+  price: "",
+  wholesale_price: "",
+  min_wholesale_qty: "",
+  stock: "",
+  gst: "",
+  barcode: "",
+  category_id: "",
+  unit: ""
+});
 
   const set = (field, val) => setForm(p => ({ ...p, [field]: val }));
 
@@ -64,14 +76,17 @@ export default function ProductForm() {
       if (!company_id) return;
       const res = await api.post("/company/get_company_by_id.php", { id: company_id });
       if (res.data.status) {
-        const company = res.data.data;
-        if (company.gst_type === "with_gst") {
-          setGstEnabled(true);
-        } else {
-          setGstEnabled(false);
-          set("gst", "");
-        }
-      }
+  const company = res.data.data;
+
+  setCompanyType(company.business_type || "retail");
+
+  if (company.gst_type === "with_gst") {
+    setGstEnabled(true);
+  } else {
+    setGstEnabled(false);
+    set("gst", "");
+  }
+}
     } catch (err) {
       console.error("GST fetch error:", err);
       setGstEnabled(false);
@@ -120,8 +135,47 @@ export default function ProductForm() {
   const handleSubmit = async () => {
     if (!form.name.trim())    { show("warn", "Missing Field", "Product name is required."); return; }
     if (!form.category_id)    { show("warn", "Missing Field", "Please select a category."); return; }
-    if (!form.price)          { show("warn", "Missing Field", "Price is required."); return; }
-    if (isNaN(Number(form.price)) || Number(form.price) < 0) { show("warn", "Invalid Price", "Please enter a valid price."); return; }
+if (companyType === "retail") {
+
+  if (!form.price) {
+    show("warn", "Missing Field", "Retail price required");
+    return;
+  }
+
+}
+
+if (companyType === "wholesale") {
+
+  if (!form.wholesale_price) {
+    show("warn", "Missing Field", "Wholesale price required");
+    return;
+  }
+
+  if (!form.min_wholesale_qty) {
+    show("warn", "Missing Field", "Minimum wholesale qty required");
+    return;
+  }
+
+}
+
+if (companyType === "both") {
+
+  if (!form.price) {
+    show("warn", "Missing Field", "Retail price required");
+    return;
+  }
+
+  if (!form.wholesale_price) {
+    show("warn", "Missing Field", "Wholesale price required");
+    return;
+  }
+
+  if (!form.min_wholesale_qty) {
+    show("warn", "Missing Field", "Minimum wholesale qty required");
+    return;
+  }
+
+}    if (isNaN(Number(form.price)) || Number(form.price) < 0) { show("warn", "Invalid Price", "Please enter a valid price."); return; }
     if (!form.stock)          { show("warn", "Missing Field", "Stock quantity is required."); return; }
     if (isNaN(Number(form.stock)) || Number(form.stock) < 0) { show("warn", "Invalid Stock", "Please enter a valid stock quantity."); return; }
     // if (!form.unit.trim())    { show("warn", "Missing Field", "Unit is required (e.g. kg, litre, piece)."); return; }
@@ -139,6 +193,8 @@ export default function ProductForm() {
       body.append("category_id", form.category_id);
       body.append("company_id", getCompanyId());
       body.append("price", form.price);
+      body.append("wholesale_price", form.wholesale_price);
+body.append("min_wholesale_qty", form.min_wholesale_qty);
       body.append("stock", form.stock);
       body.append("gst_percentage", gstEnabled ? form.gst : "");
       body.append("barcode", form.barcode);
@@ -525,26 +581,87 @@ export default function ProductForm() {
             {/* ── Pricing & Stock ── */}
             <p className="pf-section" style={{marginTop:"1.25rem"}}>Pricing & Stock</p>
 
-            <div className="pf-grid-2">
-              <div>
-                <label className="pf-label">Price (₹) <span style={{color:"#ef4444"}}>*</span></label>
-                <div className="pf-input-wrap">
-                  <span className="pf-prefix">₹</span>
-                  <input type="number" className="pf-input" placeholder="0.00"
-                    value={form.price}
-                    onChange={e => set("price", e.target.value)} />
-                </div>
-              </div>
-              <div>
-                <label className="pf-label">Stock Qty <span style={{color:"#ef4444"}}>*</span></label>
-                <div className="pf-input-wrap">
-                  <span className="pf-input-icon">📦</span>
-                  <input type="number" className="pf-input" placeholder="0"
-                    value={form.stock}
-                    onChange={e => set("stock", e.target.value)} />
-                </div>
-              </div>
-            </div>
+           <div className="pf-grid-2">
+
+  {(companyType === "retail" || companyType === "both") && (
+    <div>
+      <label className="pf-label">
+        Retail Price (₹)
+      </label>
+
+      <div className="pf-input-wrap">
+        <span className="pf-prefix">₹</span>
+
+        <input
+          type="number"
+          className="pf-input"
+          value={form.price}
+          placeholder="0.00"
+          onChange={(e)=>set("price",e.target.value)}
+        />
+      </div>
+    </div>
+  )}
+
+  {(companyType === "wholesale" || companyType === "both") && (
+    <>
+      <div>
+        <label className="pf-label">
+          Wholesale Price (₹)
+        </label>
+
+        <div className="pf-input-wrap">
+          <span className="pf-prefix">₹</span>
+
+          <input
+            type="number"
+            className="pf-input"
+            value={form.wholesale_price}
+            placeholder="0.00"
+            onChange={(e)=>set("wholesale_price",e.target.value)}
+          />
+        </div>
+      </div>
+
+      <div>
+        <label className="pf-label">
+          Min Wholesale Qty
+        </label>
+
+        <div className="pf-input-wrap">
+          <span className="pf-input-icon">📦</span>
+
+          <input
+            type="number"
+            className="pf-input"
+            value={form.min_wholesale_qty}
+            placeholder="10"
+            onChange={(e)=>set("min_wholesale_qty",e.target.value)}
+          />
+        </div>
+      </div>
+    </>
+  )}
+
+  <div>
+    <label className="pf-label">
+      Stock Qty
+    </label>
+
+    <div className="pf-input-wrap">
+      <span className="pf-input-icon">📦</span>
+
+      <input
+        type="number"
+        className="pf-input"
+        value={form.stock}
+        placeholder="0"
+        onChange={(e)=>set("stock",e.target.value)}
+      />
+    </div>
+  </div>
+
+</div>
 {/* 
             <div className="pf-field">
               <label className="pf-label">Unit <span style={{color:"#ef4444"}}>*</span></label>

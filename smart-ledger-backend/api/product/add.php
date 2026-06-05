@@ -30,6 +30,8 @@ if (
 $name = trim($_POST['product_name'] ?? '');
 $category_id = intval($_POST['category_id'] ?? 0);
 $price = floatval($_POST['price'] ?? 0);
+$wholesale_price = floatval($_POST['wholesale_price'] ?? 0);
+$min_wholesale_qty = intval($_POST['min_wholesale_qty'] ?? 0);
 $stock = intval($_POST['stock'] ?? 0);
 $product_code = trim($_POST['product_code'] ?? '');
 $barcode = trim($_POST['barcode'] ?? '');
@@ -117,33 +119,90 @@ if (mysqli_num_rows($check) == 0) {
 
     exit;
 }
+$companyRes = mysqli_query(
+    $conn,
+    "SELECT business_type
+     FROM companies
+     WHERE id='$company_id'
+     LIMIT 1"
+);
 
+$company = mysqli_fetch_assoc($companyRes);
+
+$business_type = $company['business_type'] ?? 'retail';
+
+
+if ($business_type == "retail") {
+
+    if ($price <= 0) {
+        echo json_encode([
+            "status" => false,
+            "message" => "Retail price required"
+        ]);
+        exit;
+    }
+
+    $wholesale_price = 0;
+    $min_wholesale_qty = 0;
+}
+
+if ($business_type == "wholesale") {
+
+    if ($wholesale_price <= 0 || $min_wholesale_qty <= 0) {
+        echo json_encode([
+            "status" => false,
+            "message" => "Wholesale fields required"
+        ]);
+        exit;
+    }
+
+    $price = 0;
+}
+
+if ($business_type == "both") {
+
+    if (
+        $price <= 0 ||
+        $wholesale_price <= 0 ||
+        $min_wholesale_qty <= 0
+    ) {
+        echo json_encode([
+            "status" => false,
+            "message" => "All pricing fields required"
+        ]);
+        exit;
+    }
+}
 /* INSERT */
 
 $sql = "
-INSERT INTO products
-(
-    product_name,
-    product_code,
-    category_id,
-    price,
-    stock,
-    barcode,
-    gst_percentage,
-    company_id,
-    image
+INSERT INTO products (
+product_name,
+product_code,
+category_id,
+price,
+wholesale_price,
+min_wholesale_qty,
+product_type,
+stock,
+barcode,
+gst_percentage,
+company_id,
+image
 )
-VALUES
-(
-    '$name',
-    '$product_code',
-    '$category_id',
-    '$price',
-    '$stock',
-    '$barcode',
-    '$gst',
-    '$company_id',
-    '$imageName'
+VALUES (
+'$name',
+'$product_code',
+'$category_id',
+'$price',
+'$wholesale_price',
+'$min_wholesale_qty',
+'$business_type',
+'$stock',
+'$barcode',
+'$gst',
+'$company_id',
+'$imageName'
 )
 ";
 
