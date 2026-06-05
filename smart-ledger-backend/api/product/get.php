@@ -38,10 +38,30 @@ if (!$company_id) {
 }
 
 $result = mysqli_query($conn, "
-SELECT p.*, c.name as category_name 
+SELECT
+    p.id,
+    p.product_name,
+    p.product_code,
+    p.price,
+    p.wholesale_price,
+    p.min_wholesale_qty,
+    p.product_type,
+    p.stock,
+    p.barcode,
+    p.gst_percentage,
+    p.image,
+    p.company_id,
+    p.category_id,
+    c.name AS category_name,
+    comp.business_type
 FROM products p
-JOIN categories c ON p.category_id = c.id
-WHERE p.company_id='$company_id' AND p.is_deleted=0
+INNER JOIN categories c
+    ON p.category_id = c.id
+INNER JOIN companies comp
+    ON p.company_id = comp.id
+WHERE p.company_id = '$company_id'
+AND p.is_deleted = 0
+ORDER BY p.id DESC
 ");
 
 $data = [];

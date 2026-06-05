@@ -1,63 +1,392 @@
-import React from 'react';
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext.jsx'
+import { getAllCategories } from '../../services/categoryService.js'
+import { getProducts, getProductsByCategory } from '../../services/productService.js'
+import { buildProductImageUrl } from '../../services/api.js'
+import LoadingSpinner from '../../components/LoadingSpinner.jsx'
+import EmptyState from '../../components/EmptyState.jsx'
+import toast from 'react-hot-toast'
+import { addToCart } from '../../services/cartService.js'
+import {
+    ShoppingBag,
+    Heart,
+    ShoppingCart as CartIcon,
+    IndianRupee,
+} from 'lucide-react'
 
-const WholesalerProducts = () => {
-  // மாதிரி தயாரிப்பு தரவு (Sample Wholesale Products)
-  const products = [
-    { id: 1, name: "Premium Wireless Earbuds", moq: 50, retailPrice: "₹2,499", wholesalePrice: "₹1,450", stock: "In Stock (1200+)" },
-    { id: 2, name: "Smart Fitness Watch v2", moq: 30, retailPrice: "₹4,999", wholesalePrice: "₹2,900", stock: "In Stock (500+)" },
-    { id: 3, name: "Mechanical Gaming Keyboard", moq: 20, retailPrice: "₹3,200", wholesalePrice: "₹1,950", stock: "Low Stock (45)" },
-  ];
+import {
+    addToWishlist,
+    removeFromWishlist,
+    getWishlistItems,
+} from '../../services/wishlistService.js'
 
-  return (
-    <div className="min-h-screen bg-slate-950 text-white p-6 md:p-10">
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-100">B2B Wholesale Catalog</h1>
-          <p className="text-sm text-gray-400">Exclusive tiered pricing for bulk purchases.</p>
-        </div>
-        <div className="bg-amber-500/10 border border-amber-500/20 px-4 py-2 rounded-lg text-xs md:text-sm text-amber-400 font-mono">
-          💡 Minimum Order Quantity (MOQ) rules apply to checkout.
-        </div>
-      </div>
+export default function WholesalerProducts() {
+    const { user } = useAuth()
+    const navigate = useNavigate()
 
-      {/* Product Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {products.map((product) => (
-          <div key={product.id} className="bg-slate-900/50 border border-slate-800 rounded-xl overflow-hidden hover:shadow-lg hover:border-slate-700 transition-all">
-            {/* Image Placeholder */}
-            <div className="h-48 bg-slate-800 flex items-center justify-center text-gray-500">
-              [ Product Image Placeholder ]
-            </div>
-            
-            <div className="p-5">
-              <h3 className="text-lg font-semibold text-gray-200 line-clamp-1">{product.name}</h3>
-              <p className="text-xs text-emerald-400 mt-1 font-medium">{product.stock}</p>
-              
-              <div className="my-4 pt-4 border-t border-slate-800 grid grid-cols-2 gap-2 text-sm">
-                <div>
-                  <span className="text-xs text-gray-500 block">Retail Price</span>
-                  <span className="line-through text-gray-400">{product.retailPrice}</span>
+    const [categories, setCategories] = useState([])
+    const [allProducts, setAllProducts] = useState([])
+    const [selectedCategory, setSelectedCategory] = useState(null)
+    const [loading, setLoading] = useState(true)
+    const [productsLoading, setProductsLoading] = useState(false)
+    const [wishlistItems, setWishlistItems] = useState([])
+
+    /*
+    |--------------------------------------------------------------------------
+    | LOAD INITIAL DATA
+    |--------------------------------------------------------------------------
+    */
+    useEffect(() => {
+        loadCategoriesAndProducts()
+    }, [user])
+
+    useEffect(() => {
+        if (user?.id) {
+            loadWishlist()
+        }
+    }, [user])
+
+    /*
+    |--------------------------------------------------------------------------
+    | DATA FETCHING & LOGIC
+    |--------------------------------------------------------------------------
+    */
+    const loadCategoriesAndProducts = async () => {
+        try {
+            if (!user?.company_id) {
+                toast.error('Company ID not found')
+                setLoading(false)
+                return
+            }
+
+            setLoading(true)
+            const categoriesResponse = await getAllCategories()
+
+            if (categoriesResponse.status && categoriesResponse.data?.length > 0) {
+                setCategories(categoriesResponse.data)
+                const firstCategory = categoriesResponse.data[0]
+                setSelectedCategory(firstCategory.id)
+
+                const productsResponse = await getProductsByCategory(
+                    firstCategory.company_id,
+                    firstCategory.id
+                )
+
+                if (productsResponse.status) {
+                    setAllProducts(productsResponse.data || [])
+                } else {
+                    toast.error(productsResponse.message || 'Failed to load products')
+                }
+            } else {
+                toast.error('No categories found')
+            }
+        } catch (error) {
+            console.error(error)
+            toast.error('Error loading data')
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const loadWishlist = async () => {
+        try {
+            const response = await getWishlistItems(user.id)
+            if (response.status) {
+                setWishlistItems(response.data || [])
+            }
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    const handleWishlist = async (product) => {
+        try {
+            if (!user?.id) {
+                toast.error('Please login')
+                return
+            }
+
+            const exists = wishlistItems.some(
+                (item) => parseInt(item.product_id) === parseInt(product.id)
+            )
+
+            if (exists) {
+                const item = wishlistItems.find(
+                    (wishlistItem) => parseInt(wishlistItem.product_id) === parseInt(product.id)
+                )
+                if (item) {
+                    await removeFromWishlist(item.id)
+                    toast.success('Removed from wishlist')
+                }
+            } else {
+                const response = await addToWishlist(user.id, product.id)
+                if (response.status) {
+                    toast.success('Added to wishlist!')
+                }
+            }
+
+            loadWishlist()
+            window.dispatchEvent(new Event('wishlistUpdated'))
+        } catch (error) {
+            console.error(error)
+            toast.error('Wishlist update failed')
+        }
+    }
+
+    const handleCategoryClick = async (categoryId, companyId) => {
+        try {
+            setSelectedCategory(categoryId)
+            setProductsLoading(true)
+
+            const response = await getProductsByCategory(companyId, categoryId)
+            if (response.status) {
+                setAllProducts(response.data || [])
+            } else {
+                toast.error(response.message || 'Failed to load products')
+            }
+        } catch (error) {
+            console.error(error)
+            toast.error('Error loading products')
+        } finally {
+            setProductsLoading(false)
+        }
+
+        window.scrollTo({
+            top: 400,
+            behavior: 'smooth',
+        })
+    }
+
+    const handleAddToCart = async (product) => {
+        try {
+            if (!user?.id) {
+                toast.error('Please login')
+                return
+            }
+
+            if (parseInt(product.stock) <= 0) {
+                toast.error('Out of stock')
+                return
+            }
+
+            const response = await addToCart(user.id, product.id, 1)
+
+            if (response.status) {
+                toast.success(`${product.product_name} added to cart!`)
+                window.dispatchEvent(new Event('cartUpdated'))
+            } else {
+                toast.error(response.message || 'Failed to add to cart')
+            }
+        } catch (error) {
+            console.error(error)
+            toast.error('Error adding to cart')
+        }
+    }
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-purple-600 border-t-transparent"></div>
+                    <p className="mt-4 text-lg font-semibold text-purple-600">Loading categories...</p>
                 </div>
-                <div>
-                  <span className="text-xs text-amber-400 block font-medium">Wholesale Price</span>
-                  <span className="text-lg font-bold text-amber-400">{product.wholesalePrice}</span>
-                </div>
-              </div>
-
-              <div className="bg-slate-950 p-3 rounded-lg flex items-center justify-between text-xs mb-4 border border-slate-800">
-                <span className="text-gray-400">Minimum Order (MOQ):</span>
-                <span className="font-bold text-gray-200">{product.moq} Units</span>
-              </div>
-
-              <button className="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold rounded-lg text-sm transition-colors">
-                Add Bulk to Cart
-              </button>
             </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+        )
+    }
+
+    if (!categories || categories.length === 0) {
+        return (
+            <EmptyState
+                title="No Categories"
+                message="No categories available"
+            />
+        )
+    }
+const getDisplayPrice = (product) => {
+
+    const type = product.product_type;
+
+    if (type === "wholesale") {
+        return Number(product.wholesale_price || 0).toFixed(2);
+    }
+
+    if (type === "both") {
+        return Number(product.wholesale_price || 0).toFixed(2);
+    }
+
+    return Number(product.price || 0).toFixed(2);
 };
+    return (
+        <div className="min-h-screen bg-white py-8 px-4">
+            <div className="max-w-7xl mx-auto">
+                {/* Header Section */}
+                <div className="mb-8 text-center">
+                    <div className="inline-flex items-center gap-3 bg-white/80 backdrop-blur-sm rounded-full px-6 py-3 shadow-lg mb-4">
+                        <ShoppingBag className="w-8 h-8 text-purple-600" />
+                        <h1 className="text-3xl font-bold text-black">
+                            Shop by Category
+                        </h1>
+                    </div>
+                    <p className="text-gray-600 mt-2">Browse and discover products from our collections</p>
+                </div>
 
-export default WholesalerProducts;
+                {/* Category Selection Section */}
+                <div className="mb-8 flex justify-center">
+                    <div className="inline-flex bg-white/60 rounded-full p-2 gap-2 flex-wrap justify-center backdrop-blur-sm">
+                        {categories.map((category) => {
+                            const isSelected = selectedCategory === category.id
+                            return (
+                                <button
+                                    key={category.id}
+                                    onClick={() => handleCategoryClick(category.id, category.company_id)}
+                                    className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 focus:outline-none ${isSelected
+                                        ? 'bg-black text-white shadow-lg'
+                                        : 'bg-transparent text-gray-700 hover:bg-gray-100 hover:text-black'
+                                        }`}
+                                >
+                                    {category.name}
+                                </button>
+                            )
+                        })}
+                    </div>
+                </div>
+
+                {/* Products Section */}
+                <div>
+                    <div className="mb-6">
+                        <h2 className="text-2xl font-bold text-gray-800">
+                            {categories.find((c) => c.id === selectedCategory)?.name || 'Category'} Collection
+                        </h2>
+                        <p className="text-gray-600 mt-1">
+                            Showing {allProducts.length} {allProducts.length === 1 ? 'product' : 'products'}
+                        </p>
+                    </div>
+
+                    {productsLoading ? (
+                        <div className="flex items-center justify-center py-20">
+                            <div className="text-center">
+                                <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-purple-600 border-t-transparent"></div>
+                                <p className="mt-4 text-gray-600 font-semibold">Loading products...</p>
+                            </div>
+                        </div>
+                    ) : allProducts.length === 0 ? (
+                        <div className="bg-white rounded-3xl shadow-xl p-12 text-center">
+                            <div className="inline-flex items-center justify-center w-32 h-32 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full mb-6">
+                                <ShoppingBag className="w-16 h-16 text-purple-600" />
+                            </div>
+                            <h3 className="text-2xl font-bold text-gray-800 mb-2">No Products Found</h3>
+                            <p className="text-gray-600">This category doesn't have any products yet. Try another category!</p>
+                        </div>
+                    ) : (
+                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
+                            {allProducts.map((product) => {
+                                const isInWishlist = wishlistItems.some(
+                                    (item) => parseInt(item.product_id) === parseInt(product.id)
+                                )
+                                const isOutOfStock = parseInt(product.stock) <= 0
+
+                                return (
+                                    <div
+                                        key={product.id}
+                                        className="group bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden"
+                                    >
+                                        {/* Product Image */}
+                                        <div className="relative h-40 w-full overflow-hidden bg-gray-100">
+
+                                            {/* Wishlist Button */}
+                                            <button
+                                                onClick={() => handleWishlist(product)}
+                                                className={`absolute right-2 top-2 z-10 flex h-8 w-8 items-center justify-center rounded-full transition-all duration-200 shadow-md ${isInWishlist
+                                                        ? 'bg-red-500 text-white scale-110'
+                                                        : 'bg-white/90 text-gray-400 hover:text-red-500'
+                                                    }`}
+                                            >
+                                                <Heart
+                                                    className={`w-4 h-4 ${isInWishlist ? 'fill-current' : ''
+                                                        }`}
+                                                />
+                                            </button>
+
+                                            {product.image ? (
+                                                <img
+                                                    src={buildProductImageUrl(product.image)}
+                                                    alt={product.product_name}
+                                                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                                    loading="lazy"
+                                                />
+                                            ) : (
+                                                <div className="flex h-full flex-col items-center justify-center">
+                                                    <ShoppingBag className="w-10 h-10 text-gray-400 mb-2" />
+                                                    <span className="text-xs text-gray-500">
+                                                        No Image
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Product Details */}
+                                        <div className="p-3">
+                                            <div className="mb-2">
+                                                <h3 className="text-base font-semibold text-gray-800 line-clamp-2 group-hover:text-red-600 transition-colors">
+                                                    {product.product_name}
+                                                </h3>
+
+                                                <p className="text-[11px] text-gray-500 mt-1">
+                                                    SKU: {product.product_code || 'N/A'}
+                                                </p>
+                                            </div>
+
+                                            {/* Price & Stock */}
+                                            <div className="flex items-center justify-between border-t pt-2 mb-3">
+                                                <div className="flex items-center gap-1">
+                                                    <IndianRupee className="w-4 h-4 text-red-600" />
+                                                    <div>
+    <span className="text-xl font-bold text-red-600">
+        {getDisplayPrice(product)}
+    </span>
+
+    {(product.product_type === "wholesale" ||
+      product.product_type === "both") && (
+        <p className="text-[10px] text-gray-500">
+            Min Qty : {product.min_wholesale_qty}
+        </p>
+    )}
+</div>
+                                                </div>
+
+                                                <span
+                                                    className={`inline-flex items-center rounded-full px-2 py-1 text-[10px] font-semibold ${!isOutOfStock
+                                                            ? 'bg-green-100 text-green-700'
+                                                            : 'bg-red-100 text-red-700'
+                                                        }`}
+                                                >
+                                                    {!isOutOfStock
+                                                        ? `${product.stock} in stock`
+                                                        : 'Sold Out'}
+                                                </span>
+                                            </div>
+
+                                            {/* Add To Cart */}
+                                            <button
+                                                onClick={() => handleAddToCart(product)}
+                                                disabled={isOutOfStock}
+                                                className={`w-full rounded-lg py-2 text-xs font-bold transition-all duration-200 flex items-center justify-center gap-2 uppercase ${isOutOfStock
+                                                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                                        : 'bg-red-600 text-white hover:bg-red-700'
+                                                    }`}
+                                            >
+                                                <CartIcon className="w-4 h-4" />
+                                                {isOutOfStock ? 'Sold Out' : 'Add To Cart'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    )
+}
