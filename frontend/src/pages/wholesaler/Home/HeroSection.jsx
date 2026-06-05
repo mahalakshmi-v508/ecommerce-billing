@@ -193,7 +193,7 @@ export default function HeroSection() {
       {/* Auto-scroll Indicator */}
       <div className="absolute bottom-4 md:bottom-8 right-4 md:right-8">
         <div className="text-white/50 text-xs bg-black/20 px-2 py-1 rounded-full">
-          Auto-scroll {!isPaused && '▶'}
+           {!isPaused && '▶'}
         </div>
       </div>
     </section>
