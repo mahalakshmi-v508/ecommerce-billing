@@ -1,4 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
+import image1 from "../../assets/image1.jpg";
+import image2 from "../../assets/image2.jpg";
+import image3 from "../../assets/image3.jpg";
+import image4 from "../../assets/image4.jpg";
+import image5 from "../../assets/image5.jpg";
+import image6 from "../../assets/image6.jpg";
 
 export default function Testimonials() {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -8,79 +14,73 @@ export default function Testimonials() {
   const scrollIntervalRef = useRef(null);
 
   const testimonials = [
-    {
-      id: 1,
-      name: "Priya Sharma",
-      role: "Fashion Designer",
-      location: "Mumbai, India",
-      rating: 5,
-      review: "Absolutely love the shopping experience! The product quality is exceptional and delivery was faster than expected. Will definitely shop again.",
-      avatar: "👩‍🎨",
-      date: "2 days ago",
-      verified: true,
-      purchase: "Women's Ethnic Wear"
-    },
-    {
-      id: 2,
-      name: "Rahul Mehta",
-      role: "Tech Entrepreneur",
-      location: "Bangalore, India",
-      rating: 5,
-      review: "Best e-commerce platform I've used! The secure payment system and customer support are top-notch. Highly recommended for everyone.",
-      avatar: "👨‍💻",
-      date: "5 days ago",
-      verified: true,
-      purchase: "Electronics Gadgets"
-    },
-    {
-      id: 3,
-      name: "Anjali Verma",
-      role: "Homemaker",
-      location: "Delhi, India",
-      rating: 5,
-      review: "Great variety of products at affordable prices. The return policy is hassle-free and customer service is very responsive. Love shopping here!",
-      avatar: "👩‍👧",
-      date: "1 week ago",
-      verified: true,
-      purchase: "Home & Kitchen"
-    },
-    {
-      id: 4,
-      name: "Vikram Singh",
-      role: "Business Owner",
-      location: "Chennai, India",
-      rating: 5,
-      review: "Incredible platform for bulk orders. The wholesale pricing is competitive and delivery is always on time. Very satisfied!",
-      avatar: "👨‍💼",
-      date: "3 days ago",
-      verified: true,
-      purchase: "Bulk Orders"
-    },
-    {
-      id: 5,
-      name: "Neha Gupta",
-      role: "Software Engineer",
-      location: "Hyderabad, India",
-      rating: 5,
-      review: "The UI is super intuitive and checkout process is seamless. Best online shopping experience I've had in years!",
-      avatar: "👩‍💻",
-      date: "1 day ago",
-      verified: true,
-      purchase: "Electronics"
-    },
-    {
-      id: 6,
-      name: "Amit Patel",
-      role: "Student",
-      location: "Pune, India",
-      rating: 4,
-      review: "Great discounts and offers! Customer support is very helpful. Will recommend to my friends.",
-      avatar: "👨‍🎓",
-      date: "4 days ago",
-      verified: true,
-      purchase: "Fashion"
-    }
-  ];
+  {
+    id: 1,
+    name: "Priya Sharma",
+    role: "Fashion Designer",
+    avatar: image1,
+    rating: 5,
+    review: "Absolutely love the shopping experience!",
+    date: "2 days ago",
+    verified: true,
+    purchase: "Women's Ethnic Wear"
+  },
+  {
+    id: 2,
+    name: "Rahul Mehta",
+    role: "Tech Entrepreneur",
+    avatar: image2,
+    rating: 5,
+    review: "Best e-commerce platform I've used!",
+    date: "5 days ago",
+    verified: true,
+    purchase: "Electronics Gadgets"
+  },
+  {
+    id: 3,
+    name: "Anjali Verma",
+    role: "Homemaker",
+    avatar: image3,
+    rating: 5,
+    review: "Great variety of products at affordable prices.",
+    date: "1 week ago",
+    verified: true,
+    purchase: "Home & Kitchen"
+  },
+  {
+    id: 4,
+    name: "Vikram Singh",
+    role: "Business Owner",
+    avatar: image4,
+    rating: 5,
+    review: "Incredible platform for bulk orders.",
+    date: "3 days ago",
+    verified: true,
+    purchase: "Bulk Orders"
+  },
+  {
+    id: 5,
+    name: "Neha Gupta",
+    role: "Software Engineer",
+    avatar: image5,
+    rating: 5,
+    review: "The UI is super intuitive.",
+    date: "1 day ago",
+    verified: true,
+    purchase: "Electronics"
+  },
+  {
+    id: 6,
+    name: "Amit Patel",
+    role: "Student",
+    avatar: image6,
+    rating: 4,
+    review: "Great discounts and offers!",
+    date: "4 days ago",
+    verified: true,
+    purchase: "Fashion"
+  }
+];
 
   // Duplicate testimonials for infinite scroll effect
   const extendedTestimonials = [...testimonials, ...testimonials, ...testimonials];
@@ -171,13 +171,14 @@ export default function Testimonials() {
               Customer Reviews
             </span>
           </div>
-          
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+
+          {/* Gradient text-ku badhula text-gray-900 (Black) mathiyachu */}
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900">
             What Our Customers Say
           </h2>
-          
+
           <div className="w-24 h-1 bg-gradient-to-r from-indigo-600 to-purple-600 mx-auto rounded-full mb-4"></div>
-          
+
           <p className="text-gray-600 max-w-2xl mx-auto">
             Trusted by thousands of happy customers worldwide
           </p>
@@ -218,14 +219,18 @@ export default function Testimonials() {
                   <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden h-full transform hover:-translate-y-2">
                     {/* Same color bar for all cards */}
                     <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-indigo-500 to-purple-500"></div>
-                    
+
                     <div className="p-6">
                       {/* Header */}
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex items-center gap-3">
                           {/* Same gradient for all avatars */}
-                          <div className="w-12 h-12 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center text-xl shadow-md">
-                            {testimonial.avatar}
+                          <div className="w-12 h-12 rounded-full overflow-hidden shadow-md">
+                            <img
+                              src={testimonial.avatar}
+                              alt={testimonial.name}
+                              className="w-full h-full object-cover"
+                            />
                           </div>
                           <div>
                             <h3 className="font-bold text-gray-900 text-sm">{testimonial.name}</h3>

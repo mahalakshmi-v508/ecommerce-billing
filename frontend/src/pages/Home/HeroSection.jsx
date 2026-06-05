@@ -1,4 +1,7 @@
 import { useState, useEffect } from 'react';
+import image1 from "../../assets/herosection/image1.jfif";
+import image2 from "../../assets/herosection/image2.jfif";
+import image3 from "../../assets/herosection/image3.jfif";
 
 export default function HeroSection({ navigate }) {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -8,27 +11,24 @@ export default function HeroSection({ navigate }) {
       id: 1,
       title: "Summer Sale Extravaganza",
       subtitle: "Up to 70% Off on Fashion & Electronics",
-      cta: "Shop Now",
       link: "/categories",
-      image: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1200&h=600&fit=crop",
+      image: image1,
       badge: "Limited Time Offer"
     },
     {
       id: 2,
       title: "Premium Electronics",
       subtitle: "Latest Gadgets at Unbeatable Prices",
-      cta: "Explore Deals",
       link: "/products",
-      image: "https://images.unsplash.com/photo-1498049794561-7780e7231661?w=1200&h=600&fit=crop",
+      image: image2,
       badge: "Free Shipping"
     },
     {
       id: 3,
       title: "SmartCommerce Exclusive",
       subtitle: "AI-Powered Shopping Experience",
-      cta: "Discover More",
       link: "/categories",
-      image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&h=600&fit=crop",
+      image: image3,
       badge: "New Arrivals"
     }
   ];
@@ -89,18 +89,6 @@ export default function HeroSection({ navigate }) {
 
                 {/* Buttons */}
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <button
-                    onClick={() => navigate(slide.link)}
-                    className="group relative px-8 py-4 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full font-semibold text-white shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 overflow-hidden"
-                  >
-                    <span className="relative z-10 flex items-center gap-2">
-                      {slide.cta}
-                      <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                      </svg>
-                    </span>
-                    <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  </button>
 
                   <button
                     onClick={() => navigate('/products')}
