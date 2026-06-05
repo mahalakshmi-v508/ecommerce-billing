@@ -40,7 +40,7 @@ export default function AboutSection() {
   ];
 
   return (
-    <section className="relative py-14 px-6 overflow-hidden bg-white">
+    <section className="relative py-10 px-6 overflow-hidden bg-white">
       {/* Background Subtle Geometrics */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl"></div>
@@ -48,25 +48,25 @@ export default function AboutSection() {
       </div>
 
       <div className="max-w-7xl mx-auto relative z-10">
-        
+
         {/* Section Header */}
-          
+
         {/* Section Header */}
         <div className="text-center mb-20">
           <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-slate-900">
             About SmartCommerce
           </h2>
-          
+
           <div className="w-16 h-1 bg-indigo-600 mx-auto rounded-full mb-6"></div>
-          
+
           <p className="text-slate-500 max-w-2xl mx-auto text-lg leading-relaxed">
-            We are revolutionizing the e-commerce experience with cutting-edge technology 
+            We are revolutionizing the e-commerce experience with cutting-edge technology
             and a strictly customer-first approach.
           </p>
         </div>Complete shopping
 
         {/* Features Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20 -mt-9">
           {features.map((feature, index) => (
             <div
               key={index}
@@ -74,17 +74,17 @@ export default function AboutSection() {
             >
               {/* Pre-active Subtle Glow Effect */}
               <div className={`absolute inset-0 rounded-2xl pointer-events-none -z-10 ${feature.glowColor}`} />
-              
+
               {/* Icon Container */}
               <div className="w-14 h-14 mb-6 bg-white rounded-xl flex items-center justify-center border border-slate-100 shadow-inner transition-transform group-hover:scale-105 duration-300">
                 {feature.icon}
               </div>
-              
+
               {/* Title */}
               <h3 className={`text-lg font-bold text-slate-800 mb-2 transition-colors duration-200 ${feature.textHoverColor}`}>
                 {feature.title}
               </h3>
-              
+
               {/* Description */}
               <p className="text-slate-500 text-sm leading-relaxed">
                 {feature.description}
@@ -94,22 +94,22 @@ export default function AboutSection() {
         </div>
 
         {/* Stats Section */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 pt-12 border-t border-slate-200">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20 -mt-9">
           <div className="text-center">
             <div className="text-4xl md:text-5xl font-bold text-slate-900 mb-2">50K+</div>
             <div className="text-slate-500 text-sm font-medium">Happy Customers</div>
           </div>
-          
+
           <div className="text-center">
             <div className="text-4xl md:text-5xl font-bold text-slate-900 mb-2">10K+</div>
             <div className="text-slate-500 text-sm font-medium">Products Sold</div>
           </div>
-          
+
           <div className="text-center">
-            <div className="text-4xl md:text-5xl font-bold text-indigo-600 mb-2">98%</div>
+            <div className="text-4xl md:text-5xl font-bold text-slate-900 mb-2">98%</div>
             <div className="text-slate-500 text-sm font-medium">Satisfaction Rate</div>
           </div>
-          
+
           <div className="text-center">
             <div className="text-4xl md:text-5xl font-bold text-slate-900 mb-2">24/7</div>
             <div className="text-slate-500 text-sm font-medium">Support Available</div>
