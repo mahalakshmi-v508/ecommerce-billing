@@ -1,6 +1,5 @@
 import HeroSection from "./HeroSection";
 import WholesaleBenefits from "./WholesaleBenefits";
-r
 import Testimonials from "./Testimonials";
 import BulkOrderBenefits from "./BulkOrderBenefits";
 import WholesalePricing from "./WholesaleProcess";
