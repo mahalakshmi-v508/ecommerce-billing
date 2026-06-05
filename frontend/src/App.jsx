@@ -22,10 +22,17 @@ import Deals from './pages/Deals.jsx'
 
 import ProtectedRoute from './routes/ProtectedRoute.jsx'
 import InvoicePreview from './pages/InvoicePreview.jsx'
+import ScrollToTop from './components/ScrollToTop.jsx'
+
+
+import WholesalerDashboard from './pages/wholesaler/WholesalerDashboard.jsx'
+import WholesalerProducts from './pages/wholesaler/WholesalerProducts.jsx'
+import WholesalerOrders from './pages/wholesaler/WholesalerOrders.jsx'
 
 function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Toaster position="top-right" />
       <Header />
 
@@ -182,6 +189,35 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['cashier']}>
                 <RoleDashboard role="cashier" />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* whole saler */}
+          {/* 🆕 WHOLESALER ROUTES (இத அப்படியே காப்பி பண்ணி போடுங்க) */}
+          <Route
+            path="/wholesaler/dashboard"
+            element={
+              <ProtectedRoute allowedRoles={['wholesaler']}>
+                <WholesalerDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/wholesaler/products"
+            element={
+              <ProtectedRoute allowedRoles={['wholesaler']}>
+                <WholesalerProducts />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/wholesaler/orders"
+            element={
+              <ProtectedRoute allowedRoles={['wholesaler']}>
+                <WholesalerOrders />
               </ProtectedRoute>
             }
           />
