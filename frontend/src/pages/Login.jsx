@@ -13,6 +13,7 @@ const roleTarget = {
   admin: '/admin/dashboard',
   cashier: '/cashier/dashboard',
   user: '/categories',
+  wholesaler: '/wholesaler/dashboard',
 }
 
 export default function Login() {
