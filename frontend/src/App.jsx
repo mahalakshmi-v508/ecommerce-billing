@@ -22,10 +22,12 @@ import Deals from './pages/Deals.jsx'
 
 import ProtectedRoute from './routes/ProtectedRoute.jsx'
 import InvoicePreview from './pages/InvoicePreview.jsx'
+import ScrollToTop from './components/ScrollToTop.jsx'
 
 function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Toaster position="top-right" />
       <Header />
 

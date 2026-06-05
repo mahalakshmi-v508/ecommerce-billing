@@ -211,7 +211,7 @@ export default function Categories() {
                 <div className="mb-8 text-center">
                     <div className="inline-flex items-center gap-3 bg-white/80 backdrop-blur-sm rounded-full px-6 py-3 shadow-lg mb-4">
                         <ShoppingBag className="w-8 h-8 text-purple-600" />
-                        <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                        <h1 className="text-3xl font-bold text-black">
                             Shop by Category
                         </h1>
                     </div>
@@ -227,11 +227,10 @@ export default function Categories() {
                                 <button
                                     key={category.id}
                                     onClick={() => handleCategoryClick(category.id, category.company_id)}
-                                    className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 focus:outline-none ${
-                                        isSelected
-                                            ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
-                                            : 'bg-transparent text-gray-700 hover:text-purple-600'
-                                    }`}
+                                    className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 focus:outline-none ${isSelected
+                                        ? 'bg-black text-white shadow-lg'
+                                        : 'bg-transparent text-gray-700 hover:bg-gray-100 hover:text-black'
+                                        }`}
                                 >
                                     {category.name}
                                 </button>
@@ -267,7 +266,7 @@ export default function Categories() {
                             <p className="text-gray-600">This category doesn't have any products yet. Try another category!</p>
                         </div>
                     ) : (
-                        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
                             {allProducts.map((product) => {
                                 const isInWishlist = wishlistItems.some(
                                     (item) => parseInt(item.product_id) === parseInt(product.id)
@@ -277,79 +276,86 @@ export default function Categories() {
                                 return (
                                     <div
                                         key={product.id}
-                                        className="group bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden hover:scale-105"
+                                        className="group bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden"
                                     >
-                                        {/* Product Image Section */}
-                                        <div className="relative aspect-square w-full overflow-hidden bg-gradient-to-br from-purple-100 to-pink-100">
-                                            
+                                        {/* Product Image */}
+                                        <div className="relative h-40 w-full overflow-hidden bg-gray-100">
+
                                             {/* Wishlist Button */}
                                             <button
                                                 onClick={() => handleWishlist(product)}
-                                                className={`absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full transition-all duration-200 shadow-md ${
-                                                    isInWishlist
+                                                className={`absolute right-2 top-2 z-10 flex h-8 w-8 items-center justify-center rounded-full transition-all duration-200 shadow-md ${isInWishlist
                                                         ? 'bg-red-500 text-white scale-110'
-                                                        : 'bg-white/90 text-gray-400 hover:text-red-500 hover:scale-110'
-                                                }`}
+                                                        : 'bg-white/90 text-gray-400 hover:text-red-500'
+                                                    }`}
                                             >
-                                                <Heart className={`w-5 h-5 ${isInWishlist ? 'fill-current' : ''}`} />
+                                                <Heart
+                                                    className={`w-4 h-4 ${isInWishlist ? 'fill-current' : ''
+                                                        }`}
+                                                />
                                             </button>
 
                                             {product.image ? (
                                                 <img
                                                     src={buildProductImageUrl(product.image)}
                                                     alt={product.product_name}
-                                                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                                                     loading="lazy"
                                                 />
                                             ) : (
                                                 <div className="flex h-full flex-col items-center justify-center">
-                                                    <ShoppingBag className="w-12 h-12 text-yellow-400 mb-2" />
-                                                    <span className="text-xs font-semibold text-gray-400">No Image</span>
+                                                    <ShoppingBag className="w-10 h-10 text-gray-400 mb-2" />
+                                                    <span className="text-xs text-gray-500">
+                                                        No Image
+                                                    </span>
                                                 </div>
                                             )}
                                         </div>
 
                                         {/* Product Details */}
-                                        <div className="p-5 space-y-4">
-                                            <div>
-                                                <h3 className="text-lg font-bold text-gray-800 line-clamp-2 group-hover:text-red-600 transition-colors">
+                                        <div className="p-3">
+                                            <div className="mb-2">
+                                                <h3 className="text-base font-semibold text-gray-800 line-clamp-2 group-hover:text-red-600 transition-colors">
                                                     {product.product_name}
                                                 </h3>
-                                                <p className="text-xs text-gray-500 mt-1">
+
+                                                <p className="text-[11px] text-gray-500 mt-1">
                                                     SKU: {product.product_code || 'N/A'}
                                                 </p>
                                             </div>
 
-                                            {/* Price and Stock */}
-                                            <div className="flex items-center justify-between pt-3 border-t border-gray-200">
+                                            {/* Price & Stock */}
+                                            <div className="flex items-center justify-between border-t pt-2 mb-3">
                                                 <div className="flex items-center gap-1">
-                                                    <IndianRupee className="w-5 h-5 text-red-600 font-bold" />
-                                                    <span className="text-2xl font-bold text-red-600">
+                                                    <IndianRupee className="w-4 h-4 text-red-600" />
+                                                    <span className="text-xl font-bold text-red-600">
                                                         {parseFloat(product.price || 0).toFixed(2)}
                                                     </span>
                                                 </div>
-                                                
-                                                <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-bold ${
-                                                    !isOutOfStock
-                                                        ? 'bg-green-100 text-green-700'
-                                                        : 'bg-red-100 text-red-700'
-                                                }`}>
-                                                    {!isOutOfStock ? `${product.stock} in stock` : 'Out of Stock'}
+
+                                                <span
+                                                    className={`inline-flex items-center rounded-full px-2 py-1 text-[10px] font-semibold ${!isOutOfStock
+                                                            ? 'bg-green-100 text-green-700'
+                                                            : 'bg-red-100 text-red-700'
+                                                        }`}
+                                                >
+                                                    {!isOutOfStock
+                                                        ? `${product.stock} in stock`
+                                                        : 'Sold Out'}
                                                 </span>
                                             </div>
 
-                                            {/* Add to Cart Button */}
+                                            {/* Add To Cart */}
                                             <button
                                                 onClick={() => handleAddToCart(product)}
                                                 disabled={isOutOfStock}
-                                                className={`w-full rounded-xl py-3 text-sm font-bold transition-all duration-200 flex items-center justify-center gap-2 uppercase ${
-                                                    isOutOfStock
+                                                className={`w-full rounded-lg py-2 text-xs font-bold transition-all duration-200 flex items-center justify-center gap-2 uppercase ${isOutOfStock
                                                         ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                                        : 'bg-red-600 text-white hover:bg-red-700 hover:shadow-lg hover:scale-105 active:scale-95'
-                                                }`}
+                                                        : 'bg-red-600 text-white hover:bg-red-700'
+                                                    }`}
                                             >
                                                 <CartIcon className="w-4 h-4" />
-                                                {isOutOfStock ? 'Sold Out' : 'Add to Cart'}
+                                                {isOutOfStock ? 'Sold Out' : 'Add To Cart'}
                                             </button>
                                         </div>
                                     </div>
