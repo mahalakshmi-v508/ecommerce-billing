@@ -85,12 +85,40 @@ export default function EcommerceHeader() {
     navigate('/login', { replace: true })
   }
 
+  // 🆕 Added Wholesaler dropdown menu items
   const roleMenuItems = {
     user: [
       { label: 'My Orders', href: '/orders' },
       { label: 'Profile', href: '/profile' },
       { label: 'Wishlist', href: '/wishlist' },
     ],
+    wholesaler: [
+      { label: 'Dashboard', href: '/wholesaler/dashboard' },
+      { label: 'Bulk Orders', href: '/wholesaler/orders' },
+      { label: 'Profile', href: '/profile' },
+    ],
+  }
+
+  // 🆕 Dynamic mobile menu links generator based on role
+  const getMobileLinks = () => {
+    if (user?.role === 'wholesaler') {
+      return [
+        { label: 'Dashboard', href: '/wholesaler/dashboard' },
+        { label: 'Wholesale Products', href: '/wholesaler/products' },
+        { label: 'Bulk Orders', href: '/wholesaler/orders' },
+        { label: 'Cart', href: '/cart' },
+        { label: 'Profile', href: '/profile' },
+      ]
+    }
+    return [
+      { label: 'Home', href: '/' },
+      { label: 'Categories', href: '/categories' },
+      { label: 'Deals', href: '/deals' },
+      { label: 'Orders', href: '/orders' },
+      { label: 'Wishlist', href: '/wishlist' },
+      { label: 'Cart', href: '/cart' },
+      { label: 'Profile', href: '/profile' },
+    ]
   }
 
   const IconButton = ({ to, count, children, label }) => {
@@ -118,44 +146,72 @@ export default function EcommerceHeader() {
     <header className="sticky top-0 z-50 border-b border-[#e5e7eb] bg-white">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between gap-4 lg:h-[72px]">
+          {/* LOGO - Dynamically redirects depending on role */}
           <Link
-            to="/"
+            to={user?.role === 'wholesaler' ? '/wholesaler/dashboard' : '/'}
             className="shrink-0 text-lg font-semibold tracking-[0.2em] text-[#111] uppercase"
           >
             SmartLedger
           </Link>
 
-          {isAuthenticated && user?.role === 'user' && (
+          {/* DESKTOP NAVIGATION */}
+          {isAuthenticated && (
             <nav className="hidden items-center gap-8 lg:flex">
-              <Link
-                to="/"
-                className="text-sm font-medium text-[#111] transition hover:opacity-60"
-              >
-                Home
-              </Link>
-
-              <Link
-                to="/categories"
-                className="text-sm font-medium text-[#111] transition hover:opacity-60"
-              >
-                Categories
-              </Link>
-
-              <Link
-                to="/deals"
-                className="text-sm font-medium text-[#111] transition hover:opacity-60"
-              >
-                Deals
-              </Link>
-              <Link
-                to="/orders"
-                className="text-sm font-medium text-[#111] transition hover:opacity-60"
-              >
-                Orders
-              </Link>
+              {user?.role === 'wholesaler' ? (
+                /* 🆕 WHOLESALER DESKTOP LINKS */
+                <>
+                  <Link
+                    to="/wholesaler/dashboard"
+                    className="text-sm font-medium text-[#111] transition hover:opacity-60"
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    to="/wholesaler/products"
+                    className="text-sm font-medium text-[#111] transition hover:opacity-60"
+                  >
+                    Wholesale Products
+                  </Link>
+                  <Link
+                    to="/wholesaler/orders"
+                    className="text-sm font-medium text-[#111] transition hover:opacity-60"
+                  >
+                    Bulk Orders
+                  </Link>
+                </>
+              ) : (
+                /* 🛒 REGULAR USER DESKTOP LINKS */
+                <>
+                  <Link
+                    to="/"
+                    className="text-sm font-medium text-[#111] transition hover:opacity-60"
+                  >
+                    Home
+                  </Link>
+                  <Link
+                    to="/categories"
+                    className="text-sm font-medium text-[#111] transition hover:opacity-60"
+                  >
+                    Categories
+                  </Link>
+                  <Link
+                    to="/deals"
+                    className="text-sm font-medium text-[#111] transition hover:opacity-60"
+                  >
+                    Deals
+                  </Link>
+                  <Link
+                    to="/orders"
+                    className="text-sm font-medium text-[#111] transition hover:opacity-60"
+                  >
+                    Orders
+                  </Link>
+                </>
+              )}
             </nav>
           )}
 
+          {/* SEARCH BAR */}
           <form
             onSubmit={handleSearch}
             className="hidden flex-1 max-w-md lg:block xl:max-w-lg"
@@ -175,16 +231,23 @@ export default function EcommerceHeader() {
             </div>
           </form>
 
+          {/* RIGHT SIDE ICONS */}
           <div className="flex items-center gap-1 sm:gap-2">
             {isAuthenticated && (
               <>
-                <IconButton to="/wishlist" count={wishlistCount} label="Wishlist">
-                  <Heart className="h-5 w-5" strokeWidth={1.5} />
-                </IconButton>
+                {/* Wishlist Icon - Only for regular users if required, or common */}
+                {user?.role !== 'wholesaler' && (
+                  <IconButton to="/wishlist" count={wishlistCount} label="Wishlist">
+                    <Heart className="h-5 w-5" strokeWidth={1.5} />
+                  </IconButton>
+                )}
+                
+                {/* Cart Icon - Common for user and wholesaler */}
                 <IconButton to="/cart" count={cartCount} label="Cart">
                   <ShoppingBag className="h-5 w-5" strokeWidth={1.5} />
                 </IconButton>
 
+                {/* PROFILE DROPDOWN */}
                 <div ref={profileRef} className="relative hidden sm:block">
                   <button
                     type="button"
@@ -223,6 +286,7 @@ export default function EcommerceHeader() {
               </>
             )}
 
+            {/* MOBILE MENU BUTTON */}
             <button
               type="button"
               onClick={() => setMobileMenuOpen((o) => !o)}
@@ -238,6 +302,7 @@ export default function EcommerceHeader() {
           </div>
         </div>
 
+        {/* MOBILE DROPDOWN MENU */}
         {mobileMenuOpen && (
           <div className="border-t border-[#e5e7eb] py-4 lg:hidden">
             <form onSubmit={handleSearch} className="mb-4">
@@ -255,17 +320,9 @@ export default function EcommerceHeader() {
                 />
               </div>
             </form>
-            {isAuthenticated && user?.role === 'user' && (
+            {isAuthenticated && (
               <nav className="flex flex-col gap-1">
-                {[
-                  { label: 'Home', href: '/' },
-                  { label: 'Categories', href: '/categories' },
-                  { label: 'Deals', href: '/deals' },
-                  { label: 'Orders', href: '/orders' },
-                  { label: 'Wishlist', href: '/wishlist' },
-                  { label: 'Cart', href: '/cart' },
-                  { label: 'Profile', href: '/profile' },
-                ].map((item) => (
+                {getMobileLinks().map((item) => (
                   <Link
                     key={item.href}
                     to={item.href}
