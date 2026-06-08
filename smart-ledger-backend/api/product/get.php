@@ -67,6 +67,7 @@ AND p.is_deleted = 0
 
 AND (
     p.product_type = 'retail'
+    OR p.product_type = 'wholesale'
     OR p.product_type = 'both'
 )
 
