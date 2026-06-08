@@ -54,12 +54,6 @@ export default function WholesalerProducts() {
     */
     const loadCategoriesAndProducts = async () => {
         try {
-            if (!user?.company_id) {
-                toast.error('Company ID not found')
-                setLoading(false)
-                return
-            }
-
             setLoading(true)
             const categoriesResponse = await getAllCategories()
 
