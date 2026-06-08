@@ -214,7 +214,7 @@ export default function CompanyForm() {
   const [form, setForm] = useState({
     name:"", code:"", address:"", gstin:"",
     gst_type:"with_gst", phone:"", logo:null,
-    owner_name:"", owner_email:"", owner_password:"",business_type:"retail", 
+    owner_name:"", owner_email:"", owner_password:"", business_type:"both",
   });
 
   const [errors, setErrors]   = useState({});
@@ -420,17 +420,8 @@ export default function CompanyForm() {
             </Field>
             
           )}
-<Field label="Business Type *">
-  <select
-    className="rc-select"
-    value={form.business_type}
-    onChange={e => set("business_type", e.target.value)}
-  >
-    <option value="retail">Retail</option>
-    <option value="wholesale">Wholesale</option>
-    <option value="both">Both</option>
-  </select>
-</Field>
+{/* Business type is fixed to 'both' for backend payload; field hidden from UI */}
+<input type="hidden" name="business_type" value={form.business_type} />
           {/* Logo upload */}
           <Field label="Company Logo">
             <div className="rc-file-area" onClick={() => fileRef.current?.click()}>
