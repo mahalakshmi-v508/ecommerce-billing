@@ -5,145 +5,96 @@ import toast from 'react-hot-toast'
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
-
   const [user, setUser] = useState(null)
   const [token, setToken] = useState(null)
   const [initializing, setInitializing] = useState(true)
 
   useEffect(() => {
-
     const storedUser = localStorage.getItem('auth_user')
     const storedToken = localStorage.getItem('auth_token')
 
     if (storedUser && storedToken) {
-
       try {
-
         setUser(JSON.parse(storedUser))
         setToken(storedToken)
-
       } catch (error) {
-
         localStorage.removeItem('auth_user')
         localStorage.removeItem('auth_token')
       }
     }
 
     setInitializing(false)
-
   }, [])
 
-  // SAVE AUTH
   const saveAuth = (authToken, authUser) => {
-
     localStorage.setItem('auth_token', authToken)
-
-    localStorage.setItem(
-      'auth_user',
-      JSON.stringify(authUser)
-    )
-
+    localStorage.setItem('auth_user', JSON.stringify(authUser))
     setToken(authToken)
     setUser(authUser)
   }
 
-  // LOGIN
+  const authenticate = (authUser) => {
+    const authToken = `token-${Date.now()}`
+    saveAuth(authToken, authUser)
+    return authUser
+  }
+
   const login = async ({ email, password }) => {
-
     try {
-
-      const response = await loginUser({
-        email,
-        password
-      })
-
+      const response = await loginUser({ email, password })
+      console.log('Login response:', response)
+      
       if (!response.status) {
-
-        throw new Error(
-          response.message || 'Unable to login'
-        )
+        throw new Error(response.message || 'Unable to login')
       }
 
-      const authToken =
-        response.token || `token-${Date.now()}`
-
+      const authToken = response.token || `token-${Date.now()}`
       const authUser = {
         ...response.data,
         role: response.role,
       }
 
-      // 🔥 CLEAR WHOLESALER SESSION
-      localStorage.removeItem('wholesaler')
-
-      // 🔥 SAVE NORMAL USER
+      console.log('Saving auth user:', authUser)
       saveAuth(authToken, authUser)
-
-      toast.success('Login successful!')
-
+      toast.success('Login successful! Redirecting...')
       return authUser
-
     } catch (error) {
-
-      const errorMessage =
-        error.message || 'Login failed'
-
+      const errorMessage = error.message || 'Login failed'
+      console.error('Login error:', error)
       toast.error(errorMessage)
-
       throw error
     }
   }
 
-  // LOGOUT
   const logout = () => {
-
     localStorage.removeItem('auth_token')
     localStorage.removeItem('auth_user')
-    localStorage.removeItem('wholesaler')
-
     setUser(null)
     setToken(null)
   }
 
-  const value = useMemo(
-    () => ({
-      user,
-      setUser,
-      token,
-      initializing,
+ const value = useMemo(
+  () => ({
+    user,
+    setUser,
+    token,
+    initializing,
+    isAuthenticated: Boolean(user && token),
+    login,
+      authenticate,
+    logout,
+    hasRole: (roles = []) => Boolean(user && roles.includes(user.role)),
+  }),
+  [user, token, initializing]
+)
 
-      isAuthenticated: Boolean(
-        user && token
-      ),
-
-      login,
-      logout,
-
-      hasRole: (roles = []) =>
-        Boolean(
-          user &&
-          roles.includes(user.role)
-        ),
-    }),
-    [user, token, initializing]
-  )
-
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  )
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
 export function useAuth() {
-
   const context = useContext(AuthContext)
-
   if (!context) {
-
-    throw new Error(
-      'useAuth must be used inside AuthProvider'
-    )
+    throw new Error('useAuth must be used inside AuthProvider')
   }
-
   return context
 }
