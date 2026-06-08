@@ -31,6 +31,9 @@ import WholesalerOrders from './pages/wholesaler/WholesalerOrders.jsx'
 
 import WholesalerHome from './pages/wholesaler/Home/Home.jsx'
 
+import WholesalerRegister from './pages/wholesaler/WholesalerRegister.jsx'
+import WholesalerLogin from './pages/wholesaler/WholesalerLogin.jsx'
+
 function App() {
   return (
     <BrowserRouter>
@@ -154,7 +157,15 @@ function App() {
               </ProtectedRoute>
             }
           />
+<Route
+  path="/wholesaler-register"
+  element={<WholesalerRegister />}
+/>
 
+<Route
+  path="/wholesaler-login"
+  element={<WholesalerLogin />}
+/>
           {/* PROFILE */}
           <Route
             path="/profile"

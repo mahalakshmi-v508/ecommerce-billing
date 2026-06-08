@@ -82,12 +82,29 @@ window.refreshNotificationCount = fetchUnread;
       : []),
 
     // SUPERADMIN ONLY
-    ...(role === "superadmin"
-      ? [
-          { name: "Company", path: "/company", icon: <Building2 size={20} /> },
-          { name: "Cashier Requests", path: "/cashier-requests", icon: <Building2 size={20} /> }
-        ]
-      : []),
+   // SUPERADMIN ONLY
+...(role === "superadmin"
+  ? [
+      {
+        name: "Company",
+        path: "/company",
+        icon: <Building2 size={20} />
+      },
+
+      {
+        name: "Cashier Requests",
+        path: "/cashier-requests",
+        icon: <Building2 size={20} />
+      },
+
+      // 🔥 NEW
+      {
+        name: "Wholesaler Requests",
+        path: "/wholesaler-requests",
+        icon: <ShieldCheck size={20} />
+      }
+    ]
+  : []),
 
     // CASHIER ONLY
     ...(role === "cashier"

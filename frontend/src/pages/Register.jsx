@@ -11,62 +11,50 @@ const phonePattern = /^[0-9]{10}$/
 
 export default function Register() {
   const navigate = useNavigate()
-
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [role, setRole] = useState('user') // ⭐ NEW ROLE STATE
   const [submitting, setSubmitting] = useState(false)
 
   const handleSubmit = async (event) => {
     event.preventDefault()
-
-    // VALIDATION
     if (!name || !email || !phone || !password || !confirmPassword) {
       toast.error('Please fill out all fields.')
       return
     }
-
     if (!emailPattern.test(email)) {
       toast.error('Enter a valid email address.')
       return
     }
-
     if (!phonePattern.test(phone)) {
       toast.error('Phone number must be 10 digits.')
       return
     }
-
     if (password.length < 6) {
       toast.error('Password should be at least 6 characters.')
       return
     }
-
     if (password !== confirmPassword) {
       toast.error('Passwords do not match.')
       return
     }
 
     setSubmitting(true)
-
     try {
       const payload = {
         name,
         email,
         password,
-        role, // ⭐ USER / WHOLESALER
+        role: 'user',
         company_id: 0,
       }
-
       const response = await registerUser(payload)
-
       if (!response.status) {
         toast.error(response.message || 'Registration failed.')
         return
       }
-
       toast.success(response.message || 'Registration successful. Please login.')
       navigate('/login', { replace: true })
     } catch (error) {
@@ -79,10 +67,9 @@ export default function Register() {
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(99,102,241,0.18),_transparent_40%),radial-gradient(circle_at_top_right,_rgba(6,182,212,0.18),_transparent_30%),linear-gradient(180deg,#020617_0%,#0f172a_100%)] px-4 py-10 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl">
-
         <AuthCard
           title="Create an account"
-          subtitle="Register now and access the platform through our secure backend."
+          subtitle="Register now and access the user portal through our secure PHP-powered backend."
           footer={
             <p>
               Already have an account?{' '}
@@ -92,98 +79,52 @@ export default function Register() {
             </p>
           }
         >
-
           <form onSubmit={handleSubmit} className="space-y-5">
-
-            {/* NAME */}
             <FormField
               label="Full Name"
               id="name"
               type="text"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(event) => setName(event.target.value)}
               placeholder="Jane Doe"
               required
             />
-
-            {/* EMAIL */}
             <FormField
               label="Email"
               id="email"
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(event) => setEmail(event.target.value)}
               placeholder="you@example.com"
               required
             />
-
-            {/* PHONE */}
             <FormField
               label="Phone Number"
               id="phone"
               type="tel"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(event) => setPhone(event.target.value)}
               placeholder="0123456789"
               required
             />
-
-            {/* PASSWORD */}
             <FormField
               label="Password"
               id="password"
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(event) => setPassword(event.target.value)}
               placeholder="Create a password"
               required
             />
-
-            {/* CONFIRM PASSWORD */}
             <FormField
               label="Confirm Password"
               id="confirmPassword"
               type="password"
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              onChange={(event) => setConfirmPassword(event.target.value)}
               placeholder="Repeat your password"
               required
             />
-
-            {/* ⭐ ROLE SELECTION */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700">
-                Select Role
-              </label>
-
-              <div className="flex gap-6 text-sm">
-
-                <label className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name="role"
-                    value="user"
-                    checked={role === 'user'}
-                    onChange={(e) => setRole(e.target.value)}
-                  />
-                  User
-                </label>
-
-                <label className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name="role"
-                    value="wholesaler"
-                    checked={role === 'wholesaler'}
-                    onChange={(e) => setRole(e.target.value)}
-                  />
-                  Wholesaler
-                </label>
-
-              </div>
-            </div>
-
-            {/* SUBMIT BUTTON */}
             <button
               type="submit"
               disabled={submitting}
@@ -191,11 +132,8 @@ export default function Register() {
             >
               {submitting ? <LoadingSpinner /> : 'Create account'}
             </button>
-
           </form>
-
         </AuthCard>
-
       </div>
     </div>
   )

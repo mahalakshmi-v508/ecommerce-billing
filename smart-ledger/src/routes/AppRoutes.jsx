@@ -37,6 +37,8 @@ import PaymentPendingHistory from "../pages/reports/PaymentPendingHistory";
 import PendingCashierRequests from "../pages/CashierRequests/PendingCashierRequests";
 import Notifications from "../pages/notifications/Notifications";
 
+import WholesalerRequests from "../../src/pages/WholesalerRequests/WholesalerRequests";
+
 export default function AppRoutes() {
   return (
     <BrowserRouter>
@@ -108,6 +110,11 @@ export default function AppRoutes() {
 <Route path="/tax/add" element={<TaxForm />} />
 
 <Route path="/cashier-requests" element={<PendingCashierRequests />}
+
+/>
+<Route
+  path="/wholesaler-requests"
+  element={<WholesalerRequests />}
 />
         </Route>
       </Routes>

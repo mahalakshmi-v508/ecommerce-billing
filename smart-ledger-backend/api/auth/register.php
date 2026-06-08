@@ -46,7 +46,7 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     exit;
 }
 
-if (!in_array($role, ['superadmin', 'cashier', 'admin', 'user', 'wholesaler'])) {
+if (!in_array($role, ['superadmin', 'cashier', 'admin', 'user'])) {
 
     echo json_encode([
         "status" => false,
