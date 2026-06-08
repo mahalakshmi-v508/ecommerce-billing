@@ -1,10 +1,7 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 
 export default function WholesalerLogin() {
-
-  const navigate = useNavigate()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -19,9 +16,11 @@ export default function WholesalerLogin() {
         'http://localhost/ecommerce-billing/smart-ledger-backend/api/wholesaler/login.php',
         {
           method: 'POST',
+
           headers: {
             'Content-Type': 'application/json'
           },
+
           body: JSON.stringify({
             email,
             password
@@ -31,19 +30,32 @@ export default function WholesalerLogin() {
 
       const data = await response.json()
 
+      // LOGIN FAILED
       if (!data.status) {
+
         toast.error(data.message)
         return
       }
 
+      // 🔥 CLEAR NORMAL USER SESSION
+      localStorage.removeItem('auth_token')
+      localStorage.removeItem('auth_user')
+
+      // 🔥 SAVE WHOLESALER
       localStorage.setItem(
         'wholesaler',
-        JSON.stringify(data.data)
+
+        JSON.stringify({
+          ...data.data,
+          role: 'wholesaler'
+        })
       )
 
       toast.success('Login successful')
 
-      navigate('/wholesaler/dashboard')
+      // 🔥 HARD REDIRECT
+      window.location.href =
+        '/wholesaler/dashboard'
 
     } catch (error) {
 
@@ -52,6 +64,7 @@ export default function WholesalerLogin() {
   }
 
   return (
+
     <div className="min-h-screen flex items-center justify-center bg-slate-100">
 
       <form
@@ -67,14 +80,20 @@ export default function WholesalerLogin() {
           type="email"
           placeholder="Email"
           className="w-full border p-3 rounded"
-          onChange={(e) => setEmail(e.target.value)}
+
+          onChange={(e) =>
+            setEmail(e.target.value)
+          }
         />
 
         <input
           type="password"
           placeholder="Password"
           className="w-full border p-3 rounded"
-          onChange={(e) => setPassword(e.target.value)}
+
+          onChange={(e) =>
+            setPassword(e.target.value)
+          }
         />
 
         <button
