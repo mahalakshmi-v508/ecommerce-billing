@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 
 const PARTICLES = Array.from({ length: 28 }, (_, i) => ({
   id: i,
@@ -10,13 +10,6 @@ const PARTICLES = Array.from({ length: 28 }, (_, i) => ({
   opacity: 0.15 + Math.random() * 0.35,
 }));
 
-const STATS = [
-  { value: "10,000+", label: "Tons Delivered", icon: "🌾" },
-  { value: "5,000+", label: "Retailers", icon: "🏪" },
-  { value: "25+", label: "States Supply", icon: "📦" },
-  { value: "100%", label: "Quality Checked", icon: "✅" },
-];
-
 const BADGES = [
   { label: "FSSAI Certified", icon: "🛡️" },
   { label: "PAN India Delivery", icon: "🚚" },
@@ -27,22 +20,10 @@ const BADGES = [
 export default function HeroSection() {
   const [mounted, setMounted] = useState(false);
   const [ripple, setRipple] = useState(null);
-  const [hoveredBtn, setHoveredBtn] = useState(null);
-  const [countAnimated, setCountAnimated] = useState(false);
-  const statsRef = useRef(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setMounted(true), 80);
     return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setCountAnimated(true); },
-      { threshold: 0.3 }
-    );
-    if (statsRef.current) observer.observe(statsRef.current);
-    return () => observer.disconnect();
   }, []);
 
   const handleRipple = (e, id) => {
@@ -56,7 +37,6 @@ export default function HeroSection() {
     <div style={{
       fontFamily: "'Manrope', 'Poppins', sans-serif",
       background: "#FFFDF7",
-      minHeight: "100vh",
       overflow: "hidden",
     }}>
       <style>{`
@@ -65,7 +45,7 @@ export default function HeroSection() {
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(32px); }
+          from { opacity: 0; transform: translateY(24px); }
           to { opacity: 1; transform: translateY(0); }
         }
         @keyframes fadeIn {
@@ -73,18 +53,18 @@ export default function HeroSection() {
           to { opacity: 1; }
         }
         @keyframes floatImg {
-          0%, 100% { transform: translateY(0px) rotate(-1deg); }
-          50% { transform: translateY(-18px) rotate(1deg); }
+          0%, 100% { transform: translateY(0px) rotate(-0.5deg); }
+          50% { transform: translateY(-10px) rotate(0.5deg); }
         }
         @keyframes floatBadge {
           0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-6px); }
+          50% { transform: translateY(-5px); }
         }
         @keyframes particleDrift {
           0% { transform: translateY(0px) rotate(0deg); opacity: 0; }
           20% { opacity: 1; }
           80% { opacity: 0.8; }
-          100% { transform: translateY(-120px) rotate(360deg); opacity: 0; }
+          100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
         }
         @keyframes shimmer {
           0% { background-position: -200% center; }
@@ -95,24 +75,20 @@ export default function HeroSection() {
           100% { transform: scale(4); opacity: 0; }
         }
         @keyframes pulseGlow {
-          0%, 100% { box-shadow: 0 0 0 0 rgba(245,176,65,0.4); }
-          50% { box-shadow: 0 0 0 12px rgba(245,176,65,0); }
+          0%, 100% { box-shadow: 0 0 0 0 rgba(46,125,50,0.4); }
+          50% { box-shadow: 0 0 0 10px rgba(46,125,50,0); }
         }
         @keyframes badgeFloat {
           0%, 100% { transform: translateY(0px) scale(1); }
-          50% { transform: translateY(-5px) scale(1.02); }
+          50% { transform: translateY(-4px) scale(1.01); }
         }
         @keyframes grainScroll {
           0%, 100% { transform: translate(0, 0); }
-          50% { transform: translate(-1%, -1%); }
-        }
-        @keyframes countUp {
-          from { opacity: 0; transform: scale(0.7); }
-          to { opacity: 1; transform: scale(1); }
+          50% { transform: translate(-0.5%, -0.5%); }
         }
         @keyframes sunray {
-          0%, 100% { opacity: 0.06; }
-          50% { opacity: 0.13; }
+          0%, 100% { opacity: 0.05; }
+          50% { opacity: 0.1; }
         }
 
         .hero-btn-primary {
@@ -121,19 +97,19 @@ export default function HeroSection() {
           color: #fff;
           border: none;
           border-radius: 50px;
-          padding: 14px 32px;
+          padding: 12px 28px;
           font-family: 'Manrope', sans-serif;
-          font-size: 15px;
+          font-size: 14px;
           font-weight: 700;
           letter-spacing: 0.3px;
           cursor: pointer;
           overflow: hidden;
           transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), box-shadow 0.25s ease;
-          box-shadow: 0 4px 20px rgba(46,125,50,0.35);
+          box-shadow: 0 4px 16px rgba(46,125,50,0.25);
         }
         .hero-btn-primary:hover {
-          transform: translateY(-3px) scale(1.03);
-          box-shadow: 0 8px 32px rgba(46,125,50,0.5), 0 0 0 4px rgba(46,125,50,0.12);
+          transform: translateY(-2px) scale(1.02);
+          box-shadow: 0 6px 24px rgba(46,125,50,0.4), 0 0 0 3px rgba(46,125,50,0.1);
           animation: pulseGlow 1.5s ease infinite;
         }
         .hero-btn-secondary {
@@ -142,19 +118,19 @@ export default function HeroSection() {
           color: #fff;
           border: none;
           border-radius: 50px;
-          padding: 14px 32px;
+          padding: 12px 28px;
           font-family: 'Manrope', sans-serif;
-          font-size: 15px;
+          font-size: 14px;
           font-weight: 700;
           letter-spacing: 0.3px;
           cursor: pointer;
           overflow: hidden;
           transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), box-shadow 0.25s ease;
-          box-shadow: 0 4px 20px rgba(245,176,65,0.35);
+          box-shadow: 0 4px 16px rgba(245,176,65,0.25);
         }
         .hero-btn-secondary:hover {
-          transform: translateY(-3px) scale(1.03);
-          box-shadow: 0 8px 32px rgba(245,176,65,0.55), 0 0 0 4px rgba(245,176,65,0.15);
+          transform: translateY(-2px) scale(1.02);
+          box-shadow: 0 6px 24px rgba(245,176,65,0.4), 0 0 0 3px rgba(245,176,65,0.1);
         }
         .arrow-icon {
           display: inline-block;
@@ -162,36 +138,29 @@ export default function HeroSection() {
         }
         .hero-btn-primary:hover .arrow-icon,
         .hero-btn-secondary:hover .arrow-icon {
-          transform: translateX(5px);
-        }
-        .stat-card {
-          transition: transform 0.3s cubic-bezier(.34,1.56,.64,1), box-shadow 0.3s ease;
-        }
-        .stat-card:hover {
-          transform: translateY(-4px) scale(1.04);
-          box-shadow: 0 12px 36px rgba(46,125,50,0.12);
+          transform: translateX(4px);
         }
         .badge-item {
           transition: transform 0.3s cubic-bezier(.34,1.56,.64,1), box-shadow 0.3s ease;
           animation: badgeFloat 3s ease-in-out infinite;
         }
         .badge-item:hover {
-          transform: scale(1.08) translateY(-2px) !important;
-          box-shadow: 0 8px 24px rgba(245,176,65,0.25) !important;
-        }
-        .count-animated {
-          animation: countUp 0.6s cubic-bezier(.34,1.56,.64,1) both;
+          transform: scale(1.05) translateY(-2px) !important;
+          box-shadow: 0 6px 16px rgba(245,176,65,0.2) !important;
         }
       `}</style>
 
       {/* HERO SECTION */}
       <section style={{
         position: "relative",
-        minHeight: "100vh",
         display: "flex",
         alignItems: "center",
+        justifyContent: "center",
         overflow: "hidden",
         background: "linear-gradient(135deg, #F8F5EC 0%, #FFFDF7 40%, #F0F7F0 100%)",
+        paddingTop: "40px",
+        paddingBottom: "40px",
+        minHeight: "calc(100vh - 70px)", /* Adjusted viewport ratio for eliminating whitespace */
       }}>
 
         {/* Background paddy field image with overlay */}
@@ -199,15 +168,15 @@ export default function HeroSection() {
           position: "absolute", inset: 0, zIndex: 0,
           backgroundImage: `url('https://images.unsplash.com/photo-1536657464919-892534f60d6e?auto=format&fit=crop&w=1920&q=80')`,
           backgroundSize: "cover",
-          backgroundPosition: "center 60%",
-          opacity: 0.08,
+          backgroundPosition: "center 50%",
+          opacity: 0.06,
         }} />
 
         {/* Golden sunray effect */}
         <div style={{
           position: "absolute", top: "-10%", right: "5%",
-          width: "600px", height: "600px",
-          background: "radial-gradient(ellipse at center, rgba(245,176,65,0.18) 0%, transparent 70%)",
+          width: "500px", height: "500px",
+          background: "radial-gradient(ellipse at center, rgba(245,176,65,0.15) 0%, transparent 70%)",
           borderRadius: "50%",
           animation: "sunray 4s ease-in-out infinite",
           zIndex: 0,
@@ -215,7 +184,7 @@ export default function HeroSection() {
 
         {/* Subtle grain texture overlay */}
         <div style={{
-          position: "absolute", inset: 0, zIndex: 0, opacity: 0.025,
+          position: "absolute", inset: 0, zIndex: 0, opacity: 0.02,
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
           animation: "grainScroll 8s ease-in-out infinite",
         }} />
@@ -237,16 +206,14 @@ export default function HeroSection() {
           }} />
         ))}
 
-       
-
-        {/* MAIN CONTENT */}
+        {/* MAIN CONTENT CONTAINER */}
         <div style={{
           position: "relative", zIndex: 5,
-          maxWidth: "1280px", margin: "0 auto",
-          padding: "120px 48px 80px",
+          maxWidth: "1200px", margin: "0 auto",
+          padding: "20px 24px", 
           display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: "60px",
+          gridTemplateColumns: "1.1fr 0.9fr",
+          gap: "40px",
           alignItems: "center",
           width: "100%",
         }}>
@@ -255,17 +222,17 @@ export default function HeroSection() {
           <div>
             {/* Eyebrow tag */}
             <div style={{
-              display: "inline-flex", alignItems: "center", gap: "8px",
-              background: "rgba(46,125,50,0.09)",
-              border: "1px solid rgba(46,125,50,0.18)",
+              display: "inline-flex", alignItems: "center", gap: "6px",
+              background: "rgba(46,125,50,0.08)",
+              border: "1px solid rgba(46,125,50,0.15)",
               borderRadius: "50px",
-              padding: "6px 16px",
-              marginBottom: "24px",
+              padding: "5px 14px",
+              marginBottom: "18px",
               animation: mounted ? "fadeUp 0.6s 0.1s ease both" : "none",
               opacity: mounted ? undefined : 0,
             }}>
-              <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#2E7D32", display: "inline-block" }} />
-              <span style={{ fontFamily: "'Manrope', sans-serif", fontSize: "12px", fontWeight: 700, color: "#2E7D32", letterSpacing: "1px", textTransform: "uppercase" }}>
+              <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#2E7D32", display: "inline-block" }} />
+              <span style={{ fontFamily: "'Manrope', sans-serif", fontSize: "11px", fontWeight: 700, color: "#2E7D32", letterSpacing: "0.8px", textTransform: "uppercase" }}>
                 India's Trusted Rice Wholesale Platform
               </span>
             </div>
@@ -273,11 +240,11 @@ export default function HeroSection() {
             {/* Main heading */}
             <h1 style={{
               fontFamily: "'Playfair Display', Georgia, serif",
-              fontSize: "clamp(34px, 4vw, 58px)",
+              fontSize: "clamp(32px, 3.8vw, 52px)",
               fontWeight: 800,
-              lineHeight: 1.12,
+              lineHeight: 1.15,
               color: "#1F2937",
-              marginBottom: "20px",
+              marginBottom: "16px",
               animation: mounted ? "fadeUp 0.7s 0.2s ease both" : "none",
               opacity: mounted ? undefined : 0,
             }}>
@@ -298,47 +265,45 @@ export default function HeroSection() {
             {/* Subheading */}
             <p style={{
               fontFamily: "'Manrope', sans-serif",
-              fontSize: "clamp(14px, 1.3vw, 17px)",
+              fontSize: "clamp(13px, 1.2vw, 15px)",
               color: "#4B5563",
-              lineHeight: 1.7,
+              lineHeight: 1.6,
               fontWeight: 500,
-              marginBottom: "32px",
+              marginBottom: "28px",
               animation: mounted ? "fadeUp 0.7s 0.3s ease both" : "none",
               opacity: mounted ? undefined : 0,
             }}>
               Direct from Rice Mills &nbsp;•&nbsp; Bulk Orders &nbsp;•&nbsp; Best Wholesale Pricing Across India
               <br />
-              <span style={{ color: "#6B7280", fontSize: "14px" }}>
+              <span style={{ color: "#6B7280", fontSize: "13px", marginTop: "4px", display: "inline-block" }}>
                 Serving 5,000+ retailers, distributors & food brands with consistent quality and timely delivery.
               </span>
             </p>
 
             {/* CTA Buttons */}
             <div style={{
-              display: "flex", gap: "16px", flexWrap: "wrap",
-              marginBottom: "40px",
+              display: "flex", gap: "14px", flexWrap: "wrap",
+              marginBottom: "32px",
               animation: mounted ? "fadeUp 0.7s 0.4s ease both" : "none",
               opacity: mounted ? undefined : 0,
             }}>
               <button
                 className="hero-btn-primary"
-                onMouseEnter={() => setHoveredBtn("explore")}
-                onMouseLeave={() => setHoveredBtn(null)}
                 onClick={(e) => handleRipple(e, "explore")}
               >
                 {ripple?.id === "explore" && (
                   <span style={{
                     position: "absolute",
                     left: ripple.x, top: ripple.y,
-                    width: "60px", height: "60px",
-                    marginLeft: "-30px", marginTop: "-30px",
+                    width: "50px", height: "50px",
+                    marginLeft: "-25px", marginTop: "-25px",
                     borderRadius: "50%",
-                    background: "rgba(255,255,255,0.35)",
+                    background: "rgba(255,255,255,0.3)",
                     animation: "rippleEffect 0.7s ease-out forwards",
                     pointerEvents: "none",
                   }} />
                 )}
-                <span style={{ display: "flex", alignItems: "center", gap: "8px", position: "relative", zIndex: 1 }}>
+                <span style={{ display: "flex", alignItems: "center", gap: "6px", position: "relative", zIndex: 1 }}>
                   🌾 Explore Rice Collection
                   <span className="arrow-icon">→</span>
                 </span>
@@ -346,23 +311,21 @@ export default function HeroSection() {
 
               <button
                 className="hero-btn-secondary"
-                onMouseEnter={() => setHoveredBtn("quote")}
-                onMouseLeave={() => setHoveredBtn(null)}
                 onClick={(e) => handleRipple(e, "quote")}
               >
                 {ripple?.id === "quote" && (
                   <span style={{
                     position: "absolute",
                     left: ripple.x, top: ripple.y,
-                    width: "60px", height: "60px",
-                    marginLeft: "-30px", marginTop: "-30px",
+                    width: "50px", height: "50px",
+                    marginLeft: "-25px", marginTop: "-25px",
                     borderRadius: "50%",
-                    background: "rgba(255,255,255,0.35)",
+                    background: "rgba(255,255,255,0.3)",
                     animation: "rippleEffect 0.7s ease-out forwards",
                     pointerEvents: "none",
                   }} />
                 )}
-                <span style={{ display: "flex", alignItems: "center", gap: "8px", position: "relative", zIndex: 1 }}>
+                <span style={{ display: "flex", alignItems: "center", gap: "6px", position: "relative", zIndex: 1 }}>
                   📋 Request Bulk Quote
                   <span className="arrow-icon">→</span>
                 </span>
@@ -371,26 +334,26 @@ export default function HeroSection() {
 
             {/* Trust Badges */}
             <div style={{
-              display: "flex", flexWrap: "wrap", gap: "10px",
+              display: "flex", flexWrap: "wrap", gap: "8px",
               animation: mounted ? "fadeUp 0.7s 0.5s ease both" : "none",
               opacity: mounted ? undefined : 0,
             }}>
               {BADGES.map((badge, i) => (
                 <div key={badge.label} className="badge-item" style={{
-                  display: "flex", alignItems: "center", gap: "6px",
+                  display: "flex", alignItems: "center", gap: "5px",
                   background: "rgba(255,253,247,0.9)",
-                  border: "1px solid rgba(245,176,65,0.3)",
+                  border: "1px solid rgba(245,176,65,0.25)",
                   borderRadius: "50px",
-                  padding: "7px 14px",
-                  fontSize: "12px",
+                  padding: "6px 12px",
+                  fontSize: "11px",
                   fontWeight: 700,
                   color: "#1F2937",
                   fontFamily: "'Manrope', sans-serif",
-                  boxShadow: "0 2px 10px rgba(245,176,65,0.12)",
-                  animationDelay: `${i * 0.5}s`,
-                  backdropFilter: "blur(8px)",
+                  boxShadow: "0 2px 8px rgba(245,176,65,0.08)",
+                  animationDelay: `${i * 0.4}s`,
+                  backdropFilter: "blur(6px)",
                 }}>
-                  <span style={{ fontSize: "14px" }}>{badge.icon}</span>
+                  <span style={{ fontSize: "12px" }}>{badge.icon}</span>
                   {badge.label}
                 </div>
               ))}
@@ -409,28 +372,28 @@ export default function HeroSection() {
             {/* Soft glow blob behind image */}
             <div style={{
               position: "absolute",
-              width: "420px", height: "420px",
+              width: "360px", height: "360px",
               borderRadius: "50%",
-              background: "radial-gradient(ellipse, rgba(245,176,65,0.18) 0%, rgba(46,125,50,0.08) 60%, transparent 100%)",
+              background: "radial-gradient(ellipse, rgba(245,176,65,0.15) 0%, rgba(46,125,50,0.06) 60%, transparent 100%)",
               zIndex: 0,
             }} />
 
-            {/* Rice warehouse background card */}
+            {/* Rice image background card */}
             <div style={{
               position: "relative", zIndex: 2,
-              width: "100%", maxWidth: "520px",
-              borderRadius: "24px",
+              width: "100%", maxWidth: "440px",
+              borderRadius: "20px",
               overflow: "hidden",
-              boxShadow: "0 32px 80px rgba(46,125,50,0.15), 0 8px 32px rgba(0,0,0,0.1)",
-              animation: "floatImg 6s ease-in-out infinite",
+              boxShadow: "0 24px 64px rgba(46,125,50,0.12), 0 8px 24px rgba(0,0,0,0.08)",
+              animation: "floatImg 5s ease-in-out infinite",
             }}>
-              {/* Main rice sack image */}
+              {/* Main image */}
               <img
                 src="https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=800&q=85"
                 alt="Premium rice sacks"
                 style={{
                   width: "100%",
-                  height: "360px",
+                  height: "320px",
                   objectFit: "cover",
                   objectPosition: "center",
                   display: "block",
@@ -439,143 +402,90 @@ export default function HeroSection() {
               {/* Overlay gradient */}
               <div style={{
                 position: "absolute", inset: 0,
-                background: "linear-gradient(to top, rgba(46,125,50,0.55) 0%, rgba(0,0,0,0.15) 50%, transparent 100%)",
+                background: "linear-gradient(to top, rgba(46,125,50,0.5) 0%, rgba(0,0,0,0.1) 50%, transparent 100%)",
               }} />
-              {/* Bottom info on image */}
+              {/* Bottom tag list inside visual */}
               <div style={{
                 position: "absolute", bottom: 0, left: 0, right: 0,
-                padding: "20px 24px",
+                padding: "16px 20px",
               }}>
-                <div style={{
-                  display: "flex", gap: "10px",
-                }}>
+                <div style={{ display: "flex", gap: "8px" }}>
                   {[
                     { label: "Basmati Rice", sub: "Premium Long Grain" },
                     { label: "Sona Masoori", sub: "Daily Use Grade A" },
                   ].map(item => (
                     <div key={item.label} style={{
                       flex: 1,
-                      background: "rgba(255,253,247,0.15)",
-                      backdropFilter: "blur(12px)",
-                      border: "1px solid rgba(255,255,255,0.25)",
-                      borderRadius: "12px",
-                      padding: "10px 14px",
+                      background: "rgba(255,253,247,0.12)",
+                      backdropFilter: "blur(10px)",
+                      border: "1px solid rgba(255,255,255,0.2)",
+                      borderRadius: "10px",
+                      padding: "8px 12px",
                     }}>
-                      <div style={{ fontFamily: "'Manrope', sans-serif", fontSize: "13px", fontWeight: 700, color: "#fff" }}>{item.label}</div>
-                      <div style={{ fontFamily: "'Manrope', sans-serif", fontSize: "11px", color: "rgba(255,255,255,0.75)" }}>{item.sub}</div>
+                      <div style={{ fontFamily: "'Manrope', sans-serif", fontSize: "12px", fontWeight: 700, color: "#fff" }}>{item.label}</div>
+                      <div style={{ fontFamily: "'Manrope', sans-serif", fontSize: "10px", color: "rgba(255,255,255,0.7)" }}>{item.sub}</div>
                     </div>
                   ))}
                 </div>
               </div>
             </div>
 
-            {/* Floating glassmorphism card - top left */}
+            {/* Glassmorphism Floating Badge - Today's Rate */}
             <div style={{
-              position: "absolute", top: "8%", left: "-10%", zIndex: 6,
-              background: "rgba(255,253,247,0.88)",
-              backdropFilter: "blur(16px)",
-              border: "1px solid rgba(245,176,65,0.25)",
-              borderRadius: "16px",
-              padding: "14px 18px",
-              boxShadow: "0 8px 32px rgba(46,125,50,0.12)",
-              minWidth: "150px",
-              animation: "floatBadge 4s ease-in-out infinite",
-              animationDelay: "1s",
-            }}>
-              <div style={{ fontFamily: "'Manrope', sans-serif", fontSize: "11px", fontWeight: 600, color: "#6B7280", textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: "4px" }}>Today's Rate</div>
-              <div style={{ fontFamily: "'Manrope', sans-serif", fontSize: "20px", fontWeight: 800, color: "#2E7D32" }}>₹42/kg</div>
-              <div style={{ fontFamily: "'Manrope', sans-serif", fontSize: "11px", color: "#10B981", fontWeight: 600, marginTop: "2px" }}>↑ 2.4% Basmati Premium</div>
-            </div>
-
-            {/* Floating glassmorphism card - bottom right */}
-            <div style={{
-              position: "absolute", bottom: "10%", right: "-8%", zIndex: 6,
-              background: "rgba(255,253,247,0.88)",
-              backdropFilter: "blur(16px)",
-              border: "1px solid rgba(46,125,50,0.2)",
-              borderRadius: "16px",
-              padding: "14px 18px",
-              boxShadow: "0 8px 32px rgba(46,125,50,0.12)",
-              animation: "floatBadge 5s ease-in-out infinite",
-              animationDelay: "0.5s",
-            }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-                <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#10B981" }} />
-                <span style={{ fontFamily: "'Manrope', sans-serif", fontSize: "11px", fontWeight: 700, color: "#374151", textTransform: "uppercase", letterSpacing: "0.8px" }}>Live Orders</span>
-              </div>
-              <div style={{ fontFamily: "'Manrope', sans-serif", fontSize: "22px", fontWeight: 800, color: "#1F2937" }}>247</div>
-              <div style={{ fontFamily: "'Manrope', sans-serif", fontSize: "11px", color: "#6B7280" }}>Bulk orders today</div>
-            </div>
-
-            {/* Certified badge */}
-            <div style={{
-              position: "absolute", top: "42%", right: "-12%", zIndex: 6,
-              background: "linear-gradient(135deg, #2E7D32, #388E3C)",
-              borderRadius: "16px",
+              position: "absolute", top: "10%", left: "-6%", zIndex: 6,
+              background: "rgba(255,253,247,0.9)",
+              backdropFilter: "blur(12px)",
+              border: "1px solid rgba(245,176,65,0.2)",
+              borderRadius: "14px",
               padding: "12px 16px",
-              boxShadow: "0 8px 24px rgba(46,125,50,0.35)",
+              boxShadow: "0 6px 24px rgba(46,125,50,0.1)",
+              minWidth: "135px",
+              animation: "floatBadge 4s ease-in-out infinite",
+              animationDelay: "0.8s",
+            }}>
+              <div style={{ fontFamily: "'Manrope', sans-serif", fontSize: "10px", fontWeight: 600, color: "#6B7280", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "2px" }}>Today's Rate</div>
+              <div style={{ fontFamily: "'Manrope', sans-serif", fontSize: "18px", fontWeight: 800, color: "#2E7D32" }}>₹42/kg</div>
+              <div style={{ fontFamily: "'Manrope', sans-serif", fontSize: "10px", color: "#10B981", fontWeight: 600 }}>↑ 2.4% Basmati</div>
+            </div>
+
+            {/* Glassmorphism Floating Badge - Live Orders */}
+            <div style={{
+              position: "absolute", bottom: "12%", right: "-4%", zIndex: 6,
+              background: "rgba(255,253,247,0.9)",
+              backdropFilter: "blur(12px)",
+              border: "1px solid rgba(46,125,50,0.15)",
+              borderRadius: "14px",
+              padding: "12px 16px",
+              boxShadow: "0 6px 24px rgba(46,125,50,0.1)",
+              animation: "floatBadge 5s ease-in-out infinite",
+              animationDelay: "0.3s",
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}>
+                <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#10B981" }} />
+                <span style={{ fontFamily: "'Manrope', sans-serif", fontSize: "10px", fontWeight: 700, color: "#374151", textTransform: "uppercase" }}>Live Orders</span>
+              </div>
+              <div style={{ fontFamily: "'Manrope', sans-serif", fontSize: "20px", fontWeight: 800, color: "#1F2937" }}>247</div>
+            </div>
+
+            {/* FSSAI Certified Badge */}
+            <div style={{
+              position: "absolute", top: "42%", right: "-6%", zIndex: 6,
+              background: "linear-gradient(135deg, #2E7D32, #388E3C)",
+              borderRadius: "14px",
+              padding: "10px 14px",
+              boxShadow: "0 6px 20px rgba(46,125,50,0.3)",
               animation: "floatBadge 3.5s ease-in-out infinite",
-              animationDelay: "2s",
+              animationDelay: "1.5s",
               textAlign: "center",
             }}>
-              <div style={{ fontSize: "22px", marginBottom: "2px" }}>🛡️</div>
-              <div style={{ fontFamily: "'Manrope', sans-serif", fontSize: "11px", fontWeight: 800, color: "#fff", letterSpacing: "0.5px" }}>FSSAI</div>
-              <div style={{ fontFamily: "'Manrope', sans-serif", fontSize: "10px", color: "rgba(255,255,255,0.75)" }}>Certified</div>
+              <div style={{ fontSize: "18px", marginBottom: "1px" }}>🛡️</div>
+              <div style={{ fontFamily: "'Manrope', sans-serif", fontSize: "10px", fontWeight: 800, color: "#fff" }}>FSSAI</div>
+              <div style={{ fontFamily: "'Manrope', sans-serif", fontSize: "9px", color: "rgba(255,255,255,0.8)" }}>Certified</div>
             </div>
-          </div>
-        </div>
 
-        {/* STATISTICS STRIP */}
-        <div ref={statsRef} style={{
-          position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 5,
-          background: "rgba(255,253,247,0.92)",
-          backdropFilter: "blur(20px)",
-          borderTop: "1px solid rgba(46,125,50,0.1)",
-          padding: "0 48px",
-        }}>
-          <div style={{
-            maxWidth: "1280px", margin: "0 auto",
-            display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
-            gap: "0",
-          }}>
-            {STATS.map((stat, i) => (
-              <div key={stat.label} className="stat-card" style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "22px 20px",
-                borderRight: i < 3 ? "1px solid rgba(46,125,50,0.1)" : "none",
-                gap: "4px",
-                animation: countAnimated ? `countUp 0.5s ${0.1 * i}s ease both` : "none",
-                opacity: countAnimated ? undefined : 0,
-              }}>
-                <span style={{ fontSize: "20px", marginBottom: "2px" }}>{stat.icon}</span>
-                <span style={{
-                  fontFamily: "'Manrope', sans-serif",
-                  fontSize: "clamp(20px, 2.2vw, 28px)",
-                  fontWeight: 900,
-                  background: "linear-gradient(135deg, #2E7D32, #F5B041)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                  lineHeight: 1.1,
-                }}>{stat.value}</span>
-                <span style={{
-                  fontFamily: "'Manrope', sans-serif",
-                  fontSize: "12px",
-                  fontWeight: 600,
-                  color: "#6B7280",
-                  letterSpacing: "0.5px",
-                }}>{stat.label}</span>
-              </div>
-            ))}
           </div>
         </div>
       </section>
-
-      
     </div>
   );
 }
