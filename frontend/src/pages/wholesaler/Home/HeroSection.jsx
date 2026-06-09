@@ -34,15 +34,9 @@ export default function HeroSection() {
   };
 
   return (
-    <div style={{
-      fontFamily: "'Manrope', 'Poppins', sans-serif",
-      background: "#FFFDF7",
-      overflow: "hidden",
-    }}>
+    <div className="font-['Manrope','Poppins',sans-serif] bg-[#FFFDF7] overflow-hidden">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap');
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(24px); }
@@ -151,48 +145,26 @@ export default function HeroSection() {
       `}</style>
 
       {/* HERO SECTION */}
-      <section style={{
-        position: "relative",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        overflow: "hidden",
-        background: "linear-gradient(135deg, #F8F5EC 0%, #FFFDF7 40%, #F0F7F0 100%)",
-        paddingTop: "40px",
-        paddingBottom: "40px",
-        minHeight: "calc(100vh - 70px)", /* Adjusted viewport ratio for eliminating whitespace */
-      }}>
-
+      <section className="relative flex items-center justify-center overflow-hidden bg-gradient-to-br from-[#F8F5EC] via-[#FFFDF7] to-[#F0F7F0] pt-10 pb-10 min-h-[calc(100vh-70px)]">
+        
         {/* Background paddy field image with overlay */}
-        <div style={{
-          position: "absolute", inset: 0, zIndex: 0,
+        <div className="absolute inset-0 z-0 bg-cover bg-center opacity-6" style={{
           backgroundImage: `url('https://images.unsplash.com/photo-1536657464919-892534f60d6e?auto=format&fit=crop&w=1920&q=80')`,
-          backgroundSize: "cover",
-          backgroundPosition: "center 50%",
-          opacity: 0.06,
         }} />
 
         {/* Golden sunray effect */}
-        <div style={{
-          position: "absolute", top: "-10%", right: "5%",
-          width: "500px", height: "500px",
+        <div className="absolute -top-[10%] right-[5%] w-[500px] h-[500px] rounded-full z-0 animate-[sunray_4s_ease-in-out_infinite]" style={{
           background: "radial-gradient(ellipse at center, rgba(245,176,65,0.15) 0%, transparent 70%)",
-          borderRadius: "50%",
-          animation: "sunray 4s ease-in-out infinite",
-          zIndex: 0,
         }} />
 
         {/* Subtle grain texture overlay */}
-        <div style={{
-          position: "absolute", inset: 0, zIndex: 0, opacity: 0.02,
+        <div className="absolute inset-0 z-0 opacity-2 animate-[grainScroll_8s_ease-in-out_infinite]" style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-          animation: "grainScroll 8s ease-in-out infinite",
         }} />
 
         {/* Floating rice grain particles */}
         {PARTICLES.map(p => (
-          <div key={p.id} style={{
-            position: "absolute",
+          <div key={p.id} className="absolute z-1" style={{
             left: `${p.x}%`,
             top: `${100 - p.y}%`,
             width: `${p.size}px`,
@@ -201,109 +173,54 @@ export default function HeroSection() {
             background: p.id % 3 === 0 ? "#F5B041" : p.id % 3 === 1 ? "#2E7D32" : "#C8B89A",
             opacity: p.opacity,
             animation: `particleDrift ${p.dur}s ease-in-out ${p.delay}s infinite`,
-            zIndex: 1,
             transform: `rotate(${Math.random() * 360}deg)`,
           }} />
         ))}
 
         {/* MAIN CONTENT CONTAINER */}
-        <div style={{
-          position: "relative", zIndex: 5,
-          maxWidth: "1200px", margin: "0 auto",
-          padding: "20px 24px", 
-          display: "grid",
-          gridTemplateColumns: "1.1fr 0.9fr",
-          gap: "40px",
-          alignItems: "center",
-          width: "100%",
-        }}>
-
+        <div className="relative z-5 max-w-[1200px] mx-auto px-6 py-5 grid grid-cols-[1.1fr_0.9fr] gap-10 items-center w-full">
+          
           {/* LEFT CONTENT */}
           <div>
             {/* Eyebrow tag */}
-            <div style={{
-              display: "inline-flex", alignItems: "center", gap: "6px",
-              background: "rgba(46,125,50,0.08)",
-              border: "1px solid rgba(46,125,50,0.15)",
-              borderRadius: "50px",
-              padding: "5px 14px",
-              marginBottom: "18px",
-              animation: mounted ? "fadeUp 0.6s 0.1s ease both" : "none",
-              opacity: mounted ? undefined : 0,
-            }}>
-              <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#2E7D32", display: "inline-block" }} />
-              <span style={{ fontFamily: "'Manrope', sans-serif", fontSize: "11px", fontWeight: 700, color: "#2E7D32", letterSpacing: "0.8px", textTransform: "uppercase" }}>
+            <div className={`inline-flex items-center gap-1.5 bg-[rgba(46,125,50,0.08)] border border-[rgba(46,125,50,0.15)] rounded-full px-3.5 py-1.25 mb-4.5 ${mounted ? 'animate-[fadeUp_0.6s_0.1s_ease_both]' : 'opacity-0'}`}>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#2E7D32] inline-block" />
+              <span className="font-['Manrope',sans-serif] text-[11px] font-bold text-[#2E7D32] tracking-[0.8px] uppercase">
                 India's Trusted Rice Wholesale Platform
               </span>
             </div>
 
             {/* Main heading */}
-            <h1 style={{
-              fontFamily: "'Playfair Display', Georgia, serif",
-              fontSize: "clamp(32px, 3.8vw, 52px)",
-              fontWeight: 800,
-              lineHeight: 1.15,
-              color: "#1F2937",
-              marginBottom: "16px",
-              animation: mounted ? "fadeUp 0.7s 0.2s ease both" : "none",
-              opacity: mounted ? undefined : 0,
-            }}>
+            <h1 className={`font-['Playfair_Display',Georgia,serif] text-[clamp(32px,3.8vw,52px)] font-extrabold leading-[1.15] text-[#1F2937] mb-4 ${mounted ? 'animate-[fadeUp_0.7s_0.2s_ease_both]' : 'opacity-0'}`}>
               Premium Quality{" "}
-              <span style={{
-                background: "linear-gradient(135deg, #2E7D32 0%, #68A84A 50%, #F5B041 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-                backgroundSize: "200% auto",
-                animation: "shimmer 4s linear infinite",
-              }}>
+              <span className="bg-gradient-to-r from-[#2E7D32] via-[#68A84A] to-[#F5B041] bg-clip-text text-transparent bg-[length:200%_auto] animate-[shimmer_4s_linear_infinite]">
                 Rice Wholesale
               </span>{" "}
               Supply
             </h1>
 
             {/* Subheading */}
-            <p style={{
-              fontFamily: "'Manrope', sans-serif",
-              fontSize: "clamp(13px, 1.2vw, 15px)",
-              color: "#4B5563",
-              lineHeight: 1.6,
-              fontWeight: 500,
-              marginBottom: "28px",
-              animation: mounted ? "fadeUp 0.7s 0.3s ease both" : "none",
-              opacity: mounted ? undefined : 0,
-            }}>
-              Direct from Rice Mills &nbsp;•&nbsp; Bulk Orders &nbsp;•&nbsp; Best Wholesale Pricing Across India
-              <br />
-              <span style={{ color: "#6B7280", fontSize: "13px", marginTop: "4px", display: "inline-block" }}>
+            <div className={`${mounted ? 'animate-[fadeUp_0.7s_0.3s_ease_both]' : 'opacity-0'}`}>
+              <p className="font-['Manrope',sans-serif] text-[clamp(13px,1.2vw,15px)] text-[#4B5563] leading-relaxed font-medium mb-3">
+                Direct from Rice Mills &nbsp;•&nbsp; Bulk Orders &nbsp;•&nbsp; Best Wholesale Pricing Across India
+              </p>
+              <span className="text-[#6B7280] text-[13px] inline-block">
                 Serving 5,000+ retailers, distributors & food brands with consistent quality and timely delivery.
               </span>
-            </p>
+            </div>
 
             {/* CTA Buttons */}
-            <div style={{
-              display: "flex", gap: "14px", flexWrap: "wrap",
-              marginBottom: "32px",
-              animation: mounted ? "fadeUp 0.7s 0.4s ease both" : "none",
-              opacity: mounted ? undefined : 0,
-            }}>
+            <div className={`flex gap-3.5 flex-wrap mb-8 ${mounted ? 'animate-[fadeUp_0.7s_0.4s_ease_both]' : 'opacity-0'}`}>
               <button
                 className="hero-btn-primary"
                 onClick={(e) => handleRipple(e, "explore")}
               >
                 {ripple?.id === "explore" && (
-                  <span style={{
-                    position: "absolute",
-                    left: ripple.x, top: ripple.y,
-                    width: "50px", height: "50px",
-                    marginLeft: "-25px", marginTop: "-25px",
-                    borderRadius: "50%",
-                    background: "rgba(255,255,255,0.3)",
-                    animation: "rippleEffect 0.7s ease-out forwards",
-                    pointerEvents: "none",
-                  }} />
+                  <span className="absolute left-0 top-0 w-[50px] h-[50px] -ml-[25px] -mt-[25px] rounded-full bg-white/30 animate-[rippleEffect_0.7s_ease-out_forwards] pointer-events-none"
+                    style={{ left: ripple.x, top: ripple.y }}
+                  />
                 )}
-                <span style={{ display: "flex", alignItems: "center", gap: "6px", position: "relative", zIndex: 1 }}>
+                <span className="flex items-center gap-1.5 relative z-1">
                   🌾 Explore Rice Collection
                   <span className="arrow-icon">→</span>
                 </span>
@@ -314,18 +231,11 @@ export default function HeroSection() {
                 onClick={(e) => handleRipple(e, "quote")}
               >
                 {ripple?.id === "quote" && (
-                  <span style={{
-                    position: "absolute",
-                    left: ripple.x, top: ripple.y,
-                    width: "50px", height: "50px",
-                    marginLeft: "-25px", marginTop: "-25px",
-                    borderRadius: "50%",
-                    background: "rgba(255,255,255,0.3)",
-                    animation: "rippleEffect 0.7s ease-out forwards",
-                    pointerEvents: "none",
-                  }} />
+                  <span className="absolute left-0 top-0 w-[50px] h-[50px] -ml-[25px] -mt-[25px] rounded-full bg-white/30 animate-[rippleEffect_0.7s_ease-out_forwards] pointer-events-none"
+                    style={{ left: ripple.x, top: ripple.y }}
+                  />
                 )}
-                <span style={{ display: "flex", alignItems: "center", gap: "6px", position: "relative", zIndex: 1 }}>
+                <span className="flex items-center gap-1.5 relative z-1">
                   📋 Request Bulk Quote
                   <span className="arrow-icon">→</span>
                 </span>
@@ -333,27 +243,11 @@ export default function HeroSection() {
             </div>
 
             {/* Trust Badges */}
-            <div style={{
-              display: "flex", flexWrap: "wrap", gap: "8px",
-              animation: mounted ? "fadeUp 0.7s 0.5s ease both" : "none",
-              opacity: mounted ? undefined : 0,
-            }}>
+            <div className={`flex flex-wrap gap-2 ${mounted ? 'animate-[fadeUp_0.7s_0.5s_ease_both]' : 'opacity-0'}`}>
               {BADGES.map((badge, i) => (
-                <div key={badge.label} className="badge-item" style={{
-                  display: "flex", alignItems: "center", gap: "5px",
-                  background: "rgba(255,253,247,0.9)",
-                  border: "1px solid rgba(245,176,65,0.25)",
-                  borderRadius: "50px",
-                  padding: "6px 12px",
-                  fontSize: "11px",
-                  fontWeight: 700,
-                  color: "#1F2937",
-                  fontFamily: "'Manrope', sans-serif",
-                  boxShadow: "0 2px 8px rgba(245,176,65,0.08)",
-                  animationDelay: `${i * 0.4}s`,
-                  backdropFilter: "blur(6px)",
-                }}>
-                  <span style={{ fontSize: "12px" }}>{badge.icon}</span>
+                <div key={badge.label} className="badge-item flex items-center gap-1.5 bg-[rgba(255,253,247,0.9)] border border-[rgba(245,176,65,0.25)] rounded-full py-1.5 px-3 text-[11px] font-bold text-[#1F2937] font-['Manrope',sans-serif] shadow-[0_2px_8px_rgba(245,176,65,0.08)] backdrop-blur-sm"
+                  style={{ animationDelay: `${i * 0.4}s` }}>
+                  <span className="text-xs">{badge.icon}</span>
                   {badge.label}
                 </div>
               ))}
@@ -361,69 +255,32 @@ export default function HeroSection() {
           </div>
 
           {/* RIGHT SIDE VISUAL */}
-          <div style={{
-            position: "relative",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            animation: mounted ? "fadeIn 0.8s 0.4s ease both" : "none",
-            opacity: mounted ? undefined : 0,
-          }}>
+          <div className={`relative flex items-center justify-center ${mounted ? 'animate-[fadeIn_0.8s_0.4s_ease_both]' : 'opacity-0'}`}>
             {/* Soft glow blob behind image */}
-            <div style={{
-              position: "absolute",
-              width: "360px", height: "360px",
-              borderRadius: "50%",
+            <div className="absolute w-[360px] h-[360px] rounded-full z-0" style={{
               background: "radial-gradient(ellipse, rgba(245,176,65,0.15) 0%, rgba(46,125,50,0.06) 60%, transparent 100%)",
-              zIndex: 0,
             }} />
 
             {/* Rice image background card */}
-            <div style={{
-              position: "relative", zIndex: 2,
-              width: "100%", maxWidth: "440px",
-              borderRadius: "20px",
-              overflow: "hidden",
-              boxShadow: "0 24px 64px rgba(46,125,50,0.12), 0 8px 24px rgba(0,0,0,0.08)",
-              animation: "floatImg 5s ease-in-out infinite",
-            }}>
+            <div className="relative z-2 w-full max-w-[440px] rounded-2xl overflow-hidden shadow-[0_24px_64px_rgba(46,125,50,0.12),0_8px_24px_rgba(0,0,0,0.08)] animate-[floatImg_5s_ease-in-out_infinite]">
               {/* Main image */}
               <img
                 src="https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=800&q=85"
                 alt="Premium rice sacks"
-                style={{
-                  width: "100%",
-                  height: "320px",
-                  objectFit: "cover",
-                  objectPosition: "center",
-                  display: "block",
-                }}
+                className="w-full h-[320px] object-cover object-center block"
               />
               {/* Overlay gradient */}
-              <div style={{
-                position: "absolute", inset: 0,
-                background: "linear-gradient(to top, rgba(46,125,50,0.5) 0%, rgba(0,0,0,0.1) 50%, transparent 100%)",
-              }} />
+              <div className="absolute inset-0 bg-gradient-to-t from-[rgba(46,125,50,0.5)] via-[rgba(0,0,0,0.1)] to-transparent" />
               {/* Bottom tag list inside visual */}
-              <div style={{
-                position: "absolute", bottom: 0, left: 0, right: 0,
-                padding: "16px 20px",
-              }}>
-                <div style={{ display: "flex", gap: "8px" }}>
+              <div className="absolute bottom-0 left-0 right-0 p-4">
+                <div className="flex gap-2">
                   {[
                     { label: "Basmati Rice", sub: "Premium Long Grain" },
                     { label: "Sona Masoori", sub: "Daily Use Grade A" },
                   ].map(item => (
-                    <div key={item.label} style={{
-                      flex: 1,
-                      background: "rgba(255,253,247,0.12)",
-                      backdropFilter: "blur(10px)",
-                      border: "1px solid rgba(255,255,255,0.2)",
-                      borderRadius: "10px",
-                      padding: "8px 12px",
-                    }}>
-                      <div style={{ fontFamily: "'Manrope', sans-serif", fontSize: "12px", fontWeight: 700, color: "#fff" }}>{item.label}</div>
-                      <div style={{ fontFamily: "'Manrope', sans-serif", fontSize: "10px", color: "rgba(255,255,255,0.7)" }}>{item.sub}</div>
+                    <div key={item.label} className="flex-1 bg-white/12 backdrop-blur-md border border-white/20 rounded-lg p-2">
+                      <div className="font-['Manrope',sans-serif] text-xs font-bold text-white">{item.label}</div>
+                      <div className="font-['Manrope',sans-serif] text-[10px] text-white/70">{item.sub}</div>
                     </div>
                   ))}
                 </div>
@@ -431,58 +288,30 @@ export default function HeroSection() {
             </div>
 
             {/* Glassmorphism Floating Badge - Today's Rate */}
-            <div style={{
-              position: "absolute", top: "10%", left: "-6%", zIndex: 6,
-              background: "rgba(255,253,247,0.9)",
-              backdropFilter: "blur(12px)",
-              border: "1px solid rgba(245,176,65,0.2)",
-              borderRadius: "14px",
-              padding: "12px 16px",
-              boxShadow: "0 6px 24px rgba(46,125,50,0.1)",
-              minWidth: "135px",
-              animation: "floatBadge 4s ease-in-out infinite",
-              animationDelay: "0.8s",
-            }}>
-              <div style={{ fontFamily: "'Manrope', sans-serif", fontSize: "10px", fontWeight: 600, color: "#6B7280", textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: "2px" }}>Today's Rate</div>
-              <div style={{ fontFamily: "'Manrope', sans-serif", fontSize: "18px", fontWeight: 800, color: "#2E7D32" }}>₹42/kg</div>
-              <div style={{ fontFamily: "'Manrope', sans-serif", fontSize: "10px", color: "#10B981", fontWeight: 600 }}>↑ 2.4% Basmati</div>
+            <div className="absolute top-[10%] -left-[6%] z-6 bg-[rgba(255,253,247,0.9)] backdrop-blur-md border border-[rgba(245,176,65,0.2)] rounded-xl p-3 shadow-[0_6px_24px_rgba(46,125,50,0.1)] min-w-[135px] animate-[floatBadge_4s_ease-in-out_infinite]"
+              style={{ animationDelay: "0.8s" }}>
+              <div className="font-['Manrope',sans-serif] text-[10px] font-semibold text-[#6B7280] uppercase tracking-[0.5px] mb-0.5">Today's Rate</div>
+              <div className="font-['Manrope',sans-serif] text-lg font-extrabold text-[#2E7D32]">₹42/kg</div>
+              <div className="font-['Manrope',sans-serif] text-[10px] text-[#10B981] font-semibold">↑ 2.4% Basmati</div>
             </div>
 
             {/* Glassmorphism Floating Badge - Live Orders */}
-            <div style={{
-              position: "absolute", bottom: "12%", right: "-4%", zIndex: 6,
-              background: "rgba(255,253,247,0.9)",
-              backdropFilter: "blur(12px)",
-              border: "1px solid rgba(46,125,50,0.15)",
-              borderRadius: "14px",
-              padding: "12px 16px",
-              boxShadow: "0 6px 24px rgba(46,125,50,0.1)",
-              animation: "floatBadge 5s ease-in-out infinite",
-              animationDelay: "0.3s",
-            }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}>
-                <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#10B981" }} />
-                <span style={{ fontFamily: "'Manrope', sans-serif", fontSize: "10px", fontWeight: 700, color: "#374151", textTransform: "uppercase" }}>Live Orders</span>
+            <div className="absolute bottom-[12%] -right-[4%] z-6 bg-[rgba(255,253,247,0.9)] backdrop-blur-md border border-[rgba(46,125,50,0.15)] rounded-xl p-3 shadow-[0_6px_24px_rgba(46,125,50,0.1)] animate-[floatBadge_5s_ease-in-out_infinite]"
+              style={{ animationDelay: "0.3s" }}>
+              <div className="flex items-center gap-1.5 mb-1">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
+                <span className="font-['Manrope',sans-serif] text-[10px] font-bold text-[#374151] uppercase">Live Orders</span>
               </div>
-              <div style={{ fontFamily: "'Manrope', sans-serif", fontSize: "20px", fontWeight: 800, color: "#1F2937" }}>247</div>
+              <div className="font-['Manrope',sans-serif] text-xl font-extrabold text-[#1F2937]">247</div>
             </div>
 
             {/* FSSAI Certified Badge */}
-            <div style={{
-              position: "absolute", top: "42%", right: "-6%", zIndex: 6,
-              background: "linear-gradient(135deg, #2E7D32, #388E3C)",
-              borderRadius: "14px",
-              padding: "10px 14px",
-              boxShadow: "0 6px 20px rgba(46,125,50,0.3)",
-              animation: "floatBadge 3.5s ease-in-out infinite",
-              animationDelay: "1.5s",
-              textAlign: "center",
-            }}>
-              <div style={{ fontSize: "18px", marginBottom: "1px" }}>🛡️</div>
-              <div style={{ fontFamily: "'Manrope', sans-serif", fontSize: "10px", fontWeight: 800, color: "#fff" }}>FSSAI</div>
-              <div style={{ fontFamily: "'Manrope', sans-serif", fontSize: "9px", color: "rgba(255,255,255,0.8)" }}>Certified</div>
+            <div className="absolute top-[42%] -right-[6%] z-6 bg-gradient-to-br from-[#2E7D32] to-[#388E3C] rounded-xl p-2.5 shadow-[0_6px_20px_rgba(46,125,50,0.3)] animate-[floatBadge_3.5s_ease-in-out_infinite] text-center"
+              style={{ animationDelay: "1.5s" }}>
+              <div className="text-lg mb-0.5">🛡️</div>
+              <div className="font-['Manrope',sans-serif] text-[10px] font-extrabold text-white">FSSAI</div>
+              <div className="font-['Manrope',sans-serif] text-[9px] text-white/80">Certified</div>
             </div>
-
           </div>
         </div>
       </section>
