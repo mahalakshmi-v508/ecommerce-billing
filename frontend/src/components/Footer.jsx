@@ -1,135 +1,140 @@
-import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { getAllCategories } from '../services/categoryService.js'
-
-const supportLinks = [
-  { label: 'Help Center', href: '#' },
-  { label: 'Track Order', href: '/orders' },
-  { label: 'Returns', href: '#' },
-  { label: 'Contact Us', href: '#' },
-]
-
-const policyLinks = [
-  { label: 'Privacy Policy', href: '#' },
-  { label: 'Terms of Service', href: '#' },
-  { label: 'Shipping Policy', href: '#' },
-  { label: 'Refund Policy', href: '#' },
-]
-
-const paymentMethods = ['Visa', 'Mastercard', 'UPI', 'COD']
+import { Phone, Mail, FileText } from 'lucide-react'
 
 export default function Footer() {
-  const [categories, setCategories] = useState([])
-
-  useEffect(() => {
-    getAllCategories()
-      .then((res) => {
-        if (res.status) setCategories(res.data?.slice(0, 6) || [])
-      })
-      .catch(() => setCategories([]))
-  }, [])
-
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="border-t border-[#e5e7eb] bg-white">
-      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-5">
-          <div className="lg:col-span-2">
-            <Link
-              to="/"
-              className="text-lg font-semibold tracking-[0.2em] text-[#111] uppercase"
-            >
-              SmartLedger
-            </Link>
-            <p className="mt-4 max-w-sm text-sm leading-relaxed text-[#666]">
-              A premium ecommerce experience built for modern living — curated
-              products, secure checkout, and reliable delivery.
-            </p>
-            <p className="mt-6 text-sm text-[#666]">
-              support@smartledger.com
-              <br />
+    <footer className="bg-[#112E24] text-white/90 pt-16 pb-8 border-t border-white/10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-2 md:grid-cols-5 gap-8 pb-12 border-b border-white/10">
+
+        <div className="col-span-2 space-y-4">
+          <Link
+            to="/"
+            className="text-2xl font-serif font-bold tracking-tight text-white"
+          >
+            Fathima Rice Land
+            <span className="text-[#D4AF37]">.</span>
+          </Link>
+
+          <p className="text-xs text-white/60 max-w-sm leading-relaxed">
+            Delivering premium quality rice varieties sourced directly from
+            trusted farms, ensuring purity, freshness and authentic taste for
+            every home.
+          </p>
+
+          <div className="space-y-2 text-xs text-white/70">
+            <p className="flex items-center gap-2">
+              <Phone size={14} className="text-[#D4AF37]" />
               +91 98765 43210
             </p>
-          </div>
 
-          <div>
-            <h4 className="text-xs font-semibold uppercase tracking-[0.14em] text-[#111]">
-              Shop
-            </h4>
-            <ul className="mt-4 space-y-3">
-              <li>
-                <Link to="/categories" className="text-sm text-[#666] hover:text-[#111]">
-                  All Categories
-                </Link>
-              </li>
-              {categories.map((cat) => (
-                <li key={cat.id}>
-                  <Link
-                    to={`/products/${cat.id}`}
-                    className="text-sm text-[#666] hover:text-[#111]"
-                  >
-                    {cat.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="text-xs font-semibold uppercase tracking-[0.14em] text-[#111]">
-              Support
-            </h4>
-            <ul className="mt-4 space-y-3">
-              {supportLinks.map((link) => (
-                <li key={link.label}>
-                  {link.href.startsWith('/') ? (
-                    <Link
-                      to={link.href}
-                      className="text-sm text-[#666] hover:text-[#111]"
-                    >
-                      {link.label}
-                    </Link>
-                  ) : (
-                    <a href={link.href} className="text-sm text-[#666] hover:text-[#111]">
-                      {link.label}
-                    </a>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="text-xs font-semibold uppercase tracking-[0.14em] text-[#111]">
-              Policies
-            </h4>
-            <ul className="mt-4 space-y-3">
-              {policyLinks.map((link) => (
-                <li key={link.label}>
-                  <a href={link.href} className="text-sm text-[#666] hover:text-[#111]">
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
+            <p className="flex items-center gap-2">
+              <Mail size={14} className="text-[#D4AF37]" />
+              info@fathimariceland.com
+            </p>
           </div>
         </div>
 
-        <div className="mt-14 flex flex-col gap-6 border-t border-[#e5e7eb] pt-8 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-wrap gap-2">
-            {paymentMethods.map((method) => (
-              <span
-                key={method}
-                className="border border-[#e5e7eb] px-3 py-1.5 text-[11px] font-medium uppercase tracking-wider text-[#666]"
-              >
-                {method}
-              </span>
-            ))}
+        <div>
+          <h4 className="text-xs uppercase tracking-widest font-bold text-[#D4AF37] mb-4">
+            Rice Collections
+          </h4>
+
+          <div className="flex flex-col gap-2.5 text-xs text-white/70">
+            <Link to="#" className="hover:text-white transition-colors">
+              Premium Basmati Rice
+            </Link>
+
+            <Link to="#" className="hover:text-white transition-colors">
+              Idli & Dosa Rice
+            </Link>
+
+            <Link to="#" className="hover:text-white transition-colors">
+              Daily Staples (Sona / Kolam)
+            </Link>
+
+            <Link to="#" className="hover:text-white transition-colors">
+              Biryani Special Rice
+            </Link>
           </div>
-          <p className="text-sm text-[#666]">
-            © {currentYear} SmartLedger. All rights reserved.
-          </p>
+        </div>
+
+        <div>
+          <h4 className="text-xs uppercase tracking-widest font-bold text-[#D4AF37] mb-4">
+            Company
+          </h4>
+
+          <div className="flex flex-col gap-2.5 text-xs text-white/70">
+            <Link to="#" className="hover:text-white transition-colors">
+              About Us
+            </Link>
+
+            <Link to="#" className="hover:text-white transition-colors">
+              Our Farmers
+            </Link>
+
+            <Link to="#" className="hover:text-white transition-colors">
+              Wholesale Orders
+            </Link>
+
+            <Link to="#" className="hover:text-white transition-colors">
+              Quality Assurance
+            </Link>
+          </div>
+        </div>
+
+        <div>
+          <h4 className="text-xs uppercase tracking-widest font-bold text-[#D4AF37] mb-4">
+            Policies
+          </h4>
+
+          <div className="flex flex-col gap-2.5 text-xs text-white/70">
+            <Link
+              to="#"
+              className="hover:text-white transition-colors flex items-center gap-1"
+            >
+              <FileText size={12} />
+              Privacy Policy
+            </Link>
+
+            <Link
+              to="#"
+              className="hover:text-white transition-colors flex items-center gap-1"
+            >
+              <FileText size={12} />
+              Terms & Conditions
+            </Link>
+
+            <Link
+              to="#"
+              className="hover:text-white transition-colors flex items-center gap-1"
+            >
+              <FileText size={12} />
+              Shipping Policy
+            </Link>
+
+            <Link
+              to="#"
+              className="hover:text-white transition-colors flex items-center gap-1"
+            >
+              <FileText size={12} />
+              Refund Policy
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-white/40">
+        <p>
+          © {currentYear} Fathima Rice Land. All Rights Reserved.
+        </p>
+
+        <div className="flex gap-3 text-lg font-bold tracking-widest opacity-60">
+          <span>UPI</span>
+          <span>VISA</span>
+          <span>MC</span>
+          <span>RUPAY</span>
         </div>
       </div>
     </footer>

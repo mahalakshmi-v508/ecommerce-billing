@@ -11,7 +11,7 @@ import {
 import { useAuth } from '../context/AuthContext.jsx'
 import { getWishlistCount } from '../services/wishlistService.js'
 import { getCartCount } from '../services/cartService.js'
-
+import logo from '../assets/logo1.png'
 export default function EcommerceHeader() {
   const navigate = useNavigate()
   const { user, logout, isAuthenticated } = useAuth()
@@ -147,14 +147,17 @@ export default function EcommerceHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-[#e5e7eb] bg-white">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between gap-4 lg:h-[72px]">
-          {/* LOGO - Dynamically redirects depending on role */}
-          <Link
-            to={user?.role === 'wholesaler' ? '/wholesaler/dashboard' : '/'}
-            className="shrink-0 text-lg font-semibold tracking-[0.2em] text-[#111] uppercase"
-          >
-            SmartLedger
-          </Link>
+<div className="flex h-20 items-center justify-between gap-4 lg:h-[90px]">          {/* LOGO - Dynamically redirects depending on role */}
+         <Link
+  to={user?.role === 'wholesaler' ? '/wholesaler/dashboard' : '/'}
+  className="shrink-0 flex items-center"
+>
+<img
+  src={logo}
+  alt="Fathima Rice Land"
+  className="w-[150px] sm:w-[180px] lg:w-[180px] h-auto object-contain relative top-2"
+/>
+</Link>
 
           {/* DESKTOP NAVIGATION */}
           {isAuthenticated && (
