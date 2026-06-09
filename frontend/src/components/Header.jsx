@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import logo from '../assets/logo/fathima-rice-logo.png'
 import {
   Search,
   Heart,
@@ -86,6 +85,7 @@ export default function EcommerceHeader() {
     navigate('/login', { replace: true })
   }
 
+  // 🆕 Added Wholesaler dropdown menu items
   const roleMenuItems = {
     user: [
       { label: 'My Orders', href: '/orders' },
@@ -96,17 +96,18 @@ export default function EcommerceHeader() {
       { label: 'Dashboard', href: '/wholesaler/dashboard' },
       { label: 'Bulk Orders', href: '/wholesaler/orders' },
       { label: 'Profile', href: '/profile' },
-      { label: 'Wishlist', href: '/wishlist' },
+      { label: 'Wishlist', href: '/wishlist' }, // Added Wishlist for wholesaler dropdown too
     ],
   }
 
+  // 🆕 Dynamic mobile menu links generator based on role
   const getMobileLinks = () => {
     if (user?.role === 'wholesaler') {
       return [
         { label: 'Dashboard', href: '/wholesaler/dashboard' },
         { label: 'Wholesale Products', href: '/wholesaler/products' },
         { label: 'Bulk Orders', href: '/wholesaler/orders' },
-        { label: 'Wishlist', href: '/wishlist' },
+        { label: 'Wishlist', href: '/wishlist' }, // Added here for mobile
         { label: 'Cart', href: '/cart' },
         { label: 'Profile', href: '/profile' },
       ]
@@ -127,9 +128,9 @@ export default function EcommerceHeader() {
       <span className="relative flex h-10 w-10 items-center justify-center text-[#111] transition hover:opacity-60">
         {children}
         {count > 0 && (
-          <span className="absolute -right-1 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white">
-            {count > 9 ? '9+' : count}
-          </span>
+        <span className="absolute -right-1 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white">
+  {count > 9 ? '9+' : count}
+</span>
         )}
       </span>
     )
@@ -144,27 +145,22 @@ export default function EcommerceHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[#e5e7eb] bg-white w-full block">
+    <header className="sticky top-0 z-50 border-b border-[#e5e7eb] bg-white">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* 🔒 FIXED HEADER ROW HEIGHT: Lock panni h-20 matrum lg:h-24 set panniruken */}
-        <div className="flex h-20 lg:h-24 items-center justify-between gap-4 w-full">
-          
-          {/* 🎯 LOGO LINK CONTAINER */}
+        <div className="flex h-16 items-center justify-between gap-4 lg:h-[72px]">
+          {/* LOGO - Dynamically redirects depending on role */}
           <Link
             to={user?.role === 'wholesaler' ? '/wholesaler/dashboard' : '/'}
-            className="flex items-center shrink-0 h-full py-2"
+            className="shrink-0 text-lg font-semibold tracking-[0.2em] text-[#111] uppercase"
           >
-            <img
-              src={logo}
-              alt="Fathima Rice"
-              className="h-full w-auto object-contain block max-h-[64px] lg:max-h-[80px]" 
-            />
+            SmartLedger
           </Link>
 
           {/* DESKTOP NAVIGATION */}
           {isAuthenticated && (
             <nav className="hidden items-center gap-8 lg:flex">
               {user?.role === 'wholesaler' ? (
+                /* 🆕 WHOLESALER DESKTOP LINKS */
                 <>
                   <Link
                     to="/wholesaler/dashboard"
@@ -186,6 +182,7 @@ export default function EcommerceHeader() {
                   </Link>
                 </>
               ) : (
+                /* 🛒 REGULAR USER DESKTOP LINKS */
                 <>
                   <Link
                     to="/"
@@ -199,6 +196,12 @@ export default function EcommerceHeader() {
                   >
                     Categories
                   </Link>
+                  {/* <Link
+                    to="/deals"
+                    className="text-sm font-medium text-[#111] transition hover:opacity-60"
+                  >
+                    Deals
+                  </Link> */}
                   <Link
                     to="/orders"
                     className="text-sm font-medium text-[#111] transition hover:opacity-60"
@@ -234,15 +237,18 @@ export default function EcommerceHeader() {
           <div className="flex items-center gap-1 sm:gap-2">
             {isAuthenticated && (
               <>
+                {/* Wishlist Icon - Now visible to EVERYONE (User & Wholesaler) */}
                 <IconButton to="/wishlist" count={wishlistCount} label="Wishlist">
                   <Heart className="h-5 w-5" strokeWidth={1.5} />
                 </IconButton>
-
+                
+                {/* Cart Icon - Common for user and wholesaler */}
                 <IconButton to="/wholesalercart" count={cartCount} label="Cart">
                   <ShoppingBag className="h-5 w-5" strokeWidth={1.5} />
                 </IconButton>
 
-                <div className="relative hidden sm:block" ref={profileRef}>
+                {/* PROFILE DROPDOWN */}
+                <div ref={profileRef} className="relative hidden sm:block">
                   <button
                     type="button"
                     onClick={() => setProfileMenuOpen((o) => !o)}
@@ -254,10 +260,10 @@ export default function EcommerceHeader() {
                   {profileMenuOpen && (
                     <div className="absolute right-0 top-full mt-2 w-52 border border-[#e5e7eb] bg-white py-1 shadow-sm">
                       <div className="border-b border-[#e5e7eb] px-4 py-3">
-                        <p className="text-sm font-medium text-[#111]">{user?.name}</p>
-                        <p className="truncate text-xs text-[#666]">{user?.email}</p>
+                        <p className="text-sm font-medium text-[#111]">{user.name}</p>
+                        <p className="truncate text-xs text-[#666]">{user.email}</p>
                       </div>
-                      {roleMenuItems[user?.role]?.map((item) => (
+                      {roleMenuItems[user.role]?.map((item) => (
                         <Link
                           key={item.href}
                           to={item.href}
