@@ -46,10 +46,6 @@ export default function HeroSection() {
           from { opacity: 0; }
           to { opacity: 1; }
         }
-        @keyframes floatImg {
-          0%, 100% { transform: translateY(0px) rotate(-0.5deg); }
-          50% { transform: translateY(-10px) rotate(0.5deg); }
-        }
         @keyframes floatBadge {
           0%, 100% { transform: translateY(0px); }
           50% { transform: translateY(-5px); }
@@ -177,11 +173,11 @@ export default function HeroSection() {
           }} />
         ))}
 
-        {/* MAIN CONTENT CONTAINER */}
-        <div className="relative z-5 max-w-[1200px] mx-auto px-6 py-5 grid grid-cols-[1.1fr_0.9fr] gap-10 items-center w-full">
+        {/* MAIN CONTENT CONTAINER - Centered with max width */}
+        <div className="relative z-5 max-w-[1200px] mx-auto px-6 py-5 text-center w-full">
           
-          {/* LEFT CONTENT */}
-          <div>
+          {/* LEFT CONTENT - Centered */}
+          <div className="max-w-3xl mx-auto">
             {/* Eyebrow tag */}
             <div className={`inline-flex items-center gap-1.5 bg-[rgba(46,125,50,0.08)] border border-[rgba(46,125,50,0.15)] rounded-full px-3.5 py-1.25 mb-4.5 ${mounted ? 'animate-[fadeUp_0.6s_0.1s_ease_both]' : 'opacity-0'}`}>
               <span className="w-1.5 h-1.5 rounded-full bg-[#2E7D32] inline-block" />
@@ -210,7 +206,7 @@ export default function HeroSection() {
             </div>
 
             {/* CTA Buttons */}
-            <div className={`flex gap-3.5 flex-wrap mb-8 ${mounted ? 'animate-[fadeUp_0.7s_0.4s_ease_both]' : 'opacity-0'}`}>
+            <div className={`flex gap-3.5 flex-wrap justify-center mb-8 ${mounted ? 'animate-[fadeUp_0.7s_0.4s_ease_both]' : 'opacity-0'}`}>
               <button
                 className="hero-btn-primary"
                 onClick={(e) => handleRipple(e, "explore")}
@@ -243,7 +239,7 @@ export default function HeroSection() {
             </div>
 
             {/* Trust Badges */}
-            <div className={`flex flex-wrap gap-2 ${mounted ? 'animate-[fadeUp_0.7s_0.5s_ease_both]' : 'opacity-0'}`}>
+            <div className={`flex flex-wrap gap-2 justify-center ${mounted ? 'animate-[fadeUp_0.7s_0.5s_ease_both]' : 'opacity-0'}`}>
               {BADGES.map((badge, i) => (
                 <div key={badge.label} className="badge-item flex items-center gap-1.5 bg-[rgba(255,253,247,0.9)] border border-[rgba(245,176,65,0.25)] rounded-full py-1.5 px-3 text-[11px] font-bold text-[#1F2937] font-['Manrope',sans-serif] shadow-[0_2px_8px_rgba(245,176,65,0.08)] backdrop-blur-sm"
                   style={{ animationDelay: `${i * 0.4}s` }}>
@@ -251,66 +247,6 @@ export default function HeroSection() {
                   {badge.label}
                 </div>
               ))}
-            </div>
-          </div>
-
-          {/* RIGHT SIDE VISUAL */}
-          <div className={`relative flex items-center justify-center ${mounted ? 'animate-[fadeIn_0.8s_0.4s_ease_both]' : 'opacity-0'}`}>
-            {/* Soft glow blob behind image */}
-            <div className="absolute w-[360px] h-[360px] rounded-full z-0" style={{
-              background: "radial-gradient(ellipse, rgba(245,176,65,0.15) 0%, rgba(46,125,50,0.06) 60%, transparent 100%)",
-            }} />
-
-            {/* Rice image background card */}
-            <div className="relative z-2 w-full max-w-[440px] rounded-2xl overflow-hidden shadow-[0_24px_64px_rgba(46,125,50,0.12),0_8px_24px_rgba(0,0,0,0.08)] animate-[floatImg_5s_ease-in-out_infinite]">
-              {/* Main image */}
-              <img
-                src="https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=800&q=85"
-                alt="Premium rice sacks"
-                className="w-full h-[320px] object-cover object-center block"
-              />
-              {/* Overlay gradient */}
-              <div className="absolute inset-0 bg-gradient-to-t from-[rgba(46,125,50,0.5)] via-[rgba(0,0,0,0.1)] to-transparent" />
-              {/* Bottom tag list inside visual */}
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <div className="flex gap-2">
-                  {[
-                    { label: "Basmati Rice", sub: "Premium Long Grain" },
-                    { label: "Sona Masoori", sub: "Daily Use Grade A" },
-                  ].map(item => (
-                    <div key={item.label} className="flex-1 bg-white/12 backdrop-blur-md border border-white/20 rounded-lg p-2">
-                      <div className="font-['Manrope',sans-serif] text-xs font-bold text-white">{item.label}</div>
-                      <div className="font-['Manrope',sans-serif] text-[10px] text-white/70">{item.sub}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Glassmorphism Floating Badge - Today's Rate */}
-            <div className="absolute top-[10%] -left-[6%] z-6 bg-[rgba(255,253,247,0.9)] backdrop-blur-md border border-[rgba(245,176,65,0.2)] rounded-xl p-3 shadow-[0_6px_24px_rgba(46,125,50,0.1)] min-w-[135px] animate-[floatBadge_4s_ease-in-out_infinite]"
-              style={{ animationDelay: "0.8s" }}>
-              <div className="font-['Manrope',sans-serif] text-[10px] font-semibold text-[#6B7280] uppercase tracking-[0.5px] mb-0.5">Today's Rate</div>
-              <div className="font-['Manrope',sans-serif] text-lg font-extrabold text-[#2E7D32]">₹42/kg</div>
-              <div className="font-['Manrope',sans-serif] text-[10px] text-[#10B981] font-semibold">↑ 2.4% Basmati</div>
-            </div>
-
-            {/* Glassmorphism Floating Badge - Live Orders */}
-            <div className="absolute bottom-[12%] -right-[4%] z-6 bg-[rgba(255,253,247,0.9)] backdrop-blur-md border border-[rgba(46,125,50,0.15)] rounded-xl p-3 shadow-[0_6px_24px_rgba(46,125,50,0.1)] animate-[floatBadge_5s_ease-in-out_infinite]"
-              style={{ animationDelay: "0.3s" }}>
-              <div className="flex items-center gap-1.5 mb-1">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
-                <span className="font-['Manrope',sans-serif] text-[10px] font-bold text-[#374151] uppercase">Live Orders</span>
-              </div>
-              <div className="font-['Manrope',sans-serif] text-xl font-extrabold text-[#1F2937]">247</div>
-            </div>
-
-            {/* FSSAI Certified Badge */}
-            <div className="absolute top-[42%] -right-[6%] z-6 bg-gradient-to-br from-[#2E7D32] to-[#388E3C] rounded-xl p-2.5 shadow-[0_6px_20px_rgba(46,125,50,0.3)] animate-[floatBadge_3.5s_ease-in-out_infinite] text-center"
-              style={{ animationDelay: "1.5s" }}>
-              <div className="text-lg mb-0.5">🛡️</div>
-              <div className="font-['Manrope',sans-serif] text-[10px] font-extrabold text-white">FSSAI</div>
-              <div className="font-['Manrope',sans-serif] text-[9px] text-white/80">Certified</div>
             </div>
           </div>
         </div>
