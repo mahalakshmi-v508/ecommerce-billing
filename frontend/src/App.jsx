@@ -35,6 +35,7 @@ import WholesalerRegister from './pages/wholesaler/WholesalerRegister.jsx'
 import WholesalerLogin from './pages/wholesaler/WholesalerLogin.jsx'
 import WholesaleCart from './pages/wholesaler/WholesaleCart.jsx'
 import WholesalerPayment from './pages/wholesaler/WholesalePayment.jsx'
+import WholesaleInvoicePreview from './pages/wholesaler/InvoicePreview.jsx'
 function App() {
   return (
     <BrowserRouter>
@@ -99,14 +100,14 @@ function App() {
               </ProtectedRoute>
             }
           />
-        <Route
-  path="/wholesaler/home"
-  element={
-    <ProtectedRoute allowedRoles={['wholesaler']}>
-      <WholesalerHome />
-    </ProtectedRoute>
-  }
-/>
+          <Route
+            path="/wholesaler/home"
+            element={
+              <ProtectedRoute allowedRoles={['wholesaler']}>
+                <WholesalerHome />
+              </ProtectedRoute>
+            }
+          />
 
           {/* WISHLIST */}
           <Route
@@ -128,16 +129,16 @@ function App() {
             }
           />
 
-            <Route
-             path="/invoice/:invoiceNo"
+          <Route
+            path="/invoice/:invoiceNo"
             element={
               <ProtectedRoute allowedRoles={['user']}>
-                <InvoicePreview/>
+                <InvoicePreview />
               </ProtectedRoute>
             }
           />
 
-          
+
 
           {/* SEARCH */}
           <Route
@@ -158,23 +159,23 @@ function App() {
               </ProtectedRoute>
             }
           />
-<Route
-  path="/wholesaler-register"
-  element={<WholesalerRegister />}
-/>
+          <Route
+            path="/wholesaler-register"
+            element={<WholesalerRegister />}
+          />
 
-<Route
-  path="/wholesaler-login"
-  element={<WholesalerLogin />}
-/>
-<Route
-  path="/wholesalercart"
-  element={<WholesaleCart/>}
-/>
-<Route
-  path="/wholesalerpayment"
-  element={<WholesalerPayment/>}
-/>
+          <Route
+            path="/wholesaler-login"
+            element={<WholesalerLogin />}
+          />
+          <Route
+            path="/wholesalercart"
+            element={<WholesaleCart />}
+          />
+          <Route
+            path="/wholesalerpayment"
+            element={<WholesalerPayment />}
+          />
           {/* PROFILE */}
           <Route
             path="/profile"
@@ -228,29 +229,37 @@ function App() {
           <Route
             path="/wholesaler/dashboard"
             element={
-              <ProtectedRoute allowedRoles={['wholesaler']}>
+              // 🔽 'user' role-aiyum inga inner elements paaka allow panrom
+              <ProtectedRoute allowedRoles={['wholesaler', 'user']}>
                 <WholesalerDashboard />
               </ProtectedRoute>
             }
           />
 
-          <Route
-            path="/wholesaler/products"
-            element={
-              <ProtectedRoute allowedRoles={['wholesaler']}>
-                <WholesalerProducts />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/wholesaler/orders"
-            element={
-              <ProtectedRoute allowedRoles={['wholesaler']}>
-                <WholesalerOrders />
-              </ProtectedRoute>
-            }
-          />
+<Route
+  path="/wholesaler/products"
+  element={
+    <ProtectedRoute allowedRoles={['wholesaler', 'user']}> {/* 👈 'user' ஐச் சேர்க்கவும் */}
+      <WholesalerProducts />
+    </ProtectedRoute>
+  }
+/>
+<Route
+path="/wholesaler/invoice/:invoiceNo"
+  element={
+    <ProtectedRoute allowedRoles={['wholesaler']}>
+      <WholesaleInvoicePreview />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/wholesaler/orders"
+  element={
+    <ProtectedRoute allowedRoles={['wholesaler', 'user']}> {/* 👈 'user' ஐச் சேர்க்கவும் */}
+      <WholesalerOrders />
+    </ProtectedRoute>
+  }
+/>
 
           {/* FALLBACK */}
           <Route path="*" element={<Navigate to="/login" replace />} />

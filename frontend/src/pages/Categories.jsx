@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
-import { getAllCategories } from '../services/categoryService.js'
+import { getActiveCategories } from '../services/categoryService.js'
 import { getProducts, getProductsByCategory } from '../services/productService.js'
 import { buildProductImageUrl } from '../services/api.js'
 import LoadingSpinner from '../components/LoadingSpinner.jsx'
@@ -61,7 +61,7 @@ export default function Categories() {
             }
 
             setLoading(true)
-            const categoriesResponse = await getAllCategories()
+            const categoriesResponse = await getActiveCategories()
 
             if (categoriesResponse.status && categoriesResponse.data?.length > 0) {
                 setCategories(categoriesResponse.data)

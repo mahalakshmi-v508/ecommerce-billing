@@ -4,12 +4,13 @@ import { getWholesalerOrders } from '../../services/wholesalerOrderService.js';
 import LoadingSpinner from '../../components/LoadingSpinner.jsx';
 import EmptyState from '../../components/EmptyState.jsx';
 import toast from 'react-hot-toast';
-
+import { useNavigate } from "react-router-dom"; 
 const WholesalerOrders = () => {
   const { user } = useAuth();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (user?.id) {
@@ -102,9 +103,12 @@ const WholesalerOrders = () => {
                       </span>
                     </td>
                     <td className="p-4">
-                      <button className="text-xs bg-slate-800 hover:bg-slate-700 text-gray-200 px-3 py-1.5 rounded border border-slate-700 transition-colors">
-                        View Invoice
-                      </button>
+                      <button
+  onClick={() => navigate(`/wholesaler/invoice/${order.invoice_no}`)}
+  className="text-xs bg-slate-800 hover:bg-slate-700 text-gray-200 px-3 py-1.5 rounded border border-slate-700 transition-colors"
+>
+  View Invoice
+</button>
                     </td>
                   </tr>
                 );
