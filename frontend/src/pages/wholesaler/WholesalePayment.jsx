@@ -71,17 +71,26 @@ export default function WholesalerPayment() {
 
       const payload = {
         company_id: companyId,
-        customer_id: parseInt(user?.id || 21),
+
+        customer_id: parseInt(user?.id || 0),
+        wholesaler_id: parseInt(user?.id || 0),
+
         customer_name: user?.name || 'Guest',
         customer_phone: user?.phone || '9876543210',
+
         cashier_id: cashierId,
+
         products,
+
         sub_total: subTotal,
         gst_total: gstAmount,
         total_amount: totalAmount,
+
         payment_method: paymentMethod,
         payment_type: paymentMethod === 'credit' ? 'credit' : 'cash',
+
         gst_type: 'with_gst',
+
         paid_amount: paymentMethod === 'credit' ? 0 : totalAmount,
       }
 

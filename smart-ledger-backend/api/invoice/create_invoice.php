@@ -16,6 +16,7 @@ $data = json_decode(file_get_contents("php://input"), true);
 /* ── INPUTS ── */
 $company_id     = intval($data['company_id'] ?? 0);
 $customer_id    = intval($data['customer_id'] ?? 0);
+$wholesaler_id = intval($data['wholesaler_id'] ?? 0);
 $customer_name  = $conn->real_escape_string($data['customer_name'] ?? '');
 $customer_phone = $conn->real_escape_string($data['customer_phone'] ?? '');
 $cashier_id     = intval($data['cashier_id'] ?? 0);
@@ -136,20 +137,41 @@ foreach ($products as $item) {
 }
 
 /* ── INSERT INVOICE ── */
-$product_json    = $conn->real_escape_string(json_encode($products));
-$customer_id_sql = $customer_id > 0 ? $customer_id : "NULL";
-$due_date_sql    = $due_date ? "'$due_date'" : "NULL";
-$gst_no_sql      = $gst_no   ? "'$gst_no'"  : "NULL";
+$product_json             = $conn->real_escape_string(json_encode($products));
+$customer_id_sql          = $customer_id > 0 ? $customer_id : "NULL";
+$payment_customer_id_sql  = $customer_id > 0 ? $customer_id : 0;
+$wholesaler_id_sql        = $wholesaler_id > 0 ? $wholesaler_id : "NULL";
+$due_date_sql             = $due_date ? "'$due_date'" : "NULL";
+$gst_no_sql               = $gst_no   ? "'$gst_no'"  : "NULL";
 
 $sql = "
 INSERT INTO invoices (
-    invoice_no, customer_id, customer_name, customer_phone, cashier_id,
-    products, sub_total, gst_total, total_amount,
-    paid_amount, balance_amount,
-    payment_method, payment_type, gst_type, gst_no,
-    payment_status, company_id, due_date
-) VALUES (
-    '$invoice_no', $customer_id_sql, '$customer_name', '$customer_phone', '$cashier_id',
+    invoice_no,
+    customer_id,
+    wholesaler_id,
+    customer_name,
+    customer_phone,
+    cashier_id,
+    products,
+    sub_total,
+    gst_total,
+    total_amount,
+    paid_amount,
+    balance_amount,
+    payment_method,
+    payment_type,
+    gst_type,
+    gst_no,
+    payment_status,
+    company_id,
+    due_date
+)VALUES (
+    '$invoice_no',
+    $customer_id_sql,
+    $wholesaler_id_sql,
+    '$customer_name',
+    '$customer_phone',
+    '$cashier_id',
     '$product_json', '$sub_total', '$gst_total', '$total_amount',
     '$final_paid', '$balance_amount',
     '$payment_method', '$payment_type', '$gst_type', $gst_no_sql,
@@ -178,7 +200,7 @@ INSERT INTO payments (
     payment_method, payment_status,
     notes, created_at, updated_at
 ) VALUES (
-    '$company_id', '$invoice_id', '$invoice_no', $customer_id_sql,
+    '$company_id', '$invoice_id', '$invoice_no', $payment_customer_id_sql,
     '$total_amount', '$final_paid', '$balance_amount',
     '$payment_method', '$payment_status',
     '', NOW(), NOW()
