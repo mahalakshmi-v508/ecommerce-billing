@@ -243,7 +243,7 @@ export default function EcommerceHeader() {
                 </IconButton>
                 
                 {/* Cart Icon - Common for user and wholesaler */}
-                <IconButton to="/cart" count={cartCount} label="Cart">
+                <IconButton to="/wholesalercart" count={cartCount} label="Cart">
                   <ShoppingBag className="h-5 w-5" strokeWidth={1.5} />
                 </IconButton>
 

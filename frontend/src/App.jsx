@@ -33,7 +33,8 @@ import WholesalerHome from './pages/wholesaler/Home/Home.jsx'
 
 import WholesalerRegister from './pages/wholesaler/WholesalerRegister.jsx'
 import WholesalerLogin from './pages/wholesaler/WholesalerLogin.jsx'
-
+import WholesaleCart from './pages/wholesaler/WholesaleCart.jsx'
+import WholesalerPayment from './pages/wholesaler/WholesalePayment.jsx'
 function App() {
   return (
     <BrowserRouter>
@@ -165,6 +166,14 @@ function App() {
 <Route
   path="/wholesaler-login"
   element={<WholesalerLogin />}
+/>
+<Route
+  path="/wholesalercart"
+  element={<WholesaleCart/>}
+/>
+<Route
+  path="/wholesalerpayment"
+  element={<WholesalerPayment/>}
 />
           {/* PROFILE */}
           <Route
