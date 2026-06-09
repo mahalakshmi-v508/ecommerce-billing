@@ -35,6 +35,7 @@ import WholesalerRegister from './pages/wholesaler/WholesalerRegister.jsx'
 import WholesalerLogin from './pages/wholesaler/WholesalerLogin.jsx'
 import WholesaleCart from './pages/wholesaler/WholesaleCart.jsx'
 import WholesalerPayment from './pages/wholesaler/WholesalePayment.jsx'
+import WholesaleInvoicePreview from './pages/wholesaler/InvoicePreview.jsx'
 function App() {
   return (
     <BrowserRouter>
@@ -251,6 +252,14 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+  path="/wholesaler/invoice/:invoiceNo"
+  element={
+    <ProtectedRoute allowedRoles={['wholesaler']}>
+      <WholesaleInvoicePreview />
+    </ProtectedRoute>
+  }
+/>
 
           {/* FALLBACK */}
           <Route path="*" element={<Navigate to="/login" replace />} />
