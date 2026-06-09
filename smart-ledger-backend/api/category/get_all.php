@@ -18,11 +18,22 @@ include __DIR__ . '/../../config/db.php';
 |--------------------------------------------------------------------------
 */
 
-$result = mysqli_query($conn, "
-SELECT * FROM categories
-WHERE is_deleted = 0
-ORDER BY id DESC
-");
+$company_id = $_GET['company_id'] ?? '';
+
+$query = "
+    SELECT *
+    FROM categories
+    WHERE is_deleted = 0
+";
+
+if (!empty($company_id)) {
+    $company_id = mysqli_real_escape_string($conn, $company_id);
+    $query .= " AND company_id = '$company_id'";
+}
+
+$query .= " ORDER BY id DESC";
+
+$result = mysqli_query($conn, $query);
 
 $data = [];
 
