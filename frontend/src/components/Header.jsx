@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom' // 👈 useLocation ஐச் சேர்க்கவும்
 import {
   Search,
   Heart,
@@ -7,7 +7,6 @@ import {
   User,
   Menu,
   X,
-  LogIn,
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext.jsx'
 import { getWishlistCount } from '../services/wishlistService.js'
@@ -16,7 +15,7 @@ import logo from '../assets/logo1.png'
 
 export default function EcommerceHeader() {
   const navigate = useNavigate()
-  const location = useLocation()
+  const location = useLocation() // 👈 தற்போதைய பாதையைக் கண்டறிய
   const { user, logout, isAuthenticated } = useAuth()
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -27,9 +26,8 @@ export default function EcommerceHeader() {
 
   const profileRef = useRef(null)
 
-  // 1. URL மட்டும் இல்லாமல் பயனர் உண்மையிலேயே wholesaler தானா என்பதையும் உறுதி செய்கிறோம்
-  const isWholesalerSection = location.pathname.startsWith('/wholesaler')
-  const isWholesalerLoggedIn = isAuthenticated && user?.role === 'wholesaler'
+  // 👈 புதிய கண்டிஷன்: பயனர் 'wholesaler' ஆக இருந்தாலும் அல்லது தற்போது இருக்கும் URL '/wholesaler' எனத் தொடங்கினாலும் wholesale மெனுவைக் காட்டுவோம்.
+  const isWholesalerSection = user?.role === 'wholesaler' || location.pathname.startsWith('/wholesaler')
 
   useEffect(() => {
     if (user?.id) {
@@ -92,8 +90,8 @@ export default function EcommerceHeader() {
     navigate('/login', { replace: true })
   }
 
-  // ரோல் அடிப்படையிலான மெனுக்கள்
-  const currentRoleForMenu = isWholesalerLoggedIn ? 'wholesaler' : 'user'
+  // ரோல் அடிப்படையிலான மெனுக்களை மாற்றுவதற்கு 'isWholesalerSection' ஐப் பயன்படுத்துகிறோம்
+  const currentRoleForMenu = isWholesalerSection ? 'wholesaler' : 'user'
 
   const roleMenuItems = {
     user: [
@@ -115,23 +113,20 @@ export default function EcommerceHeader() {
         { label: 'Dashboard', href: '/wholesaler/dashboard' },
         { label: 'Wholesale Products', href: '/wholesaler/products' },
         { label: 'Bulk Orders', href: '/wholesaler/orders' },
-        ...(isWholesalerLoggedIn ? [
-          { label: 'Wishlist', href: '/wishlist' },
-          { label: 'Cart', href: '/cart' },
-          { label: 'Profile', href: '/profile' },
-        ] : [])
+        { label: 'Wishlist', href: '/wishlist' },
+        { label: 'Cart', href: '/cart' },
+        { label: 'Profile', href: '/profile' },
       ]
     }
     return [
       { label: 'Home', href: '/' },
       { label: 'Categories', href: '/categories' },
+      { label: 'Deals', href: '/deals' },
       { label: 'Orders', href: '/orders' },
       { label: 'Bulk Orders', href: '/wholesaler/dashboard' },
-      ...(isAuthenticated ? [
-        { label: 'Wishlist', href: '/wishlist' },
-        { label: 'Cart', href: '/cart' },
-        { label: 'Profile', href: '/profile' },
-      ] : [])
+      { label: 'Wishlist', href: '/wishlist' },
+      { label: 'Cart', href: '/cart' },
+      { label: 'Profile', href: '/profile' },
     ]
   }
 
@@ -173,57 +168,59 @@ export default function EcommerceHeader() {
           </Link>
 
           {/* DESKTOP NAVIGATION */}
-          <nav className="hidden items-center gap-8 lg:flex">
-            {isWholesalerSection ? (
-              <>
-                <Link
-                  to="/wholesaler/dashboard"
-                  className="text-sm font-medium text-[#111] transition hover:opacity-60"
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  to="/wholesaler/products"
-                  className="text-sm font-medium text-[#111] transition hover:opacity-60"
-                >
-                  Wholesale Products
-                </Link>
-                <Link
-                  to="/wholesaler/orders"
-                  className="text-sm font-medium text-[#111] transition hover:opacity-60"
-                >
-                  Orders
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link
-                  to="/"
-                  className="text-sm font-medium text-[#111] transition hover:opacity-60"
-                >
-                  Home
-                </Link>
-                <Link
-                  to="/categories"
-                  className="text-sm font-medium text-[#111] transition hover:opacity-60"
-                >
-                  Categories
-                </Link>
-                <Link
-                  to="/orders"
-                  className="text-sm font-medium text-[#111] transition hover:opacity-60"
-                >
-                  Orders
-                </Link>
-                <Link
-                  to="/wholesaler/dashboard"
-                  className="text-sm font-medium text-[#111] transition hover:opacity-60"
-                >
-                  Bulk Orders
-                </Link>
-              </>
-            )}
-          </nav>
+          {isAuthenticated && (
+            <nav className="hidden items-center gap-8 lg:flex">
+              {isWholesalerSection ? (
+                <>
+                  <Link
+                    to="/wholesaler/dashboard"
+                    className="text-sm font-medium text-[#111] transition hover:opacity-60"
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    to="/wholesaler/products"
+                    className="text-sm font-medium text-[#111] transition hover:opacity-60"
+                  >
+                    Wholesale Products
+                  </Link>
+                  <Link
+                    to="/wholesaler/orders"
+                    className="text-sm font-medium text-[#111] transition hover:opacity-60"
+                  >
+                    Orders
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/"
+                    className="text-sm font-medium text-[#111] transition hover:opacity-60"
+                  >
+                    Home
+                  </Link>
+                  <Link
+                    to="/categories"
+                    className="text-sm font-medium text-[#111] transition hover:opacity-60"
+                  >
+                    Categories
+                  </Link>
+                  <Link
+                    to="/orders"
+                    className="text-sm font-medium text-[#111] transition hover:opacity-60"
+                  >
+                    Orders
+                  </Link>
+                  <Link
+                    to="/wholesaler/dashboard"
+                    className="text-sm font-medium text-[#111] transition hover:opacity-60"
+                  >
+                    Bulk Orders
+                  </Link>
+                </>
+              )}
+            </nav>
+          )}
 
           {/* SEARCH BAR */}
           <form
@@ -245,11 +242,9 @@ export default function EcommerceHeader() {
             </div>
           </form>
 
-          {/* RIGHT SIDE ICONS / AUTH BUTTONS */}
+          {/* RIGHT SIDE ICONS */}
           <div className="flex items-center gap-1 sm:gap-2">
-            
-            {/* கண்டிஷன்: Wholesaler பக்கத்தில் Wholesaler லாகின் செய்திருந்தால் மட்டும் அல்லது நார்மல் பக்கத்தில் லாகின் செய்திருந்தால் மட்டும் கார்ட்/விஷ்லிஸ்ட் காட்டும் */}
-            {((isWholesalerSection && isWholesalerLoggedIn) || (!isWholesalerSection && isAuthenticated)) ? (
+            {isAuthenticated && (
               <>
                 <IconButton to="/wishlist" count={wishlistCount} label="Wishlist">
                   <Heart className="h-5 w-5" strokeWidth={1.5} />
@@ -272,8 +267,8 @@ export default function EcommerceHeader() {
                   {profileMenuOpen && (
                     <div className="absolute right-0 top-full mt-2 w-52 border border-[#e5e7eb] bg-white py-1 shadow-sm">
                       <div className="border-b border-[#e5e7eb] px-4 py-3">
-                        <p className="text-sm font-medium text-[#111]">{user?.name}</p>
-                        <p className="truncate text-xs text-[#666]">{user?.email}</p>
+                        <p className="text-sm font-medium text-[#111]">{user.name}</p>
+                        <p className="truncate text-xs text-[#666]">{user.email}</p>
                       </div>
                       {roleMenuItems[currentRoleForMenu]?.map((item) => (
                         <Link
@@ -296,15 +291,6 @@ export default function EcommerceHeader() {
                   )}
                 </div>
               </>
-            ) : (
-              /* லாகின் செய்யவில்லை என்றால் அல்லது தப்பான ரோல் என்றால் Signup / Sign In பட்டன் காட்டும் */
-              <Link
-                to="/login"
-                className="inline-flex items-center gap-2 bg-[#111] text-white px-4 py-2 text-sm font-medium transition hover:bg-opacity-80"
-              >
-                <LogIn className="h-4 w-4" />
-                <span>Sign In</span>
-              </Link>
             )}
 
             {/* MOBILE MENU BUTTON */}
@@ -341,19 +327,18 @@ export default function EcommerceHeader() {
                 />
               </div>
             </form>
-            
-            <nav className="flex flex-col gap-1">
-              {getMobileLinks().map((item) => (
-                <Link
-                  key={item.href}
-                  to={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="px-2 py-2.5 text-sm font-medium text-[#111]"
-                >
-                  {item.label}
-                </Link>
-              ))}
-              {((isWholesalerSection && isWholesalerLoggedIn) || (!isWholesalerSection && isAuthenticated)) ? (
+            {isAuthenticated && (
+              <nav className="flex flex-col gap-1">
+                {getMobileLinks().map((item) => (
+                  <Link
+                    key={item.href}
+                    to={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="px-2 py-2.5 text-sm font-medium text-[#111]"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
                 <button
                   type="button"
                   onClick={handleLogout}
@@ -361,17 +346,8 @@ export default function EcommerceHeader() {
                 >
                   Logout
                 </button>
-              ) : (
-                <Link
-                  to="/login"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="px-2 py-2.5 text-sm font-medium text-blue-600 flex items-center gap-2"
-                >
-                  <LogIn className="h-4 w-4" />
-                  Sign In
-                </Link>
-              )}
-            </nav>
+              </nav>
+            )}
           </div>
         )}
       </div>
