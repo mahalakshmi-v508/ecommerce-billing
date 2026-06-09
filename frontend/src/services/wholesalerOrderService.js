@@ -6,7 +6,12 @@ export const getWholesalerOrders = async (wholesalerId) => {
       '/wholesaler/get_orders.php',
       { wholesaler_id: wholesalerId }
     )
-    return data
+
+    return {
+      status: data.status,
+      message: data.message || '',
+      data: data.data ?? data.orders ?? [],
+    }
   } catch (error) {
     console.error('Error fetching wholesaler orders:', error)
     return {
