@@ -5,6 +5,8 @@ import Barcode from "react-barcode";
 import api from "../../services/api";
 
 /* ─── Toast Hook ─────────────────────────────────────────── */
+
+const body = new FormData();
 function useToast() {
   const [toasts, setToasts] = useState([]);
   const show = (type, title, msg) => {
@@ -131,6 +133,9 @@ const [form, setForm] = useState({
       }
     };
   }, [imagePreview]);
+  for (let pair of body.entries()) {
+  console.log(pair[0], pair[1]);
+}
 
   const handleSubmit = async () => {
     if (!form.name.trim())    { show("warn", "Missing Field", "Product name is required."); return; }

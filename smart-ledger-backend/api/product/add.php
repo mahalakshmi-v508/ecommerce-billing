@@ -42,14 +42,24 @@ $imageName = '';
 
 /* IMAGE UPLOAD */
 
+/* IMAGE UPLOAD */
+
+$imageName = '';
 $imageBase64 = '';
+
+$jsonData = $jsonData ?? [];
+
 if (!empty($jsonData['image']) && is_string($jsonData['image'])) {
     $imageBase64 = $jsonData['image'];
 }
 
+/* DEBUG */
+error_log("POST => " . print_r($_POST, true));
+error_log("FILES => " . print_r($_FILES, true));
+
 if (
     isset($_FILES['image']) &&
-    $_FILES['image']['error'] === 0
+    $_FILES['image']['error'] === UPLOAD_ERR_OK
 ) {
 
     $uploadDir = __DIR__ . '/../../uploads/products/';
@@ -58,9 +68,27 @@ if (
         mkdir($uploadDir, 0777, true);
     }
 
-    $ext = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+    $ext = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
+
     $imageName = time() . "_" . rand(1000,9999) . "." . $ext;
-    move_uploaded_file($_FILES['image']['tmp_name'], $uploadDir . $imageName);
+
+    $targetFile = $uploadDir . $imageName;
+
+    if (
+        !move_uploaded_file(
+            $_FILES['image']['tmp_name'],
+            $targetFile
+        )
+    ) {
+
+        echo json_encode([
+            "status" => false,
+            "message" => "Failed to move uploaded image",
+            "tmp_file" => $_FILES['image']['tmp_name'],
+            "target" => $targetFile
+        ]);
+        exit;
+    }
 
 } elseif (!empty($imageBase64)) {
 
@@ -71,18 +99,29 @@ if (
     }
 
     if (strpos($imageBase64, 'data:image') === 0) {
+
         list($type, $imageBase64) = explode(';', $imageBase64);
         list(, $imageBase64) = explode(',', $imageBase64);
+
         $imageBase64 = base64_decode($imageBase64);
+
         $ext = explode('/', $type)[1] ?? 'png';
+
     } else {
+
         $imageBase64 = base64_decode($imageBase64);
+
         $ext = 'png';
     }
 
     if ($imageBase64 !== false) {
+
         $imageName = time() . "_" . rand(1000,9999) . "." . $ext;
-        file_put_contents($uploadDir . $imageName, $imageBase64);
+
+        file_put_contents(
+            $uploadDir . $imageName,
+            $imageBase64
+        );
     }
 }
 
