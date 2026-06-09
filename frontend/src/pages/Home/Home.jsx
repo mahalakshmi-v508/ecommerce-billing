@@ -4,11 +4,14 @@ import {
   CheckCircle, Truck, ShieldCheck, Award, MapPin, ArrowRight, 
   ChevronDown, Phone, Mail, FileText, Smartphone, Percent, HelpCircle 
 } from 'lucide-react';
+import { useNavigate } from "react-router-dom";
 import img from "../../assets/rice.png"
-import catImg1 from "../../assets/IMG1.PNG"
-import catImg2 from "../../assets/IMG4.PNG"
-import catImg3 from "../../assets/IMG3.PNG"
-import catImg4 from "../../assets/IMG2.PNG"
+import catImg1 from "../../assets/catagory/seeraga Samba.png"
+import catImg2 from "../../assets/catagory/mappillai Samba.png"
+import catImg3 from "../../assets/catagory/Kichili Samba1.png"
+import catImg4 from "../../assets/catagory/Thooyamalligemini.png"
+import catImg5 from "../../assets/catagory/Ponni Rice.png"
+
 import biryaniBanner from "../../assets/rice-types/biriyani.png"
 import dailyStaples from "../../assets/rice-types/biriyani.png"
 import idliDosaRice from "../../assets/rice-types/idly.png"
@@ -22,9 +25,9 @@ export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [cartCount, setCartCount] = useState(3);
   const [selectedWeights, setSelectedWeights] = useState({});
-
-  // Sample Product Dataset
-  const bestSellers = [
+const [activeCategory, setActiveCategory] = useState("traditional");
+ const navigate = useNavigate();
+const bestSellers = [
     { id: 'p1', name: '1121 Extra Long Premium Aged Basmati', price: 180, originalPrice: 220, rating: 4.9, reviews: 1240, tags: ['Best Seller', '2 Years Aged'], image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=600&q=80', weights: ['1kg', '5kg', '10kg'], defaultWeight: '5kg' },
     { id: 'p2', name: 'Super Hybrid Organic Sona Masoori', price: 95, originalPrice: 110, rating: 4.8, reviews: 840, tags: ['Organic', 'Low GI'], image: 'https://images.unsplash.com/photo-1536304997881-a372c179924b?auto=format&fit=crop&w=600&q=80', weights: ['1kg', '5kg', '25kg'], defaultWeight: '5kg' },
     { id: 'p3', name: 'Traditional Fortune Wada Kolam', price: 85, originalPrice: 95, rating: 4.7, reviews: 620, tags: ['Daily Staple'], image: 'https://images.unsplash.com/photo-1590005354167-6da97870c913?auto=format&fit=crop&w=600&q=80', weights: ['5kg', '10kg', '25kg'], defaultWeight: '10kg' },
@@ -44,6 +47,35 @@ export default function HomePage() {
     }
   };
 
+  const riceCategories = {
+  traditional: [
+    { name: "Seeraga Samba", img: catImg1 },
+    { name: "Mappillai Samba", img: catImg2 },
+    { name: "Kichili Samba", img: catImg3 },
+    { name: "Thooyamalli Rice", img: catImg4 },
+  ],
+
+  daily: [
+    { name: "Ponni Rice", img: catImg5 },
+    { name: "Sona Masoori", img: catImg2 },
+    { name: "Idly Rice", img: catImg3 },
+    { name: "Boiled Rice", img: catImg4 },
+  ],
+
+  organic: [
+    { name: "Karuppu Kavuni", img: catImg1 },
+    { name: "Red Rice", img: catImg2 },
+    { name: "Brown Rice", img: catImg3 },
+    { name: "Hand Pounded Rice", img: catImg4 },
+  ],
+
+  speciality: [
+    { name: "Kattuyanam Rice", img: catImg1 },
+    { name: "Poongar Rice", img: catImg2 },
+    { name: "Kuzhiyadichan Rice", img: catImg3 },
+    { name: "Navara Rice", img: catImg4 },
+  ],
+};
   return (
     <div className="min-h-screen bg-[#FDFBF7] text-[#112E24] font-sans antialiased selection:bg-[#D4AF37] selection:text-[#112E24]">
       
@@ -84,31 +116,98 @@ export default function HomePage() {
       </section>
 
       {/* 4. MAIN CATEGORIES SECTION */}
-      <section id="categories" className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto mb-12">
-          <h2 className="text-3xl font-serif font-bold mb-4">Curated Dynamic Collections</h2>
-          <p className="text-[#5A6561]">Explore pristine grains specialized for nutritional dominance and fine dining culinary art.</p>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-          {[
-            { name: 'Traditional Basmati', count: '12 Varieties', img: catImg1 },
-            { name: 'Regional Staples', count: '18 Varieties', img: catImg2 },
-            { name: 'Organic & Fitness', count: '8 Varieties', img: catImg3 },
-            { name: 'Exotic & Wild Rice', count: '5 Varieties', img: catImg4 },
-          ].map((cat, idx) => (
-            <div key={idx} className="group relative h-64 rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer">
-              <img src={cat.img} alt={cat.name} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#112E24]/90 via-[#112E24]/40 to-transparent"></div>
-              <div className="absolute bottom-4 left-4 right-4 text-white">
-                <h3 className="font-serif font-bold text-lg leading-tight">{cat.name}</h3>
-                <p className="text-xs text-[#FDFBF7]/80 mt-1 flex items-center justify-between">
-                  {cat.count} <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+     <section id="categories" className="py-20 bg-[#F7F3E8]">
+  <div className="max-w-7xl mx-auto px-4">
+
+    <div className="text-center mb-12">
+      <h2 className="text-4xl font-serif text-[#00000] font-semibold">
+        RICE COLLECTIONS
+      </h2>
+
+      <div className="w-24 h-[2px] bg-[#A62B1F] mx-auto mt-4"></div>
+    </div>
+
+   <div className="flex flex-wrap justify-center gap-4 mb-12">
+  <button
+    onClick={() => setActiveCategory("traditional")}
+    className={`px-6 py-3 rounded-xl border ${
+      activeCategory === "traditional"
+        ? "bg-[#A62B1F] text-white"
+        : "border-[#A62B1F] text-[#A62B1F]"
+    }`}
+  >
+    Traditional Heritage
+  </button>
+
+  <button
+    onClick={() => setActiveCategory("daily")}
+    className={`px-6 py-3 rounded-xl border ${
+      activeCategory === "daily"
+        ? "bg-[#A62B1F] text-white"
+        : "border-[#A62B1F] text-[#A62B1F]"
+    }`}
+  >
+    Daily Staples
+  </button>
+
+  <button
+    onClick={() => setActiveCategory("organic")}
+    className={`px-6 py-3 rounded-xl border ${
+      activeCategory === "organic"
+        ? "bg-[#A62B1F] text-white"
+        : "border-[#A62B1F] text-[#A62B1F]"
+    }`}
+  >
+    Organic & Healthy
+  </button>
+
+  <button
+    onClick={() => setActiveCategory("speciality")}
+    className={`px-6 py-3 rounded-xl border ${
+      activeCategory === "speciality"
+        ? "bg-[#A62B1F] text-white"
+        : "border-[#A62B1F] text-[#A62B1F]"
+    }`}
+  >
+    Speciality Rice
+  </button>
+</div>
+
+  <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
+  {riceCategories[activeCategory].map((item, index) => (
+    <div
+      key={index}
+      className="group text-center cursor-pointer"
+    >
+      <div className="overflow-hidden rounded-xl bg-white shadow-md">
+        <img
+          src={item.img}
+          alt={item.name}
+          className="h-72 w-full object-cover group-hover:scale-105 transition duration-500"
+        />
+      </div>
+
+      <h3 className="mt-4 text-lg font-semibold text-[#112E24]">
+        {item.name}
+      </h3>
+    </div>
+  ))}
+</div>
+  </div>
+
+  {/* View Collection Button */}
+<div className="flex justify-center mt-14">
+  <button
+    onClick={() => navigate("/collections")}
+    className="bg-[#0B3B2E] text-white px-10 py-4 rounded-xl font-semibold text-lg
+    shadow-lg transition-all duration-300 hover:bg-[#D4AF37]
+    hover:text-[#112E24] hover:scale-105 active:scale-95 flex items-center gap-2"
+  >
+    View Collection
+    <ArrowRight size={20} />
+  </button>
+</div>
+</section>
 
       {/* 5. BEST SELLING RICE PRODUCTS */}
       <section id="bestsellers" className="py-16 bg-[#112E24]/5">

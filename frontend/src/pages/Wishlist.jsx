@@ -107,9 +107,9 @@ export default function Wishlist() {
         {/* Modern Clean Header */}
         <div className="flex items-center justify-between border-b border-slate-100 pb-6 mb-12 animate-fade-in-down">
           <div className="space-y-1">
-            <div className="flex items-center gap-2 text-xs font-semibold tracking-[0.2em] text-blue-600 uppercase">
+            {/* <div className="flex items-center gap-2 text-xs font-semibold tracking-[0.2em] text-blue-600 uppercase">
               <TrendingUp className="w-3.5 h-3.5" /> Curated Vault
-            </div>
+            </div> */}
             <h1 className="text-3xl font-bold tracking-tight text-slate-900">
               Favorites <span className="text-xl font-normal text-slate-400 ml-1">/ {wishlistItems.length}</span>
             </h1>
@@ -194,18 +194,18 @@ export default function Wishlist() {
                   <div className="flex items-center gap-3 w-full sm:w-auto justify-end border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-100">
                     
                     {/* Royal Blue Add to Cart Button */}
-                    <button
-                      onClick={() => handleAddToCart(item)}
-                      disabled={!isInStock}
-                      className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold tracking-wider uppercase transition-all duration-150 ${
-                        isInStock
-                          ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm active:scale-[0.98]'
-                          : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                      }`}
-                    >
-                      <ShoppingCart className="w-3.5 h-3.5" />
-                      {isInStock ? 'Add to Cart' : 'Out of stock'}
-                    </button>
+                  <button
+  onClick={() => handleAddToCart(item)}
+  disabled={!isInStock}
+  className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold tracking-wider uppercase transition-all duration-300 ${
+    isInStock
+      ? 'bg-[#0B3B2E] text-white hover:bg-[#D4AF37] hover:text-[#112E24] shadow-sm active:scale-[0.98]'
+      : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+  }`}
+>
+  <ShoppingCart className="w-3.5 h-3.5" />
+  {isInStock ? 'Add to Cart' : 'Out of stock'}
+</button>
 
                     {/* Clean Dismiss Button */}
                     <button
