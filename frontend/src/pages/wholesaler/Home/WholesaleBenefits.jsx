@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import riceFieldBg from '../../../assets/banner/rice one.jpg';
 
 export default function WholesaleBenefits() {
   const [hoveredIndex, setHoveredIndex] = useState(null);
@@ -8,104 +9,92 @@ export default function WholesaleBenefits() {
       id: 1,
       title: "Bulk Discounts",
       subtitle: "Save up to 40% on wholesale orders",
-      icon: (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      ),
-      gradient: "from-emerald-500 to-teal-500",
-      bgGradient: "from-emerald-50 to-teal-50",
-      color: "emerald"
+      description: "Volume-based pricing that rewards larger quantities",
+      icon: "💰",
+      gradient: "from-green-600 to-emerald-600"
     },
     {
       id: 2,
-      title: "Wholesale Pricing",
-      subtitle: "Exclusive rates for businesses",
-      icon: (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 8h6m-5 4h4m-6 4h6M5 4h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z" />
-        </svg>
-      ),
-      gradient: "from-blue-500 to-indigo-500",
-      bgGradient: "from-blue-50 to-indigo-50",
-      color: "blue"
+      title: "Direct from Mills",
+      subtitle: "No middlemen, best prices",
+      description: "Source directly from premium rice mills across India",
+      icon: "🏭",
+      gradient: "from-green-600 to-emerald-600"
     },
     {
       id: 3,
       title: "GST Invoice",
       subtitle: "100% tax compliant billing",
-      icon: (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-      ),
-      gradient: "from-purple-500 to-pink-500",
-      bgGradient: "from-purple-50 to-pink-50",
-      color: "purple"
+      description: "Get instant GST invoices for all business purchases",
+      icon: "📄",
+      gradient: "from-green-600 to-emerald-600"
     },
     {
       id: 4,
       title: "Fast Delivery",
       subtitle: "Pan-India delivery in 3-5 days",
-      icon: (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 13l4 4L19 7" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      ),
-      gradient: "from-orange-500 to-red-500",
-      bgGradient: "from-orange-50 to-red-50",
-      color: "orange"
+      description: "Express shipping with real-time tracking",
+      icon: "🚚",
+      gradient: "from-green-600 to-emerald-600"
     },
     {
       id: 5,
-      title: "Easy Returns",
-      subtitle: "30-day hassle-free returns",
-      icon: (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-        </svg>
-      ),
-      gradient: "from-cyan-500 to-blue-500",
-      bgGradient: "from-cyan-50 to-blue-50",
-      color: "cyan"
+      title: "Premium Quality",
+      subtitle: "FSSAI certified rice",
+      description: "Superior quality rice with consistent grading",
+      icon: "⭐",
+      gradient: "from-green-600 to-emerald-600"
     },
     {
       id: 6,
       title: "24/7 Support",
       subtitle: "Dedicated account manager",
-      icon: (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-        </svg>
-      ),
-      gradient: "from-rose-500 to-pink-500",
-      bgGradient: "from-rose-50 to-pink-50",
-      color: "rose"
+      description: "Round-the-clock assistance for all your needs",
+      icon: "🎧",
+      gradient: "from-green-600 to-emerald-600"
     }
   ];
 
   return (
-    <section className="py-16 bg-gradient-to-b from-gray-50 to-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <div className="text-center mb-12">
-          <div className="inline-block">
-            <span className="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-semibold px-3 py-1 rounded-full mb-3 inline-block">
-              Why Choose Us
-            </span>
+    <section className="relative py-24 overflow-hidden">
+      {/* Background Image with Overlay */}
+      <div className="absolute inset-0 z-0">
+        <img 
+          src={riceFieldBg} 
+          alt="Rice Field Background"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-green-900/95 via-green-800/90 to-emerald-900/95"></div>
+        {/* Rice grain pattern overlay */}
+        <div className="absolute inset-0 opacity-5">
+          <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <pattern id="ricePatternBg" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse">
+              <ellipse cx="15" cy="15" rx="4" ry="2" fill="white" transform="rotate(45 15 15)" />
+            </pattern>
+            <rect width="100%" height="100%" fill="url(#ricePatternBg)" />
+          </svg>
+        </div>
+      </div>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section Header - Light Text */}
+        <div className="text-center mb-16">
+          <div className="inline-block mb-4">
+            <div className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-full px-4 py-1.5">
+              <span className="text-amber-300 text-xs font-semibold tracking-wide">✦ WHY CHOOSE US ✦</span>
+            </div>
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
             Wholesale Benefits
           </h2>
-          <div className="w-20 h-0.5 bg-gradient-to-r from-amber-500 to-orange-500 mx-auto mb-4"></div>
-          <p className="text-gray-600 max-w-2xl mx-auto text-sm">
-            Exclusive advantages designed for businesses and bulk buyers
+          <div className="w-24 h-1 bg-gradient-to-r from-amber-400 to-green-400 mx-auto mb-6"></div>
+          <p className="text-green-100 text-lg max-w-2xl mx-auto">
+            Exclusive advantages designed for rice wholesalers and bulk buyers
           </p>
         </div>
 
-        {/* Benefits Grid - Smaller Cards */}
-        <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-5">
+        {/* Benefits Grid - Modern Glassmorphism Cards */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {benefits.map((benefit, index) => (
             <div
               key={benefit.id}
@@ -113,74 +102,63 @@ export default function WholesaleBenefits() {
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(null)}
             >
-              {/* Card Content */}
-              <div className="relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
-                <div className="p-5">
-                  {/* Icon with Hover Effect */}
-                  <div className={`mb-3 inline-flex p-2 rounded-xl bg-gradient-to-r ${benefit.bgGradient} group-hover:scale-110 transition-transform duration-300`}>
-                    <div className={`text-${benefit.color}-600`}>
-                      {benefit.icon}
-                    </div>
+              {/* Glassmorphism Card */}
+              <div className="relative bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl transition-all duration-500 h-full overflow-hidden hover:shadow-2xl hover:shadow-green-500/20 hover:border-white/40">
+                
+                {/* Animated Gradient Background on Hover */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${benefit.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}></div>
+                
+                {/* Card Content */}
+                <div className="relative p-6">
+                  {/* Icon Container */}
+                  <div className={`mb-5 inline-flex w-14 h-14 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 text-3xl transition-all duration-300 group-hover:scale-110 group-hover:rotate-6 group-hover:bg-white/30`}>
+                    {benefit.icon}
                   </div>
 
                   {/* Title */}
-                  <h3 className={`text-lg font-bold text-gray-900 mb-1 group-hover:text-${benefit.color}-600 transition-colors duration-300`}>
+                  <h3 className="text-xl font-bold text-white mb-2 transition-colors duration-300 group-hover:text-amber-300">
                     {benefit.title}
                   </h3>
 
                   {/* Subtitle */}
-                  <p className="text-gray-500 text-sm leading-relaxed">
+                  <p className="text-green-100 text-sm font-medium mb-2">
                     {benefit.subtitle}
                   </p>
+
+                  {/* Description - Expand on Hover */}
+                  <div className={`overflow-hidden transition-all duration-300 ${
+                    hoveredIndex === index ? 'max-h-20 opacity-100 mt-3' : 'max-h-0 opacity-0'
+                  }`}>
+                    <p className="text-green-200 text-xs leading-relaxed">
+                      {benefit.description}
+                    </p>
+                  </div>
+
+                  {/* Decorative Line */}
+                  <div className={`mt-4 h-px bg-gradient-to-r ${benefit.gradient} transition-all duration-500 ${hoveredIndex === index ? 'w-full' : 'w-12'}`}></div>
                 </div>
 
-                {/* Bottom Progress Bar */}
-                <div className={`absolute bottom-0 left-0 h-0.5 bg-gradient-to-r ${benefit.gradient} transition-all duration-500 ${hoveredIndex === index ? 'w-full' : 'w-0'}`}></div>
+                {/* Corner Decoration */}
+                <div className="absolute top-0 right-0 w-16 h-16 overflow-hidden opacity-20 group-hover:opacity-40 transition-opacity duration-300">
+                  <div className="absolute -top-8 -right-8 w-16 h-16 bg-white rotate-45"></div>
+                </div>
               </div>
             </div>
           ))}
         </div>
-
-        {/* Compact Call to Action */}
-        {/* <div className="mt-12 bg-gradient-to-r from-slate-900 to-slate-800 rounded-xl p-6 text-center relative overflow-hidden group">
-          <div className="relative z-10">
-            <h3 className="text-xl md:text-2xl font-bold text-white mb-2">
-              Ready to Scale Your Business?
-            </h3>
-            <p className="text-gray-300 text-sm mb-4">
-              Join 5000+ businesses already saving with our wholesale program
-            </p>
-            <button className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold px-6 py-2 rounded-lg text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 inline-flex items-center gap-2 group">
-              Become a Partner
-              <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </button>
-          </div>
-        </div> */}
-
-        {/* Trust Badges - Compact */}
-        <div className="mt-8 flex flex-wrap justify-center gap-6 items-center text-xs">
-          <div className="flex items-center gap-1.5 text-gray-500">
-            <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-            </svg>
-            <span>Trusted by 5000+ Businesses</span>
-          </div>
-          <div className="flex items-center gap-1.5 text-gray-500">
-            <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-            </svg>
-            <span>4.9/5 Rating</span>
-          </div>
-          <div className="flex items-center gap-1.5 text-gray-500">
-            <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-            </svg>
-            <span>Secure Payments</span>
-          </div>
-        </div>
       </div>
+
+      {/* Floating Animation Styles */}
+      <style jsx>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-5px); }
+        }
+        
+        .group:hover .group-hover\\:scale-110 {
+          animation: float 2s ease-in-out infinite;
+        }
+      `}</style>
     </section>
   );
 }

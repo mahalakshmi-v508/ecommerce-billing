@@ -4,12 +4,14 @@ import Testimonials from "./Testimonials";
 import BulkOrderBenefits from "./BulkOrderBenefits";
 import WholesalePricing from "./WholesaleProcess";
 import WholesaleProcess from "./WholesaleProcess";
+import StatsSection from "./StatsSection";
 
 
 export default function WholesalerHome () {
   return (
     <div className="wholesaler-home">
       <HeroSection />
+      <StatsSection/>
       <WholesaleBenefits />
       <WholesaleProcess/>
       
