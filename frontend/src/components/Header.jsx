@@ -11,7 +11,7 @@ import {
 import { useAuth } from '../context/AuthContext.jsx'
 import { getWishlistCount } from '../services/wishlistService.js'
 import { getCartCount } from '../services/cartService.js'
-import logo from '../assets/logo1.png'
+import logo from '../assets/logo.png'
 
 export default function EcommerceHeader() {
   const navigate = useNavigate()
