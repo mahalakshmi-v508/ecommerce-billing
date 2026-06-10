@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom' // 👈 useLocation ஐச் சேர்க்கவும்
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import {
   Search,
   Heart,
@@ -15,7 +15,7 @@ import logo from '../assets/logo1.png'
 
 export default function EcommerceHeader() {
   const navigate = useNavigate()
-  const location = useLocation() // 👈 தற்போதைய பாதையைக் கண்டறிய
+  const location = useLocation()
   const { user, logout, isAuthenticated } = useAuth()
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -26,17 +26,33 @@ export default function EcommerceHeader() {
 
   const profileRef = useRef(null)
 
-  // 👈 புதிய கண்டிஷன்: பயனர் 'wholesaler' ஆக இருந்தாலும் அல்லது தற்போது இருக்கும் URL '/wholesaler' எனத் தொடங்கினாலும் wholesale மெனுவைக் காட்டுவோம்.
-  const isWholesalerSection = user?.role === 'wholesaler' || location.pathname.startsWith('/wholesaler')
+  const isWholesalerSection = location.pathname.startsWith('/wholesaler')
+  const isUserLoggedIn = user?.role === 'user'
+
+  const wholesalerUser = JSON.parse(
+    localStorage.getItem('wholesaler_user') || 'null'
+  )
+  const isWholesalerLoggedIn = !!wholesalerUser
+
+  const canShowAccount =
+    (!isWholesalerSection && isUserLoggedIn) ||
+    (isWholesalerSection && isWholesalerLoggedIn)
+
+  // தற்போதைய ஆக்டிவ் பயனர் ஐடி மற்றும் வகையைக் கண்டறிதல்
+  const activeUserId = isWholesalerSection ? wholesalerUser?.id : user?.id
+  const activeUserType = isWholesalerSection ? 'wholesaler' : 'user'
 
   useEffect(() => {
-    if (user?.id) {
+    if (activeUserId) {
       loadCartCount()
       loadWishlistCount()
+    } else {
+      setCartCount(0)
+      setWishlistCount(0)
     }
 
-    const handleCartUpdate = () => user?.id && loadCartCount()
-    const handleWishlistUpdate = () => user?.id && loadWishlistCount()
+    const handleCartUpdate = () => activeUserId && loadCartCount()
+    const handleWishlistUpdate = () => activeUserId && loadWishlistCount()
 
     window.addEventListener('cartUpdated', handleCartUpdate)
     window.addEventListener('wishlistUpdated', handleWishlistUpdate)
@@ -44,7 +60,7 @@ export default function EcommerceHeader() {
       window.removeEventListener('cartUpdated', handleCartUpdate)
       window.removeEventListener('wishlistUpdated', handleWishlistUpdate)
     }
-  }, [user])
+  }, [activeUserId, location.pathname]) // பாத் மாறும்போது கவுண்ட் அப்டேட் ஆகும்
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -58,7 +74,8 @@ export default function EcommerceHeader() {
 
   const loadCartCount = async () => {
     try {
-      const count = await getCartCount(user.id)
+      // உங்கள் API-க்கு user_type-ஐயும் சேர்த்து அனுப்ப ஏதுவாக மாற்றவும் (தேவைப்பட்டால்)
+      const count = await getCartCount(activeUserId, activeUserType)
       setCartCount(count)
     } catch {
       setCartCount(0)
@@ -67,7 +84,7 @@ export default function EcommerceHeader() {
 
   const loadWishlistCount = async () => {
     try {
-      const count = await getWishlistCount(user.id)
+      const count = await getWishlistCount(activeUserId, activeUserType)
       setWishlistCount(count)
     } catch {
       setWishlistCount(0)
@@ -84,13 +101,18 @@ export default function EcommerceHeader() {
   }
 
   const handleLogout = () => {
-    logout()
+    if (isWholesalerSection) {
+      localStorage.removeItem('wholesaler_user')
+      localStorage.removeItem('wholesaler_token')
+      navigate('/wholesaler-login')
+    } else {
+      logout()
+      navigate('/login')
+    }
     setProfileMenuOpen(false)
     setMobileMenuOpen(false)
-    navigate('/login', { replace: true })
   }
 
-  // ரோல் அடிப்படையிலான மெனுக்களை மாற்றுவதற்கு 'isWholesalerSection' ஐப் பயன்படுத்துகிறோம்
   const currentRoleForMenu = isWholesalerSection ? 'wholesaler' : 'user'
 
   const roleMenuItems = {
@@ -114,7 +136,7 @@ export default function EcommerceHeader() {
         { label: 'Wholesale Products', href: '/wholesaler/products' },
         { label: 'Bulk Orders', href: '/wholesaler/orders' },
         { label: 'Wishlist', href: '/wishlist' },
-        { label: 'Cart', href: '/cart' },
+        { label: 'Cart', href: '/wholesalercart' },
         { label: 'Profile', href: '/profile' },
       ]
     }
@@ -168,7 +190,7 @@ export default function EcommerceHeader() {
           </Link>
 
           {/* DESKTOP NAVIGATION */}
-          {isAuthenticated && (
+          {canShowAccount && (
             <nav className="hidden items-center gap-8 lg:flex">
               {isWholesalerSection ? (
                 <>
@@ -213,6 +235,8 @@ export default function EcommerceHeader() {
                   </Link>
                   <Link
                     to="/wholesaler/dashboard"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="text-sm font-medium text-[#111] transition hover:opacity-60"
                   >
                     Bulk Orders
@@ -244,32 +268,47 @@ export default function EcommerceHeader() {
 
           {/* RIGHT SIDE ICONS */}
           <div className="flex items-center gap-1 sm:gap-2">
-            {isAuthenticated && (
+            {canShowAccount ? (
               <>
-                <IconButton to="/wishlist" count={wishlistCount} label="Wishlist">
+                <IconButton
+                  to="/wishlist"
+                  count={wishlistCount}
+                  label="Wishlist"
+                >
                   <Heart className="h-5 w-5" strokeWidth={1.5} />
                 </IconButton>
 
-                <IconButton to="/wholesalercart" count={cartCount} label="Cart">
+                <IconButton
+                  to={isWholesalerSection ? '/wholesalercart' : '/cart'}
+                  count={cartCount}
+                  label="Cart"
+                >
                   <ShoppingBag className="h-5 w-5" strokeWidth={1.5} />
                 </IconButton>
 
-                {/* PROFILE DROPDOWN */}
-                <div ref={profileRef} className="relative hidden sm:block">
+                <div
+                  ref={profileRef}
+                  className="relative hidden sm:block"
+                >
                   <button
                     type="button"
                     onClick={() => setProfileMenuOpen((o) => !o)}
                     className="flex h-10 w-10 items-center justify-center text-[#111] transition hover:opacity-60"
-                    aria-label="Account menu"
                   >
                     <User className="h-5 w-5" strokeWidth={1.5} />
                   </button>
+
                   {profileMenuOpen && (
                     <div className="absolute right-0 top-full mt-2 w-52 border border-[#e5e7eb] bg-white py-1 shadow-sm">
                       <div className="border-b border-[#e5e7eb] px-4 py-3">
-                        <p className="text-sm font-medium text-[#111]">{user.name}</p>
-                        <p className="truncate text-xs text-[#666]">{user.email}</p>
+                        <p className="text-sm font-medium text-[#111]">
+                          {isWholesalerSection ? wholesalerUser?.name : user?.name}
+                        </p>
+                        <p className="truncate text-xs text-[#666]">
+                          {isWholesalerSection ? wholesalerUser?.email : user?.email}
+                        </p>
                       </div>
+
                       {roleMenuItems[currentRoleForMenu]?.map((item) => (
                         <Link
                           key={item.href}
@@ -280,6 +319,7 @@ export default function EcommerceHeader() {
                           {item.label}
                         </Link>
                       ))}
+
                       <button
                         type="button"
                         onClick={handleLogout}
@@ -291,20 +331,29 @@ export default function EcommerceHeader() {
                   )}
                 </div>
               </>
+            ) : (
+              <>
+                <Link
+                  to={isWholesalerSection ? '/wholesaler-login' : '/login'}
+                  className="hidden sm:flex items-center px-4 py-2 text-sm font-medium text-[#111]"
+                >
+                  Login
+                </Link>
+                <Link
+                  to={isWholesalerSection ? '/wholesaler-register' : '/register'}
+                  className="hidden sm:flex items-center rounded bg-black px-4 py-2 text-sm text-white"
+                >
+                  Sign Up
+                </Link>
+              </>
             )}
 
-            {/* MOBILE MENU BUTTON */}
             <button
               type="button"
               onClick={() => setMobileMenuOpen((o) => !o)}
               className="flex h-10 w-10 items-center justify-center text-[#111] lg:hidden"
-              aria-label="Toggle menu"
             >
-              {mobileMenuOpen ? (
-                <X className="h-5 w-5" strokeWidth={1.5} />
-              ) : (
-                <Menu className="h-5 w-5" strokeWidth={1.5} />
-              )}
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
           </div>
         </div>
@@ -327,7 +376,7 @@ export default function EcommerceHeader() {
                 />
               </div>
             </form>
-            {isAuthenticated && (
+            {canShowAccount ? (
               <nav className="flex flex-col gap-1">
                 {getMobileLinks().map((item) => (
                   <Link
@@ -347,6 +396,21 @@ export default function EcommerceHeader() {
                   Logout
                 </button>
               </nav>
+            ) : (
+              <div className="flex flex-col gap-2">
+                <Link
+                  to={isWholesalerSection ? '/wholesaler-login' : '/login'}
+                  className="px-2 py-2.5 text-sm font-medium text-[#111]"
+                >
+                  Login
+                </Link>
+                <Link
+                  to={isWholesalerSection ? '/wholesaler-register' : '/register'}
+                  className="px-2 py-2.5 text-sm font-medium text-[#111]"
+                >
+                  Sign Up
+                </Link>
+              </div>
             )}
           </div>
         )}

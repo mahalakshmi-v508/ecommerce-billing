@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext.jsx'
 export default function WholesalerLogin() {
 
   const navigate = useNavigate()
-const { authenticate } = useAuth()
+  const { authenticate } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
@@ -36,20 +36,31 @@ const { authenticate } = useAuth()
         return
       }
 
-   const authUser = {
-  ...data.data,
-  role: data.role || 'wholesaler',
-}
+      const authUser = {
+        ...data.data,
+        role: data.role || 'wholesaler',
+      }
 
-authenticate(authUser)
+      const authToken = `wholesaler-${Date.now()}`
+
+      localStorage.setItem(
+        'wholesaler_user',
+        JSON.stringify(authUser)
+      )
+
+      localStorage.setItem(
+        'wholesaler_token',
+        authToken
+      )
+
       toast.success('Login successful')
 
       navigate('/wholesaler/dashboard')
 
     } catch (error) {
-  console.log(error)
-  toast.error(error.message || 'Login failed')
-}
+      console.log(error)
+      toast.error(error.message || 'Login failed')
+    }
   }
 
   return (
