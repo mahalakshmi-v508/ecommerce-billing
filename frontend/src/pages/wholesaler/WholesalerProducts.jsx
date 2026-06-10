@@ -164,7 +164,12 @@ export default function WholesalerProducts() {
                 return
             }
 
-            const response = await addToCart(user.id, product.id, 1)
+            const response = await addToCart(
+  user.id,
+  product.id,
+  1,
+  'wholesaler'
+)
 
             if (response.status) {
                 toast.success(`${product.product_name} added to cart!`)

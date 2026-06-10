@@ -48,7 +48,10 @@ export default function Wholesalercart() {
 
   const loadCart = async () => {
     try {
-      const response = await getCartItems(user.id)
+      const response = await getCartItems(
+  user.id,
+  'wholesaler'
+)
       console.log('Cart Response:', response)
 
       if (response.status) {
