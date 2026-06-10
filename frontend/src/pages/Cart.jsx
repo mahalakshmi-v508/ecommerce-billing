@@ -121,7 +121,7 @@ export default function Cart() {
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-5 h-5 border-2 border-[#0B3B2E] border-t-transparent rounded-full animate-spin"></div>
       </div>
     )
   }
@@ -133,7 +133,7 @@ export default function Cart() {
         {/* Sleek Blue-Accented Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-slate-100 pb-6 mb-10 gap-4 animate-fade-in-down">
           <div className="space-y-1">
-            <div className="flex items-center gap-1.5 text-xs font-semibold tracking-[0.2em] text-blue-600 uppercase">
+            <div className="flex items-center gap-1.5 text-xs font-semibold tracking-[0.2em] text-[#0B3B2E] uppercase">
               <TrendingUp className="w-3.5 h-3.5" /> Shopping Overview
             </div>
             <h1 className="text-3xl font-bold tracking-tight text-slate-900">
@@ -142,7 +142,7 @@ export default function Cart() {
           </div>
           <Link 
             to="/products" 
-            className="group inline-flex items-center gap-1 text-xs font-medium tracking-wider uppercase text-slate-500 hover:text-blue-600 transition-colors"
+            className="group inline-flex items-center gap-1 text-xs font-medium tracking-wider uppercase text-slate-500 hover:text-[#0B3B2E] transition-colors"
           >
             <ChevronLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
             Continue Browsing
@@ -198,7 +198,7 @@ export default function Cart() {
 
                       {/* Title Specs and Dynamic Price Elements */}
                       <div className="space-y-1.5">
-                        <h3 className="text-sm font-semibold text-slate-800 tracking-tight line-clamp-1 group-hover:text-blue-600 transition-colors">
+                        <h3 className="text-sm font-semibold text-slate-800 tracking-tight line-clamp-1 group-hover:text-[#0B3B2E] transition-colors">
                           {item.product_name}
                         </h3>
                         <div className="flex items-center gap-2 text-xs text-slate-400">
@@ -220,7 +220,7 @@ export default function Cart() {
                         <button
                           onClick={() => handleQuantity(item.id, parseInt(item.quantity || 1), 'decrease')}
                           disabled={isUpdating || parseInt(item.quantity || 1) <= 1}
-                          className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-blue-600 hover:bg-blue-50/50 disabled:opacity-30 disabled:hover:bg-transparent transition-all"
+                          className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-[#0B3B2E] hover:bg-green-50 disabled:opacity-30 disabled:hover:bg-transparent transition-all"
                         >
                           <Minus className="w-3.5 h-3.5 stroke-[2.5]" />
                         </button>
@@ -236,7 +236,7 @@ export default function Cart() {
                         <button
                           onClick={() => handleQuantity(item.id, parseInt(item.quantity || 1), 'increase')}
                           disabled={isUpdating}
-                          className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-blue-600 hover:bg-blue-50/50 disabled:opacity-30 transition-all"
+                          className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-[#0B3B2E] hover:bg-blue-50/50 disabled:opacity-30 transition-all"
                         >
                           <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
                         </button>
@@ -286,7 +286,7 @@ export default function Cart() {
                   </div>
                   <div className="flex justify-between text-slate-500">
                     <span>Logistics Dispatch</span>
-                    <span className="text-blue-600 font-semibold uppercase tracking-wider text-[10px] bg-blue-50 px-2 py-0.5 rounded-md">Complimentary</span>
+                    <span className="text-[#0B3B2E] font-semibold uppercase tracking-wider text-[10px] bg-blue-50 px-2 py-0.5 rounded-md">Complimentary</span>
                   </div>
                   <div className="flex justify-between text-slate-500">
                     <span>Tax Assessment (GST 18%)</span>
@@ -296,7 +296,7 @@ export default function Cart() {
                   <div className="border-t border-slate-100 my-4 pt-4 flex justify-between items-baseline">
                     <span className="text-sm font-bold text-slate-900">Grand Valuation</span>
                     <div className="text-right">
-                      <span className="text-2xl font-black tracking-tight text-blue-600">
+                      <span className="text-2xl font-black tracking-tight text-[#0B3B2E]">
                         ₹{grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                       </span>
                     </div>
@@ -325,16 +325,15 @@ export default function Cart() {
                         }
                       })
                     }
-                    className="w-full bg-blue-600 text-white py-3.5 rounded-xl font-semibold text-xs tracking-widest uppercase hover:bg-blue-700 transition-all shadow-md shadow-blue-100 active:scale-[0.99] flex items-center justify-center gap-2"
-                  >
-                    <CreditCard className="w-4 h-4" />
+className="w-full bg-[#0B3B2E] text-white py-3.5 rounded-xl font-semibold text-xs tracking-widest uppercase hover:bg-[#D4AF37] hover:text-[#112E24] transition-all shadow-md active:scale-[0.99] flex items-center justify-center gap-2"                  >
+                    <CreditCard className="w-4 h-4 " />
                     Proceed to Settlement
                     <ArrowRight className="w-3.5 h-3.5 ml-0.5 animate-pulse" />
                   </button>
 
                   <button
                     onClick={() => navigate('/products')}
-                    className="w-full bg-white border border-slate-200 text-slate-600 py-3 rounded-xl font-semibold text-xs tracking-wider uppercase hover:text-blue-600 hover:border-blue-200 transition-all flex items-center justify-center gap-2"
+                    className="w-full bg-white border border-slate-200 text-slate-600 py-3 rounded-xl font-semibold text-xs tracking-wider uppercase hover:text-[#0B3B2E] hover:border-blue-200 transition-all flex items-center justify-center gap-2"
                   >
                     Continue Acquisition
                   </button>
