@@ -5,7 +5,6 @@ header("Access-Control-Allow-Headers: Content-Type");
 header("Access-Control-Allow-Methods: GET, OPTIONS");
 header("Content-Type: application/json");
 
-/* HANDLE PREFLIGHT */
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
@@ -13,22 +12,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 include __DIR__ . '/../../config/db.php';
 
-$user_id = isset($_GET['user_id']) ? intval($_GET['user_id']) : 0;
-$user_type = isset($_GET['user_type']) ? $_GET['user_type'] : 'user';
+$user_id = isset($_GET['user_id'])
+    ? intval($_GET['user_id'])
+    : 0;
+
+$user_type = isset($_GET['user_type'])
+    ? $_GET['user_type']
+    : 'user';
 
 $sql = "
-SELECT 
+SELECT
     cart.id,
     cart.quantity,
-    cart.user_type,
     products.id AS product_id,
-    products.company_id AS company_id,
+    products.company_id,
     products.product_name,
     products.price,
     products.stock,
     products.image
 FROM cart
-JOIN products 
+INNER JOIN products
     ON cart.product_id = products.id
 WHERE cart.user_id = ?
 AND cart.user_type = ?
@@ -39,20 +42,21 @@ $stmt = mysqli_prepare($conn, $sql);
 if (!$stmt) {
     echo json_encode([
         "status" => false,
-        "message" => "Failed to prepare cart query",
+        "message" => mysqli_error($conn),
         "data" => []
     ]);
-    exit;
+    exit();
 }
 
 mysqli_stmt_bind_param(
     $stmt,
-    'is',
+    "is",
     $user_id,
     $user_type
 );
 
 mysqli_stmt_execute($stmt);
+
 $result = mysqli_stmt_get_result($stmt);
 
 $data = [];
@@ -67,4 +71,3 @@ echo json_encode([
     "status" => true,
     "data" => $data
 ]);
-?>
