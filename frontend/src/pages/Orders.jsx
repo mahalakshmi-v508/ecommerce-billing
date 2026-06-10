@@ -59,8 +59,8 @@ const Orders = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+<div className="min-h-screen bg-white py-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="mb-8 text-center">
           <div className="inline-block">
@@ -142,8 +142,7 @@ const Orders = () => {
                     return (
                       <tr
                         key={order.id}
-                        className="hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 transition-all duration-200 group"
-                      >
+className="hover:bg-green-50 transition-all duration-200 group"                      >
                         {/* Invoice No */}
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-2">
@@ -199,8 +198,7 @@ const Orders = () => {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <button
                             onClick={() => navigate(`/invoice/${order.invoice_id || order.invoice_no}`)}
-                            className="group relative inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border-2 border-black text-black text-sm font-semibold hover:bg-black hover:text-white hover:shadow-lg transform hover:scale-105 transition-all duration-200"
-                          >
+className="group relative inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0B3B2E] border-2 border-[#0B3B2E] text-white text-sm font-semibold hover:bg-[#D4AF37] hover:border-[#D4AF37] hover:text-[#112E24] hover:shadow-lg transform hover:scale-105 transition-all duration-200"                          >
                             {/* <span>📄</span> */}
                             View Invoice
                             <span className="absolute inset-0 rounded-xl bg-black opacity-0 group-hover:opacity-5 transition-opacity"></span>

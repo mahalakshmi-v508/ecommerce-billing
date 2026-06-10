@@ -39,7 +39,7 @@ export default function PaymentPage() {
       title: 'Cash',
       icon: Wallet,
       description: 'Pay with physical cash',
-      iconColor: 'text-blue-600',
+      iconColor: 'text-[#0B3B2E]',
       bgLight: 'bg-blue-50/60'
     },
     {
@@ -47,7 +47,7 @@ export default function PaymentPage() {
       title: 'UPI',
       icon: Zap,
       description: 'Google Pay, PhonePe, etc.',
-      iconColor: 'text-blue-600',
+      iconColor: 'text-[#0B3B2E]',
       bgLight: 'bg-blue-50/60'
     },
     {
@@ -55,7 +55,7 @@ export default function PaymentPage() {
       title: 'Credit',
       icon: CalendarDays,
       description: 'Pay later on credit',
-      iconColor: 'text-blue-600',
+      iconColor: 'text-[#0B3B2E]',
       bgLight: 'bg-blue-50/60'
     }
   ]
@@ -131,7 +131,7 @@ export default function PaymentPage() {
         <div className="mb-10 text-left border-b border-slate-100 pb-5">
           <div className="flex items-center gap-3 mb-2">
             <div className="p-2 bg-blue-50 rounded-lg">
-              <CreditCard className="w-6 h-6 text-blue-600" />
+              <CreditCard className="w-6 h-6 text-[#0B3B2E]" />
             </div>
             <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
               Secure Checkout
@@ -149,7 +149,7 @@ export default function PaymentPage() {
             {/* Payment Options Segment */}
             <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
               <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100">
-                <Wallet className="w-5 h-5 text-blue-600" />
+                <Wallet className="w-5 h-5 text-[#0B3B2E]" />
                 <h2 className="text-base font-semibold text-slate-900">Payment Method</h2>
               </div>
 
@@ -166,13 +166,13 @@ export default function PaymentPage() {
                         flex items-center justify-between p-4 rounded-xl border cursor-pointer
                         transition-all duration-150 ease-in-out select-none
                         ${isSelected
-                          ? `border-blue-600 bg-blue-50/30`
+                          ? `border-[#0B3B2E] bg-green-50`
                           : 'border-slate-200 hover:bg-slate-50/50'
                         }
                       `}
                     >
                       <div className="flex items-center gap-3.5">
-                        <div className={`p-2.5 rounded-lg ${isSelected ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'}`}>
+                        <div className={`p-2.5 rounded-lg ${isSelected ? 'bg-[#0B3B2E] text-white' : 'bg-slate-100 text-slate-600'}`}>
                           <Icon className="w-5 h-5" />
                         </div>
                         <div>
@@ -184,10 +184,10 @@ export default function PaymentPage() {
                       {/* Pure Blue Radio Visual */}
                       <div className={`
                         w-5 h-5 rounded-full border flex items-center justify-center transition-colors
-                        ${isSelected ? 'border-blue-600 bg-white' : 'border-slate-300 bg-white'}
+                        ${isSelected ? 'border-[#0B3B2E] bg-white' : 'border-slate-300 bg-white'}
                       `}>
                         {isSelected && (
-                          <div className="w-2.5 h-2.5 rounded-full bg-blue-600"></div>
+                          <div className="w-2.5 h-2.5 rounded-full bg-[#0B3B2E]"></div>
                         )}
                       </div>
                     </div>
@@ -198,7 +198,7 @@ export default function PaymentPage() {
               {/* Context Dynamic Alert Box */}
               <div className="mt-4 p-3.5 rounded-lg border border-blue-100 bg-blue-50/40">
                 <div className="flex gap-2.5">
-                  <ShieldCheck className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <ShieldCheck className="w-4 h-4 text-[#0B3B2E] flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="text-xs font-medium text-blue-900">
                       {paymentMethod === 'cash' && 'Hand over the exact cash amount to the delivery executive.'}
@@ -213,7 +213,7 @@ export default function PaymentPage() {
             {/* Customer Information Base */}
             <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
               <div className="flex items-center gap-2 mb-3 pb-2 border-b border-slate-100">
-                <Truck className="w-5 h-5 text-blue-600" />
+                <Truck className="w-5 h-5 text-[#0B3B2E]" />
                 <h2 className="text-base font-semibold text-slate-900">Customer Profile</h2>
               </div>
               <div className="grid grid-cols-2 gap-4 text-sm">
@@ -236,7 +236,7 @@ export default function PaymentPage() {
               {/* Card Title Box */}
               <div className="bg-slate-50 border-b border-slate-200 p-4 flex items-center justify-between">
                 <div className="flex items-center gap-2 text-slate-900">
-                  <ShoppingBag className="w-4 h-4 text-blue-600" />
+                  <ShoppingBag className="w-4 h-4 text-[#0B3B2E]" />
                   <h2 className="text-sm font-bold uppercase tracking-wider">Summary</h2>
                 </div>
                 <span className="text-xs bg-slate-200 text-slate-700 font-semibold px-2.5 py-0.5 rounded-full">
@@ -278,7 +278,7 @@ export default function PaymentPage() {
 
                 <div className="flex justify-between pt-3 border-t border-slate-200 items-baseline">
                   <span className="font-bold text-slate-900">Grand Total</span>
-                  <div className="text-xl font-black text-blue-600 flex items-center">
+                  <div className="text-xl font-black text-[#0B3B2E] flex items-center">
                     <IndianRupee className="w-4 h-4 stroke-[3]" />
                     <span>{Number(totalAmount).toFixed(2)}</span>
                   </div>
@@ -288,7 +288,7 @@ export default function PaymentPage() {
               {/* Footer CTA & Information Zone */}
               <div className="p-4 bg-white">
                 <div className="flex items-center gap-2.5 text-slate-500 text-xs mb-4">
-                  <Clock className="w-3.5 h-3.5 text-blue-600" />
+                  <Clock className="w-3.5 h-3.5 text-[#0B3B2E]" />
                   <span>Dispatching to logistics within 24 hours.</span>
                 </div>
 
@@ -296,7 +296,7 @@ export default function PaymentPage() {
                 <button
                   onClick={handlePayment}
                   disabled={loading}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg text-sm font-bold shadow-sm transition-colors duration-150 flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="w-full bg-[#0B3B2E] hover:bg-[#D4AF37] hover:text-[#112E24] text-white py-3 rounded-lg text-sm font-bold shadow-sm transition-colors duration-150 flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   {loading ? (
                     <>

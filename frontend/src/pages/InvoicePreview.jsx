@@ -14,7 +14,7 @@ function DesignOriginal({ invoice, company, color }) {
           <p style={{ margin: "2px 0", fontSize: "13px" }}>{company?.company_address}</p>
           <p style={{ margin: "2px 0", fontSize: "13px" }}>Phone: {company?.phone}</p>
           <p style={{ margin: "2px 0", fontSize: "13px" }}>GSTIN: {company?.gstin}</p>
-          <p style={{ margin: "2px 0", fontSize: "13px" }}>GST: {company?.gst_type}</p>
+          {/* <p style={{ margin: "2px 0", fontSize: "13px" }}>GST: {company?.gst_type}</p> */}
         </div>
         {company?.logo && (
           <img
@@ -130,8 +130,7 @@ export default function InvoicePreview() {
   const { invoiceNo } = useParams()
   const [invoice, setInvoice] = useState(null)
   const [company, setCompany] = useState(null)
-  const color = "#2563eb"
-
+const color = "#2E7D32"
   useEffect(() => {
     api.get(`/invoice/get_invoice_by_id.php?id=${invoiceNo}`).then((res) => {
       if (res.data.status) {
@@ -183,7 +182,7 @@ export default function InvoicePreview() {
           <button
             onClick={downloadPDF}
             style={{
-              background: "#16a34a",
+              background: "#03441b",
               color: "#fff",
               border: "none",
               borderRadius: 8,

@@ -273,8 +273,8 @@ const response = await addToCart(
                             <p className="text-gray-600">This category doesn't have any products yet. Try another category!</p>
                         </div>
                     ) : (
-                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
-                           {allProducts.map((product) => {
+<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                               {allProducts.map((product) => {
 
     const selectedWeight =
         selectedWeights[product.id] || 5
@@ -352,8 +352,8 @@ const response = await addToCart(
           })
         }
         className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 border ${
-          active
-            ? "bg-[#0B3B2E] text-white border-[#0B3B2E] shadow-md"
+         active
+? "bg-[#DFF5E8] text-[#0B3B2E] border-[#0B3B2E] shadow-sm"
             : "bg-white text-gray-600 border-gray-300 hover:border-[#0B3B2E] hover:text-[#0B3B2E]"
         }`}
       >

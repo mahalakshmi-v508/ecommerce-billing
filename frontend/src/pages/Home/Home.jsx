@@ -125,7 +125,6 @@ const bestSellers = [
       </h2> */}
               <h2 className="text-3xl font-serif font-bold text-[#112E24] mb-2">Rice  collection</h2>
 
-      <div className="w-24 h-[2px] bg-[#A62B1F] mx-auto mt-4"></div>
     </div>
 
    <div className="flex flex-wrap justify-center gap-4 mb-12">
@@ -199,7 +198,7 @@ const bestSellers = [
   {/* View Collection Button */}
 <div className="flex justify-center mt-14">
   <button
-    onClick={() => navigate("/collections")}
+onClick={() => navigate("/categories")}
     className="bg-[#0B3B2E] text-white px-10 py-4 rounded-xl font-semibold text-lg
     shadow-lg transition-all duration-300 hover:bg-[#D4AF37]
     hover:text-[#112E24] hover:scale-105 active:scale-95 flex items-center gap-2"
@@ -210,87 +209,7 @@ const bestSellers = [
 </div>
 </section>
 
-      {/* 5. BEST SELLING RICE PRODUCTS */}
-      <section id="bestsellers" className="py-16 bg-[#112E24]/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-12 gap-4">
-            <div>
-              <h2 className="text-3xl font-serif font-bold text-[#112E24] mb-2">Our Signature Best Sellers</h2>
-              <p className="text-[#5A6561]">The highly verified staples keeping millions of family meals premium and authentic.</p>
-            </div>
-            <button className="text-[#112E24] font-semibold flex items-center gap-1 group whitespace-nowrap hover:text-[#D4AF37] transition-colors">
-              View All Products <ChevronRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
-            </button>
-          </div>
-
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            {bestSellers.map((product) => {
-              const currentWeight = selectedWeights[product.id] || product.defaultWeight;
-              return (
-                <div key={product.id} className="bg-[#FDFBF7] rounded-xl border border-[#EAE6DF] overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col group">
-                  <div className="relative pt-[100%] bg-white overflow-hidden">
-                    <span className="absolute top-2 left-2 bg-[#112E24] text-[#FDFBF7] text-[10px] uppercase tracking-wider font-semibold px-2 py-1 rounded z-10">
-                      {product.tags[0]}
-                    </span>
-                    <img 
-                      src={product.image} 
-                      alt={product.name} 
-                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-102 transition-transform duration-300" 
-                    />
-                  </div>
-                  
-                  <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
-                    <div>
-                      <div className="flex items-center gap-1 mb-1">
-                        <Star size={14} className="fill-[#D4AF37] text-[#D4AF37]" />
-                        <span className="text-xs font-bold text-[#112E24]">{product.rating}</span>
-                        <span className="text-xs text-[#5A6561]">({product.reviews})</span>
-                      </div>
-                      <h3 className="font-medium text-sm sm:text-base text-[#112E24] line-clamp-2 min-h-[40px] hover:text-[#D4AF37] cursor-pointer transition-colors">
-                        {product.name}
-                      </h3>
-                    </div>
-
-                    <div>
-                      {/* Weight Selector tabs inside card */}
-                      <div className="flex gap-1.5 mb-3 overflow-x-auto pb-1 scrollbar-none">
-                        {product.weights.map((w) => (
-                          <button
-                            key={w}
-                            onClick={() => handleWeightChange(product.id, w)}
-                            className={`text-xs px-2.5 py-1 rounded border whitespace-nowrap font-medium transition-all ${
-                              currentWeight === w 
-                                ? 'bg-[#112E24] text-white border-[#112E24]' 
-                                : 'bg-transparent text-[#5A6561] border-[#EAE6DF] hover:border-[#112E24]'
-                            }`}
-                          >
-                            {w}
-                          </button>
-                        ))}
-                      </div>
-
-                      <div className="flex items-baseline justify-between pt-1">
-                        <div className="flex items-baseline gap-1.5">
-                          <span className="text-lg font-bold text-[#112E24]">₹{product.price}</span>
-                          <span className="text-xs text-[#5A6561] line-through">₹{product.originalPrice}</span>
-                        </div>
-                        <span className="text-[11px] font-bold text-[#2E7D32]">Save {Math.round(((product.originalPrice - product.price)/product.originalPrice)*100)}%</span>
-                      </div>
-                    </div>
-
-                    <button 
-                      onClick={() => setCartCount(prev => prev + 1)}
-                      className="w-full bg-[#112E24] text-white py-2.5 rounded-lg text-sm font-semibold hover:bg-[#D4AF37] hover:text-[#112E24] transition-all active:scale-[0.98]"
-                    >
-                      Add To Bag
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+    
 
       {/* 6. PREMIUM RICE COLLECTION */}
       <section className="py-20 bg-[#112E24] text-[#FDFBF7] overflow-hidden">
