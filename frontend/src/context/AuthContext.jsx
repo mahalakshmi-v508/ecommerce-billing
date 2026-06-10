@@ -35,7 +35,13 @@ export function AuthProvider({ children }) {
 
   const authenticate = (authUser) => {
     const authToken = `token-${Date.now()}`
-    saveAuth(authToken, authUser)
+    const saveAuth = (authToken, authUser) => {
+  localStorage.setItem('auth_token', authToken)
+  localStorage.setItem('auth_user', JSON.stringify(authUser))
+
+  setToken(authToken)
+  setUser(authUser)
+}
     return authUser
   }
 
