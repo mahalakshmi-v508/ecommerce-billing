@@ -22,6 +22,8 @@ import {
 } from '../services/wishlistService.js'
 
 export default function Categories() {
+
+
     const { user } = useAuth()
     const navigate = useNavigate()
 
@@ -31,7 +33,7 @@ export default function Categories() {
     const [loading, setLoading] = useState(true)
     const [productsLoading, setProductsLoading] = useState(false)
     const [wishlistItems, setWishlistItems] = useState([])
-
+const [selectedWeights, setSelectedWeights] = useState({})
     /*
     |--------------------------------------------------------------------------
     | LOAD INITIAL DATA
@@ -170,8 +172,13 @@ export default function Categories() {
                 return
             }
 
-            const response = await addToCart(user.id, product.id, 1)
+const weight = selectedWeights[product.id] || 5
 
+const response = await addToCart(
+  user.id,
+  product.id,
+  weight
+)
             if (response.status) {
                 toast.success(`${product.product_name} added to cart!`)
                 window.dispatchEvent(new Event('cartUpdated'))
@@ -204,18 +211,19 @@ export default function Categories() {
         )
     }
 
+    
     return (
         <div className="min-h-screen bg-white py-8 px-4">
             <div className="max-w-7xl mx-auto">
                 {/* Header Section */}
                 <div className="mb-8 text-center">
                     <div className="inline-flex items-center gap-3 bg-white/80 backdrop-blur-sm rounded-full px-6 py-3 shadow-lg mb-4">
-                        <ShoppingBag className="w-8 h-8 text-purple-600" />
+                        {/* <ShoppingBag className="w-8 h-8 text-purple-600" /> */}
                         <h1 className="text-3xl font-bold text-black">
                             Shop by Category
                         </h1>
                     </div>
-                    <p className="text-gray-600 mt-2">Browse and discover products from our collections</p>
+                    {/* <p className="text-gray-600 mt-2">Browse and discover products from our collections</p> */}
                 </div>
 
                 {/* Category Selection Section */}
@@ -227,11 +235,10 @@ export default function Categories() {
                                 <button
                                     key={category.id}
                                     onClick={() => handleCategoryClick(category.id, category.company_id)}
-                                    className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 focus:outline-none ${isSelected
-                                        ? 'bg-black text-white shadow-lg'
-                                        : 'bg-transparent text-gray-700 hover:bg-gray-100 hover:text-black'
-                                        }`}
-                                >
+                                    className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 focus:outline-none ${isSelected
+                                            ? 'bg-[#0B3B2E] text-white shadow-lg'
+                                            : 'bg-white text-[#0B3B2E] border border-[#0B3B2E] hover:bg-[#D4AF37] hover:text-[#112E24] hover:border-[#D4AF37]'
+                                        }`}                                >
                                     {category.name}
                                 </button>
                             )
@@ -267,8 +274,15 @@ export default function Categories() {
                         </div>
                     ) : (
                         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
-                            {allProducts.map((product) => {
-                                const isInWishlist = wishlistItems.some(
+                           {allProducts.map((product) => {
+
+    const selectedWeight =
+        selectedWeights[product.id] || 5
+
+    const finalPrice =
+        parseFloat(product.price || 0) * selectedWeight
+
+    const isInWishlist = wishlistItems.some(
                                     (item) => parseInt(item.product_id) === parseInt(product.id)
                                 )
                                 const isOutOfStock = parseInt(product.stock) <= 0
@@ -285,8 +299,8 @@ export default function Categories() {
                                             <button
                                                 onClick={() => handleWishlist(product)}
                                                 className={`absolute right-2 top-2 z-10 flex h-8 w-8 items-center justify-center rounded-full transition-all duration-200 shadow-md ${isInWishlist
-                                                        ? 'bg-red-500 text-white scale-110'
-                                                        : 'bg-white/90 text-gray-400 hover:text-red-500'
+                                                    ? 'bg-red-500 text-white scale-110'
+                                                    : 'bg-white/90 text-gray-400 hover:text-red-500'
                                                     }`}
                                             >
                                                 <Heart
@@ -315,8 +329,7 @@ export default function Categories() {
                                         {/* Product Details */}
                                         <div className="p-3">
                                             <div className="mb-2">
-                                                <h3 className="text-base font-semibold text-gray-800 line-clamp-2 group-hover:text-red-600 transition-colors">
-                                                    {product.product_name}
+                                                <h3 className="text-base font-semibold text-gray-800 line-clamp-2 group-hover:text-[#0B3B2E] transition-colors">                                                    {product.product_name}
                                                 </h3>
 
                                                 <p className="text-[11px] text-gray-500 mt-1">
@@ -324,19 +337,42 @@ export default function Categories() {
                                                 </p>
                                             </div>
 
+<div className="flex items-center gap-2 mb-4">
+  {[5, 10, 15, 30].map((weight) => {
+    const active = (selectedWeights[product.id] || 5) === weight
+
+    return (
+      <button
+        key={weight}
+        type="button"
+        onClick={() =>
+          setSelectedWeights({
+            ...selectedWeights,
+            [product.id]: weight
+          })
+        }
+        className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 border ${
+          active
+            ? "bg-[#0B3B2E] text-white border-[#0B3B2E] shadow-md"
+            : "bg-white text-gray-600 border-gray-300 hover:border-[#0B3B2E] hover:text-[#0B3B2E]"
+        }`}
+      >
+        {weight}kg
+      </button>
+    )
+  })}
+</div>
                                             {/* Price & Stock */}
                                             <div className="flex items-center justify-between border-t pt-2 mb-3">
                                                 <div className="flex items-center gap-1">
-                                                    <IndianRupee className="w-4 h-4 text-red-600" />
-                                                    <span className="text-xl font-bold text-red-600">
-                                                        {parseFloat(product.price || 0).toFixed(2)}
-                                                    </span>
+                                                    <IndianRupee className="w-4 h-4 text-[#0B3B2E]" />                                                    <span className="text-xl font-bold text-red-600">
+{finalPrice.toFixed(2)}                                                    </span>
                                                 </div>
 
                                                 <span
                                                     className={`inline-flex items-center rounded-full px-2 py-1 text-[10px] font-semibold ${!isOutOfStock
-                                                            ? 'bg-green-100 text-green-700'
-                                                            : 'bg-red-100 text-red-700'
+                                                        ? 'bg-green-100 text-green-700'
+                                                        : 'bg-red-100 text-red-700'
                                                         }`}
                                                 >
                                                     {!isOutOfStock
@@ -349,10 +385,11 @@ export default function Categories() {
                                             <button
                                                 onClick={() => handleAddToCart(product)}
                                                 disabled={isOutOfStock}
-                                                className={`w-full rounded-lg py-2 text-xs font-bold transition-all duration-200 flex items-center justify-center gap-2 uppercase ${isOutOfStock
-                                                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                                        : 'bg-red-600 text-white hover:bg-red-700'
-                                                    }`}
+                                              className={`w-full rounded-lg py-2 text-xs font-bold transition-all duration-300 flex items-center justify-center gap-2 uppercase ${
+    isOutOfStock
+        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+        : 'bg-[#0B3B2E] text-white hover:bg-[#D4AF37] hover:text-[#112E24]'
+}`}
                                             >
                                                 <CartIcon className="w-4 h-4" />
                                                 {isOutOfStock ? 'Sold Out' : 'Add To Cart'}

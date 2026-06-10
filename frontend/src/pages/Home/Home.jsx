@@ -120,9 +120,10 @@ const bestSellers = [
   <div className="max-w-7xl mx-auto px-4">
 
     <div className="text-center mb-12">
-      <h2 className="text-4xl font-serif text-[#00000] font-semibold">
+      {/* <h2 className="text-4xl font-serif text-[#00000] font-semibold">
         RICE COLLECTIONS
-      </h2>
+      </h2> */}
+              <h2 className="text-3xl font-serif font-bold text-[#112E24] mb-2">Rice  collection</h2>
 
       <div className="w-24 h-[2px] bg-[#A62B1F] mx-auto mt-4"></div>
     </div>
@@ -442,7 +443,7 @@ const bestSellers = [
       </section>
 
       {/* 11. FARMER DIRECT SECTION */}
-      <section className="py-16 bg-[#F5F1E9]">
+      {/* <section className="py-16 bg-[#F5F1E9]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-12 gap-12 items-center">
           <div className="lg:col-span-6 order-2 lg:order-1">
             <img 
@@ -464,7 +465,7 @@ const bestSellers = [
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* 12. QUALITY ASSURANCE SECTION */}
       <section className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

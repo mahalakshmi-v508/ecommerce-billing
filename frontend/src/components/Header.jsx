@@ -216,7 +216,7 @@ export default function EcommerceHeader() {
                   Orders
                 </Link>
                 <Link
-                  to="/wholesaler/dashboard"
+                  to="/wholesaler-register"
                   className="text-sm font-medium text-[#111] transition hover:opacity-60"
                 >
                   Bulk Orders
@@ -255,9 +255,13 @@ export default function EcommerceHeader() {
                   <Heart className="h-5 w-5" strokeWidth={1.5} />
                 </IconButton>
 
-                <IconButton to="/wholesalercart" count={cartCount} label="Cart">
-                  <ShoppingBag className="h-5 w-5" strokeWidth={1.5} />
-                </IconButton>
+               <IconButton
+  to={isWholesalerLoggedIn ? "/wholesalercart" : "/cart"}
+  count={cartCount}
+  label="Cart"
+>
+  <ShoppingBag className="h-5 w-5" strokeWidth={1.5} />
+</IconButton>
 
                 {/* PROFILE DROPDOWN */}
                 <div ref={profileRef} className="relative hidden sm:block">

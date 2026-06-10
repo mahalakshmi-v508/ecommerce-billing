@@ -155,12 +155,12 @@ export default function Cart() {
             <ShoppingBag className="w-6 h-6 text-slate-300 mx-auto mb-4 stroke-[1.5]" />
             <h2 className="text-base font-medium text-slate-700 mb-1">Your bag is empty</h2>
             <p className="text-xs text-slate-400 max-w-xs mx-auto mb-8">Once you discover products you love, they'll be managed right here.</p>
-            <button
-              onClick={() => navigate('/products')}
-              className="inline-block px-6 py-3 bg-blue-600 text-white text-[11px] font-semibold tracking-widest uppercase rounded-xl hover:bg-blue-700 transition-all shadow-sm"
-            >
-              Explore Products
-            </button>
+           <button
+  onClick={() => navigate('/products')}
+  className="inline-block px-6 py-3 bg-[#0B3B2E] text-white text-[11px] font-semibold tracking-widest uppercase rounded-xl hover:bg-[#D4AF37] hover:text-[#112E24] transition-all duration-300 shadow-sm"
+>
+  Explore Products
+</button>
           </div>
         ) : (
           /* Main Checkout Studio Layout */
