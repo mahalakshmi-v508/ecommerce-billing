@@ -9,11 +9,12 @@ import api from './api'
 /* GET CART ITEMS */
 
 export const getCartItems = async (
-  user_id
+  user_id,
+  user_type = 'user'
 ) => {
 
   const response = await api.get(
-    `/cart/get_cart.php?user_id=${user_id}`
+    `/cart/get_cart.php?user_id=${user_id}&user_type=${user_type}`
   )
 
   return response.data
@@ -26,7 +27,10 @@ export const getCartCount = async (
 ) => {
 
   const response =
-    await getCartItems(user_id)
+  await getCartItems(
+    user_id,
+    'wholesaler'
+  )
 
   const items =
     response.data || []
@@ -43,7 +47,8 @@ export const getCartCount = async (
 export const addToCart = async (
   user_id,
   product_id,
-  quantity = 1
+  quantity = 1,
+  user_type = 'user'
 ) => {
 
   const response = await api.post(
@@ -52,6 +57,7 @@ export const addToCart = async (
       user_id,
       product_id,
       quantity,
+      user_type
     }
   )
 

@@ -14,11 +14,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 include __DIR__ . '/../../config/db.php';
 
 $user_id = isset($_GET['user_id']) ? intval($_GET['user_id']) : 0;
+$user_type = isset($_GET['user_type']) ? $_GET['user_type'] : 'user';
 
 $sql = "
 SELECT 
     cart.id,
     cart.quantity,
+    cart.user_type,
     products.id AS product_id,
     products.company_id AS company_id,
     products.product_name,
@@ -29,6 +31,7 @@ FROM cart
 JOIN products 
     ON cart.product_id = products.id
 WHERE cart.user_id = ?
+AND cart.user_type = ?
 ";
 
 $stmt = mysqli_prepare($conn, $sql);
@@ -42,7 +45,13 @@ if (!$stmt) {
     exit;
 }
 
-mysqli_stmt_bind_param($stmt, 'i', $user_id);
+mysqli_stmt_bind_param(
+    $stmt,
+    'is',
+    $user_id,
+    $user_type
+);
+
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 

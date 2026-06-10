@@ -12,9 +12,9 @@ export default function WholesalerHome () {
     <div className="wholesaler-home">
       <HeroSection />
       <StatsSection/>
-      <WholesaleBenefits />
-      <WholesaleProcess/>
       
+      <WholesaleProcess/>
+      <WholesaleBenefits />
       <BulkOrderBenefits/>
      
       
