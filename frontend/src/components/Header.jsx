@@ -125,21 +125,21 @@ export default function EcommerceHeader() {
       { label: 'Dashboard', href: '/wholesaler/dashboard' },
       { label: 'Orders', href: '/wholesaler/orders' },
       { label: 'Profile', href: '/profile' },
-      { label: 'Wishlist', href: '/wishlist' },
+      { label: 'Wishlist', href: '/wholesaler/wishlist' },
     ],
   }
 
   const getMobileLinks = () => {
-    if (isWholesalerSection) {
-      return [
-        { label: 'Dashboard', href: '/wholesaler/dashboard' },
-        { label: 'Wholesale Products', href: '/wholesaler/products' },
-        { label: 'Bulk Orders', href: '/wholesaler/orders' },
-        { label: 'Wishlist', href: '/wishlist' },
-        { label: 'Cart', href: '/wholesalercart' },
-        { label: 'Profile', href: '/profile' },
-      ]
-    }
+if (isWholesalerSection) {
+  return [
+    { label: 'Dashboard', href: '/wholesaler/dashboard' },
+    { label: 'Wholesale Products', href: '/wholesaler/products' },
+    { label: 'Bulk Orders', href: '/wholesaler/orders' },
+    { label: 'Wishlist', href: '/wholesaler/wishlist' },
+    { label: 'Cart', href: '/wholesalercart' },
+    { label: 'Profile', href: '/profile' },
+  ]
+}
     return [
       { label: 'Home', href: '/' },
       { label: 'Categories', href: '/categories' },
@@ -270,13 +270,13 @@ export default function EcommerceHeader() {
           <div className="flex items-center gap-1 sm:gap-2">
             {canShowAccount ? (
               <>
-                <IconButton
-                  to="/wishlist"
-                  count={wishlistCount}
-                  label="Wishlist"
-                >
-                  <Heart className="h-5 w-5" strokeWidth={1.5} />
-                </IconButton>
+<IconButton
+  to={isWholesalerSection ? '/wholesaler/wishlist' : '/wishlist'}
+  count={wishlistCount}
+  label="Wishlist"
+>
+  <Heart className="h-5 w-5" strokeWidth={1.5} />
+</IconButton>
 
                 <IconButton
                   to={isWholesalerSection ? '/wholesalercart' : '/cart'}

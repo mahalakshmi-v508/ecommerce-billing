@@ -36,6 +36,7 @@ import WholesalerLogin from './pages/wholesaler/WholesalerLogin.jsx'
 import WholesaleCart from './pages/wholesaler/WholesaleCart.jsx'
 import WholesalerPayment from './pages/wholesaler/WholesalePayment.jsx'
 import WholesaleInvoicePreview from './pages/wholesaler/InvoicePreview.jsx'
+import WholesalerWishlist from './pages/wholesaler/WholesalerWishlist.jsx'
 function App() {
   return (
     <BrowserRouter>
@@ -214,6 +215,14 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/wholesaler/wishlist"
+            element={
+              <ProtectedRoute allowedRoles={['wholesaler']}>
+                <WholesalerWishlist />
+              </ProtectedRoute>
+            }
+          />
 
           <Route
             path="/cashier/dashboard"
@@ -236,30 +245,30 @@ function App() {
             }
           />
 
-<Route
-  path="/wholesaler/products"
-  element={
-    <ProtectedRoute allowedRoles={['wholesaler', 'user']}> {/* 👈 'user' ஐச் சேர்க்கவும் */}
-      <WholesalerProducts />
-    </ProtectedRoute>
-  }
-/>
-<Route
-path="/wholesaler/invoice/:invoiceNo"
-  element={
-    <ProtectedRoute allowedRoles={['wholesaler']}>
-      <WholesaleInvoicePreview />
-    </ProtectedRoute>
-  }
-/>
-<Route
-  path="/wholesaler/orders"
-  element={
-    <ProtectedRoute allowedRoles={['wholesaler', 'user']}> {/* 👈 'user' ஐச் சேர்க்கவும் */}
-      <WholesalerOrders />
-    </ProtectedRoute>
-  }
-/>
+          <Route
+            path="/wholesaler/products"
+            element={
+              <ProtectedRoute allowedRoles={['wholesaler', 'user']}> {/* 👈 'user' ஐச் சேர்க்கவும் */}
+                <WholesalerProducts />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/wholesaler/invoice/:invoiceNo"
+            element={
+              <ProtectedRoute allowedRoles={['wholesaler']}>
+                <WholesaleInvoicePreview />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/wholesaler/orders"
+            element={
+              <ProtectedRoute allowedRoles={['wholesaler', 'user']}> {/* 👈 'user' ஐச் சேர்க்கவும் */}
+                <WholesalerOrders />
+              </ProtectedRoute>
+            }
+          />
 
           {/* FALLBACK */}
           <Route path="*" element={<Navigate to="/login" replace />} />
