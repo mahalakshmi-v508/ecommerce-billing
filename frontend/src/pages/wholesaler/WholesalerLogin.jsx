@@ -1,13 +1,11 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../../context/AuthContext.jsx'
 import toast from 'react-hot-toast'
-
+import { useAuth } from '../../context/AuthContext.jsx'
 export default function WholesalerLogin() {
 
   const navigate = useNavigate()
-  const { authenticate } = useAuth()
-
+const { authenticate } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
@@ -38,21 +36,20 @@ export default function WholesalerLogin() {
         return
       }
 
-      const authUser = {
-        ...data.data,
-        role: data.role || 'wholesaler',
-      }
+   const authUser = {
+  ...data.data,
+  role: data.role || 'wholesaler',
+}
 
-      authenticate(authUser)
-
+authenticate(authUser)
       toast.success('Login successful')
 
       navigate('/wholesaler/dashboard')
 
     } catch (error) {
-
-      toast.error('Login failed')
-    }
+  console.log(error)
+  toast.error(error.message || 'Login failed')
+}
   }
 
   return (

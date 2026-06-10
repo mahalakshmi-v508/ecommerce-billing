@@ -129,12 +129,12 @@ export default function Wishlist() {
             <Heart className="w-6 h-6 text-slate-300 mx-auto mb-4 stroke-[1.5]" />
             <h2 className="text-base font-medium text-slate-700 mb-1">Your vault is clear</h2>
             <p className="text-xs text-slate-400 max-w-xs mx-auto mb-8">Items you bookmark will appear in this tailored layout.</p>
-            <Link
-              to="/products"
-              className="inline-block px-6 py-3 bg-blue-600 text-white text-[11px] font-semibold tracking-widest uppercase rounded-lg hover:bg-blue-700 transition-all shadow-sm"
-            >
-              Browse Catalog
-            </Link>
+          <Link
+  to="/products"
+  className="inline-block px-6 py-3 bg-[#0B3B2E] text-white text-[11px] font-semibold tracking-widest uppercase rounded-lg hover:bg-[#D4AF37] hover:text-[#112E24] transition-all shadow-sm"
+>
+  Browse Catalog
+</Link>
           </div>
         ) : (
           /* Sleek Row-List Layout with Cascading Animations */

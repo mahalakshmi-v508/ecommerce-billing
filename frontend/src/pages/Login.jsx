@@ -12,7 +12,7 @@ const roleTarget = {
   superadmin: '/superadmin/dashboard',
   admin: '/admin/dashboard',
   cashier: '/cashier/dashboard',
-  user: '/categories',
+  user: '/',
 }
 
 export default function Login() {
