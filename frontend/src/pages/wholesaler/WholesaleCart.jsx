@@ -22,7 +22,9 @@ import {
 import { buildProductImageUrl } from '../../services/api.js'
 
 export default function Wholesalercart() {
-  const { user } = useAuth()
+  const wholesalerUser = JSON.parse(
+  localStorage.getItem('wholesaler_user') || 'null'
+)
   const navigate = useNavigate()
 
   const [cartItems, setCartItems] = useState([])
@@ -31,25 +33,27 @@ export default function Wholesalercart() {
   const [updatingId, setUpdatingId] = useState(null)
 
   useEffect(() => {
-    if (user?.id) {
+  if (wholesalerUser?.id) {
+    loadCart()
+  }
+
+  const handleCartRefresh = () => {
+    if (wholesalerUser?.id) {
       loadCart()
     }
+  }
 
-    const handleCartRefresh = () => {
-      if (user?.id) loadCart();
-    }
+  window.addEventListener('cartUpdated', handleCartRefresh)
 
-    window.addEventListener('cartUpdated', handleCartRefresh)
-
-    return () => {
-      window.removeEventListener('cartUpdated', handleCartRefresh)
-    }
-  }, [user])
+  return () => {
+    window.removeEventListener('cartUpdated', handleCartRefresh)
+  }
+}, [])
 
   const loadCart = async () => {
     try {
-      const response = await getCartItems(
-  user.id,
+ const response = await getCartItems(
+  wholesalerUser.id,
   'wholesaler'
 )
       console.log('Cart Response:', response)
@@ -58,7 +62,7 @@ export default function Wholesalercart() {
         const updatedCart = (response.data || []).map((item) => ({
           ...item,
           product_id: item.product_id ?? item.id,
-          company_id: item.company_id ?? user?.company_id ?? 0,
+          company_id: item.company_id ?? wholesalerUser?.company_id ?? 0
         }))
         setCartItems(updatedCart)
       } else {
@@ -323,8 +327,15 @@ export default function Wholesalercart() {
                             quantity: item.quantity,
                             company_id: item.company_id,
                           })),
-                          company_id: cartItems[0]?.company_id ?? user?.company_id ?? 0,
-                          cashier_id: user?.cashier_id ?? user?.id ?? 0,
+                          company_id:
+  cartItems[0]?.company_id ??
+  wholesalerUser?.company_id ??
+  0,
+
+cashier_id:
+  wholesalerUser?.cashier_id ??
+  wholesalerUser?.id ??
+  0,
                         }
                       })
                     }

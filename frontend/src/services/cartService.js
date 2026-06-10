@@ -23,17 +23,16 @@ export const getCartItems = async (
 /* GET CART COUNT */
 
 export const getCartCount = async (
-  user_id
+  user_id,
+  user_type = 'user'
 ) => {
 
-  const response =
-  await getCartItems(
+  const response = await getCartItems(
     user_id,
-    'wholesaler'
+    user_type
   )
 
-  const items =
-    response.data || []
+  const items = response.data || []
 
   return items.reduce(
     (total, item) =>
