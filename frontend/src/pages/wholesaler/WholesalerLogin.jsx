@@ -125,7 +125,7 @@ export default function WholesalerLogin() {
                 <input
                   type="email"
                   placeholder="wholesaler@example.com"
-                  className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all duration-200 bg-white/90"
+                  className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all duration-200 bg-white/90 text-black"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -147,7 +147,7 @@ export default function WholesalerLogin() {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Enter your password"
-                  className="w-full pl-9 pr-10 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all duration-200 bg-white/90"
+                  className="w-full pl-9 pr-10 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition-all duration-200 bg-white/90 text-black"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
