@@ -11,7 +11,8 @@ import {
   ShieldCheck,
   ArrowRight,
   ChevronLeft,
-  TrendingUp
+  TrendingUp,
+  Scale // Weight-க்கு ஒரு icon காமிக்க
 } from 'lucide-react'
 
 import {
@@ -46,17 +47,37 @@ export default function Cart() {
     }
   }, [user])
 
-  const loadCart = async () => {
+ const loadCart = async () => {
     try {
       const response = await getCartItems(user.id)
       console.log('Cart Response:', response)
 
       if (response.status) {
-        const updatedCart = (response.data || []).map((item) => ({
-          ...item,
-          product_id: item.product_id ?? item.id,
-          company_id: item.company_id ?? user?.company_id ?? 0,
-        }))
+        const frontendWeights = JSON.parse(localStorage.getItem('frontend_cart_weights')) || {}
+
+        const updatedCart = (response.data || []).map((item) => {
+          const pId = item.product_id || item.id;
+          const pName = item.product_name;
+
+          // லோக்கல் ஸ்டோரேஜில் இருந்து டேட்டாவை எடுக்கிறோம்
+          const savedWeightData = frontendWeights[pId] || frontendWeights[pName];
+          
+          // வெயிட் டெக்ஸ்ட் (e.g., '1/2kg') மற்றும் அதன் வேல்யூ (e.g., 0.5)
+          const assignedWeightText = savedWeightData?.text || item.weight || '1kg';
+          const weightMultiplier = savedWeightData?.value || 1; // Default 1kg
+
+          // ஒரிஜினல் பேஸ் பிரைஸை வெயிட் வேல்யூவால் பெருக்குகிறோம் (e.g., 540 * 0.5 = 270)
+          const calculatedPrice = parseFloat(item.price || 0) * weightMultiplier;
+
+          return {
+            ...item,
+            product_id: pId,
+            company_id: item.company_id ?? user?.company_id ?? 0,
+            selected_weight: assignedWeightText,
+            // இங்க ஒரிஜினல் விலைக்குப் பதிலா கணக்கிடப்பட்ட விலையை ஓவர்ரைட் பண்றோம்
+            price: calculatedPrice 
+          }
+        })
         setCartItems(updatedCart)
       } else {
         setCartItems([])
@@ -67,7 +88,6 @@ export default function Cart() {
       setLoading(false)
     }
   }
-
   const handleQuantity = async (cart_id, currentQty, type) => {
     let newQty = type === 'increase' ? currentQty + 1 : currentQty - 1
 
@@ -89,11 +109,18 @@ export default function Cart() {
     }
   }
 
-  const handleRemove = async (cart_id) => {
+  const handleRemove = async (cart_id, pId) => {
     setRemovingId(cart_id)
     try {
       const response = await removeFromCart(cart_id)
       if (response.status) {
+        // Cart-ல் இருந்து நீக்கும் போது localStorage-ல் இருந்தும் அந்த weight-ஐ clean செய்கிறோம்
+        const frontendWeights = JSON.parse(localStorage.getItem('frontend_cart_weights')) || {}
+        if (pId && frontendWeights[pId]) {
+          delete frontendWeights[pId]
+          localStorage.setItem('frontend_cart_weights', JSON.stringify(frontendWeights))
+        }
+
         await loadCart()
         window.dispatchEvent(new Event('cartUpdated'))
       }
@@ -166,7 +193,7 @@ export default function Cart() {
           /* Main Checkout Studio Layout */
           <div className="grid lg:grid-cols-3 gap-12 items-start">
             
-            {/* Left Side: Dynamic Luxury Cart Items with Cascading Pop-In Animation */}
+            {/* Left Side: Dynamic Luxury Cart Items */}
             <div className="lg:col-span-2 space-y-4">
               {cartItems.map((item, index) => {
                 const uniqueKey = item.product_id || item.id || index;
@@ -196,11 +223,18 @@ export default function Cart() {
                         )}
                       </div>
 
-                      {/* Title Specs and Dynamic Price Elements */}
+                      {/* Title Specs, Weight and Dynamic Price Elements */}
                       <div className="space-y-1.5">
                         <h3 className="text-sm font-semibold text-slate-800 tracking-tight line-clamp-1 group-hover:text-[#0B3B2E] transition-colors">
                           {item.product_name}
                         </h3>
+                        
+                        {/* --- DISPLAYING SELECTED WEIGHT FRONTEND VALUE --- */}
+                        <div className="inline-flex items-center gap-1 bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md text-[11px] font-medium border border-slate-200">
+                          <Scale className="w-3 h-3 text-[#0B3B2E]" />
+                          <span>Weight: {item.selected_weight}</span>
+                        </div>
+
                         <div className="flex items-center gap-2 text-xs text-slate-400">
                           <span className="flex items-center font-bold text-slate-700">
                             <IndianRupee className="w-3 h-3 stroke-[2]" />
@@ -215,7 +249,7 @@ export default function Cart() {
                     {/* Operational Core (Controls + Accumulated Subtotals) */}
                     <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-100">
                       
-                      {/* Premium Quantizer Core with Blue Borders on Focus/Hover */}
+                      {/* Premium Quantizer Core */}
                       <div className="flex items-center bg-white border border-slate-200 rounded-xl p-1 shadow-sm relative group-hover:border-slate-300 transition-colors">
                         <button
                           onClick={() => handleQuantity(item.id, parseInt(item.quantity || 1), 'decrease')}
@@ -252,7 +286,7 @@ export default function Cart() {
 
                       {/* Dismissal Action Button */}
                       <button
-                        onClick={() => handleRemove(item.id)}
+                        onClick={() => handleRemove(item.id, item.product_id)}
                         disabled={isRemoving}
                         title="Remove piece"
                         className="w-8 h-8 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50/60 flex items-center justify-center transition-all disabled:opacity-40"
@@ -271,7 +305,7 @@ export default function Cart() {
               })}
             </div>
 
-            {/* Right Side: Royal Blue Themed Invoice Widget */}
+            {/* Right Side: Invoice Widget */}
             <div className="lg:col-span-1 animate-fade-in-up" style={{ animationDelay: '150ms' }}>
               <div className="border border-slate-200/80 rounded-2xl p-6 bg-white shadow-sm sticky top-8 space-y-6">
                 <h2 className="text-sm font-bold tracking-wider uppercase text-slate-400 pb-2 border-b border-slate-100 flex items-center gap-2">
@@ -319,13 +353,14 @@ export default function Cart() {
                             price: item.price,
                             quantity: item.quantity,
                             company_id: item.company_id,
+                            weight: item.selected_weight // Payment screen-க்கும் weight பாஸ் ஆகிறது!
                           })),
                           company_id: cartItems[0]?.company_id ?? user?.company_id ?? 0,
                           cashier_id: user?.cashier_id ?? user?.id ?? 0,
                         }
                       })
                     }
-className="w-full bg-[#0B3B2E] text-white py-3.5 rounded-xl font-semibold text-xs tracking-widest uppercase hover:bg-[#D4AF37] hover:text-[#112E24] transition-all shadow-md active:scale-[0.99] flex items-center justify-center gap-2"                  >
+                    className="w-full bg-[#0B3B2E] text-white py-3.5 rounded-xl font-semibold text-xs tracking-widest uppercase hover:bg-[#D4AF37] hover:text-[#112E24] transition-all shadow-md active:scale-[0.99] flex items-center justify-center gap-2"                  >
                     <CreditCard className="w-4 h-4 " />
                     Proceed to Settlement
                     <ArrowRight className="w-3.5 h-3.5 ml-0.5 animate-pulse" />
