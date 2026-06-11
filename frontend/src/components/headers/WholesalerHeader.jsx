@@ -24,27 +24,35 @@ export default function WholesalerHeader() {
   const activeUserType = 'wholesaler'
 
   // Load wholesaler from localStorage on mount and when storage changes
-  useEffect(() => {
-    const loadWholesaler = () => {
-      const stored = localStorage.getItem('wholesaler_user')
-      if (stored) {
-        try {
-          setWholesaler(JSON.parse(stored))
-        } catch {
-          setWholesaler(null)
-        }
-      } else {
+// 1. உங்களுடைய முதல் useEffect-ஐ மட்டும் இந்த மாதிரி மாத்துங்க:
+useEffect(() => {
+  const loadWholesaler = () => {
+    const stored = localStorage.getItem('wholesaler_user')
+    if (stored) {
+      try {
+        setWholesaler(JSON.parse(stored))
+      } catch {
         setWholesaler(null)
       }
+    } else {
+      setWholesaler(null)
     }
+  }
 
-    loadWholesaler()
+  loadWholesaler()
 
-    // Listen for storage changes
-    const handleStorageChange = () => loadWholesaler()
-    window.addEventListener('storage', handleStorageChange)
-    return () => window.removeEventListener('storage', handleStorageChange)
-  }, [])
+  // Listen for storage and custom events
+  const handleStorageChange = () => loadWholesaler()
+  window.addEventListener('storage', handleStorageChange)
+  window.addEventListener('wholesalerLogin', handleStorageChange)
+  window.addEventListener('wholesalerLogout', handleStorageChange)
+  
+  return () => {
+    window.removeEventListener('storage', handleStorageChange)
+    window.removeEventListener('wholesalerLogin', handleStorageChange)
+    window.removeEventListener('wholesalerLogout', handleStorageChange)
+  }
+}, [location.pathname]) // 👈 இங்க 'location.pathname' சேர்த்தாச்சு! பேஜ் மாறும்போது செக் பண்ணும்.
 
   useEffect(() => {
     if (activeUserId) {
@@ -98,16 +106,19 @@ export default function WholesalerHeader() {
   }
 
   // Wholesaler logout
-  const handleLogout = () => {
-    localStorage.removeItem('wholesaler_user')
-    localStorage.removeItem('wholesaler_token')
-    localStorage.removeItem('bulk_order_email')
-    setWholesaler(null)
-    toast.success('Logged out successfully')
-    navigate('/')
-    setProfileMenuOpen(false)
-    setMobileMenuOpen(false)
-  }
+ const handleLogout = () => {
+  localStorage.removeItem('wholesaler_user')
+  localStorage.removeItem('wholesaler_token')
+  localStorage.removeItem('bulk_order_email')
+
+  window.dispatchEvent(new Event('wholesalerLogout'))
+
+  setWholesaler(null)
+  toast.success('Logged out successfully')
+  navigate('/wholesaler/dashboard')
+  setProfileMenuOpen(false)
+  setMobileMenuOpen(false)
+}
 
   const handleLoginClick = () => {
     navigate('/wholesaler-login')

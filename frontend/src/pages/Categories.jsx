@@ -22,8 +22,6 @@ import {
 } from '../services/wishlistService.js'
 
 export default function Categories() {
-
-
     const { user } = useAuth()
     const navigate = useNavigate()
 
@@ -33,7 +31,19 @@ export default function Categories() {
     const [loading, setLoading] = useState(true)
     const [productsLoading, setProductsLoading] = useState(false)
     const [wishlistItems, setWishlistItems] = useState([])
-const [selectedWeights, setSelectedWeights] = useState({})
+
+    // Default weight-ai 1kg aaga set seithullom
+    const [selectedWeights, setSelectedWeights] = useState({})
+
+    // Weight options list with label (for UI) and value (for Calculation)
+    const weightOptions = [
+        { label: '1/2', value: 0.5 },
+        { label: '3/4', value: 0.75 },
+        { label: '1', value: 1 },
+        { label: '2', value: 2 },
+        { label: '5', value: 5 }
+    ]
+
     /*
     |--------------------------------------------------------------------------
     | LOAD INITIAL DATA
@@ -102,7 +112,7 @@ const [selectedWeights, setSelectedWeights] = useState({})
         }
     }
 
-    const handleWishlist = async (product) => {
+   const handleWishlist = async (product) => {
         try {
             if (!user?.id) {
                 toast.error('Please login')
@@ -113,17 +123,34 @@ const [selectedWeights, setSelectedWeights] = useState({})
                 (item) => parseInt(item.product_id) === parseInt(product.id)
             )
 
+            // இங்க வெயிட் வேல்யூவை எடுக்கிறோம்
+            const weightValue = selectedWeights[product.id] || 1
+            const weightText = weightValue === 0.5 ? '1/2kg' : weightValue === 0.75 ? '3/4kg' : `${weightValue}kg`
+
             if (exists) {
                 const item = wishlistItems.find(
                     (wishlistItem) => parseInt(wishlistItem.product_id) === parseInt(product.id)
                 )
                 if (item) {
                     await removeFromWishlist(item.id)
+                    
+                    // லோக்கல் ஸ்டோரேஜில் இருந்து நீக்குகிறோம்
+                    const frontendWishlist = JSON.parse(localStorage.getItem('frontend_wishlist_weights')) || {}
+                    delete frontendWishlist[product.id]
+                    delete frontendWishlist[product.product_name]
+                    localStorage.setItem('frontend_wishlist_weights', JSON.stringify(frontendWishlist))
+
                     toast.success('Removed from wishlist')
                 }
             } else {
                 const response = await addToWishlist(user.id, product.id)
                 if (response.status) {
+                    // --- விஷ்லிஸ்ட் வெயிட் மற்றும் விலையை லோக்கல் ஸ்டோரேஜில் சேமிக்கிறோம் ---
+                    const frontendWishlist = JSON.parse(localStorage.getItem('frontend_wishlist_weights')) || {}
+                    frontendWishlist[product.id] = { text: weightText, value: weightValue }
+                    frontendWishlist[product.product_name] = { text: weightText, value: weightValue }
+                    localStorage.setItem('frontend_wishlist_weights', JSON.stringify(frontendWishlist))
+
                     toast.success('Added to wishlist!')
                 }
             }
@@ -172,14 +199,28 @@ const [selectedWeights, setSelectedWeights] = useState({})
                 return
             }
 
-const weight = selectedWeights[product.id] || 5
+            // Default-aga 1kg (value: 1) eduthukollum
+            const weightValue = selectedWeights[product.id] || 1
 
-const response = await addToCart(
-  user.id,
-  product.id,
-  weight
-)
+            // UI-ல் '1/2kg', '2kg' எனத் தெரிய text வடிவம்
+            const weightText = weightValue === 0.5 ? '1/2kg' : weightValue === 0.75 ? '3/4kg' : `${weightValue}kg`
+
+            const response = await addToCart(
+                user.id,
+                product.id,
+                weightValue
+            )
+
             if (response.status) {
+                // --- கார்ட் பேஜில் வெயிட் மற்றும் விலை மாற லோக்கல் ஸ்டோரேஜில் சேமிக்கிறோம் ---
+                const existingFrontendCart = JSON.parse(localStorage.getItem('frontend_cart_weights')) || {}
+
+                // இங்க வெறும் Text மட்டும் இல்லாம, அதோட Numeric Value-வையும் சேர்த்து ஆப்ஜெக்ட்டா சேமிக்கிறோம்
+                existingFrontendCart[product.id] = { text: weightText, value: weightValue }
+                existingFrontendCart[product.product_name] = { text: weightText, value: weightValue }
+
+                localStorage.setItem('frontend_cart_weights', JSON.stringify(existingFrontendCart))
+
                 toast.success(`${product.product_name} added to cart!`)
                 window.dispatchEvent(new Event('cartUpdated'))
             } else {
@@ -190,7 +231,6 @@ const response = await addToCart(
             toast.error('Error adding to cart')
         }
     }
-
     if (loading) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 flex items-center justify-center">
@@ -211,19 +251,16 @@ const response = await addToCart(
         )
     }
 
-    
     return (
         <div className="min-h-screen bg-white py-8 px-4">
             <div className="max-w-7xl mx-auto">
                 {/* Header Section */}
                 <div className="mb-8 text-center">
                     <div className="inline-flex items-center gap-3 bg-white/80 backdrop-blur-sm rounded-full px-6 py-3 shadow-lg mb-4">
-                        {/* <ShoppingBag className="w-8 h-8 text-purple-600" /> */}
                         <h1 className="text-3xl font-bold text-black">
                             Shop by Category
                         </h1>
                     </div>
-                    {/* <p className="text-gray-600 mt-2">Browse and discover products from our collections</p> */}
                 </div>
 
                 {/* Category Selection Section */}
@@ -236,9 +273,10 @@ const response = await addToCart(
                                     key={category.id}
                                     onClick={() => handleCategoryClick(category.id, category.company_id)}
                                     className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 focus:outline-none ${isSelected
-                                            ? 'bg-[#0B3B2E] text-white shadow-lg'
-                                            : 'bg-white text-[#0B3B2E] border border-[#0B3B2E] hover:bg-[#D4AF37] hover:text-[#112E24] hover:border-[#D4AF37]'
-                                        }`}                                >
+                                        ? 'bg-[#0B3B2E] text-white shadow-lg'
+                                        : 'bg-white text-[#0B3B2E] border border-[#0B3B2E] hover:bg-[#D4AF37] hover:text-[#112E24] hover:border-[#D4AF37]'
+                                        }`}
+                                >
                                     {category.name}
                                 </button>
                             )
@@ -273,16 +311,15 @@ const response = await addToCart(
                             <p className="text-gray-600">This category doesn't have any products yet. Try another category!</p>
                         </div>
                     ) : (
-<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                               {allProducts.map((product) => {
+                        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                            {allProducts.map((product) => {
+                                // Default actual value 1kg endru edukum
+                                const selectedWeightValue = selectedWeights[product.id] || 1
 
-    const selectedWeight =
-        selectedWeights[product.id] || 5
+                                // Price-ai accurate-aga calculate seigirathu (e.g., 200 * 0.5 = 100)
+                                const finalPrice = parseFloat(product.price || 0) * selectedWeightValue
 
-    const finalPrice =
-        parseFloat(product.price || 0) * selectedWeight
-
-    const isInWishlist = wishlistItems.some(
+                                const isInWishlist = wishlistItems.some(
                                     (item) => parseInt(item.product_id) === parseInt(product.id)
                                 )
                                 const isOutOfStock = parseInt(product.stock) <= 0
@@ -294,7 +331,6 @@ const response = await addToCart(
                                     >
                                         {/* Product Image */}
                                         <div className="relative h-40 w-full overflow-hidden bg-gray-100">
-
                                             {/* Wishlist Button */}
                                             <button
                                                 onClick={() => handleWishlist(product)}
@@ -304,8 +340,7 @@ const response = await addToCart(
                                                     }`}
                                             >
                                                 <Heart
-                                                    className={`w-4 h-4 ${isInWishlist ? 'fill-current' : ''
-                                                        }`}
+                                                    className={`w-4 h-4 ${isInWishlist ? 'fill-current' : ''}`}
                                                 />
                                             </button>
 
@@ -319,9 +354,7 @@ const response = await addToCart(
                                             ) : (
                                                 <div className="flex h-full flex-col items-center justify-center">
                                                     <ShoppingBag className="w-10 h-10 text-gray-400 mb-2" />
-                                                    <span className="text-xs text-gray-500">
-                                                        No Image
-                                                    </span>
+                                                    <span className="text-xs text-gray-500">No Image</span>
                                                 </div>
                                             )}
                                         </div>
@@ -329,44 +362,47 @@ const response = await addToCart(
                                         {/* Product Details */}
                                         <div className="p-3">
                                             <div className="mb-2">
-                                                <h3 className="text-base font-semibold text-gray-800 line-clamp-2 group-hover:text-[#0B3B2E] transition-colors">                                                    {product.product_name}
+                                                <h3 className="text-base font-semibold text-gray-800 line-clamp-2 group-hover:text-[#0B3B2E] transition-colors">
+                                                    {product.product_name}
                                                 </h3>
-
                                                 <p className="text-[11px] text-gray-500 mt-1">
                                                     SKU: {product.product_code || 'N/A'}
                                                 </p>
                                             </div>
 
-<div className="flex items-center gap-2 mb-4">
-  {[5, 10, 15, 30].map((weight) => {
-    const active = (selectedWeights[product.id] || 5) === weight
+                                            {/* Weight Selection Section */}
+                                            <div className="flex items-center gap-1.5 mb-4 flex-wrap">
+                                                {weightOptions.map((option) => {
+                                                    const active = selectedWeightValue === option.value
 
-    return (
-      <button
-        key={weight}
-        type="button"
-        onClick={() =>
-          setSelectedWeights({
-            ...selectedWeights,
-            [product.id]: weight
-          })
-        }
-        className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 border ${
-         active
-? "bg-[#DFF5E8] text-[#0B3B2E] border-[#0B3B2E] shadow-sm"
-            : "bg-white text-gray-600 border-gray-300 hover:border-[#0B3B2E] hover:text-[#0B3B2E]"
-        }`}
-      >
-        {weight}kg
-      </button>
-    )
-  })}
-</div>
+                                                    return (
+                                                        <button
+                                                            key={option.label}
+                                                            type="button"
+                                                            onClick={() =>
+                                                                setSelectedWeights({
+                                                                    ...selectedWeights,
+                                                                    [product.id]: option.value
+                                                                })
+                                                            }
+                                                            className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all duration-300 border ${active
+                                                                ? "bg-[#DFF5E8] text-[#0B3B2E] border-[#0B3B2E] shadow-sm"
+                                                                : "bg-white text-gray-600 border-gray-300 hover:border-[#0B3B2E] hover:text-[#0B3B2E]"
+                                                                }`}
+                                                        >
+                                                            {option.label}kg
+                                                        </button>
+                                                    )
+                                                })}
+                                            </div>
+
                                             {/* Price & Stock */}
                                             <div className="flex items-center justify-between border-t pt-2 mb-3">
                                                 <div className="flex items-center gap-1">
-                                                    <IndianRupee className="w-4 h-4 text-[#0B3B2E]" />                                                    <span className="text-xl font-bold text-red-600">
-{finalPrice.toFixed(2)}                                                    </span>
+                                                    <IndianRupee className="w-4 h-4 text-[#0B3B2E]" />
+                                                    <span className="text-xl font-bold text-red-600">
+                                                        {finalPrice.toFixed(2)}
+                                                    </span>
                                                 </div>
 
                                                 <span
@@ -385,11 +421,10 @@ const response = await addToCart(
                                             <button
                                                 onClick={() => handleAddToCart(product)}
                                                 disabled={isOutOfStock}
-                                              className={`w-full rounded-lg py-2 text-xs font-bold transition-all duration-300 flex items-center justify-center gap-2 uppercase ${
-    isOutOfStock
-        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-        : 'bg-[#0B3B2E] text-white hover:bg-[#D4AF37] hover:text-[#112E24]'
-}`}
+                                                className={`w-full rounded-lg py-2 text-xs font-bold transition-all duration-300 flex items-center justify-center gap-2 uppercase ${isOutOfStock
+                                                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                                    : 'bg-[#0B3B2E] text-white hover:bg-[#D4AF37] hover:text-[#112E24]'
+                                                    }`}
                                             >
                                                 <CartIcon className="w-4 h-4" />
                                                 {isOutOfStock ? 'Sold Out' : 'Add To Cart'}
