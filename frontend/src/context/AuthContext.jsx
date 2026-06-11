@@ -35,14 +35,7 @@ export function AuthProvider({ children }) {
 
   const authenticate = (authUser) => {
     const authToken = `token-${Date.now()}`
-    const saveAuth = (authToken, authUser) => {
-  localStorage.setItem('auth_token', authToken)
-  localStorage.setItem('auth_user', JSON.stringify(authUser))
-
-  setToken(authToken)
-  setUser(authUser)
-}
-    return authUser
+    saveAuth(authToken, authUser)
   }
 
   const login = async ({ email, password }) => {
@@ -72,27 +65,51 @@ export function AuthProvider({ children }) {
     }
   }
 
-  const logout = () => {
+  // User logout - only clears user session
+  const userLogout = () => {
     localStorage.removeItem('auth_token')
     localStorage.removeItem('auth_user')
     setUser(null)
     setToken(null)
+    toast.success('Logged out successfully')
   }
 
- const value = useMemo(
-  () => ({
-    user,
-    setUser,
-    token,
-    initializing,
-    isAuthenticated: Boolean(user && token),
-    login,
+  // Wholesaler logout - only clears wholesaler session
+  const wholesalerLogout = () => {
+    localStorage.removeItem('wholesaler_user')
+    localStorage.removeItem('wholesaler_token')
+    localStorage.removeItem('bulk_order_email')
+    toast.success('Wholesaler logged out successfully')
+  }
+
+  // Full logout - clears both (use only when needed)
+  const fullLogout = () => {
+    localStorage.removeItem('auth_token')
+    localStorage.removeItem('auth_user')
+    localStorage.removeItem('wholesaler_user')
+    localStorage.removeItem('wholesaler_token')
+    localStorage.removeItem('bulk_order_email')
+    setUser(null)
+    setToken(null)
+    toast.success('Logged out successfully')
+  }
+
+  const value = useMemo(
+    () => ({
+      user,
+      setUser,
+      token,
+      initializing,
+      isAuthenticated: Boolean(user && token),
+      login,
       authenticate,
-    logout,
-    hasRole: (roles = []) => Boolean(user && roles.includes(user.role)),
-  }),
-  [user, token, initializing]
-)
+      userLogout,
+      wholesalerLogout,
+      fullLogout,
+      hasRole: (roles = []) => Boolean(user && roles.includes(user.role)),
+    }),
+    [user, token, initializing]
+  )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../../context/AuthContext.jsx'
 import { getAllCategories } from '../../services/categoryService.js'
 import { getProducts, getProductsByCategory } from '../../services/productService.js'
 import { buildProductImageUrl } from '../../services/api.js'
@@ -22,7 +21,6 @@ import {
 } from '../../services/wishlistService.js'
 
 export default function WholesalerProducts() {
-    const { user } = useAuth()
     const navigate = useNavigate()
 
     const [categories, setCategories] = useState([])
@@ -32,20 +30,39 @@ export default function WholesalerProducts() {
     const [productsLoading, setProductsLoading] = useState(false)
     const [wishlistItems, setWishlistItems] = useState([])
 
+    // Get wholesaler from localStorage (NOT from useAuth)
+    const [wholesaler, setWholesaler] = useState(null)
+
+    // Load wholesaler from localStorage
+    useEffect(() => {
+        const storedWholesaler = localStorage.getItem('wholesaler_user')
+        if (storedWholesaler) {
+            try {
+                const parsed = JSON.parse(storedWholesaler)
+                setWholesaler(parsed)
+            } catch (error) {
+                console.error('Error parsing wholesaler:', error)
+                setWholesaler(null)
+            }
+        }
+    }, [])
+
     /*
     |--------------------------------------------------------------------------
     | LOAD INITIAL DATA
     |--------------------------------------------------------------------------
     */
     useEffect(() => {
-        loadCategoriesAndProducts()
-    }, [user])
+        if (wholesaler?.id) {
+            loadCategoriesAndProducts()
+        }
+    }, [wholesaler])
 
     useEffect(() => {
-        if (user?.id) {
+        if (wholesaler?.id) {
             loadWishlist()
         }
-    }, [user])
+    }, [wholesaler])
 
     /*
     |--------------------------------------------------------------------------
@@ -85,7 +102,8 @@ export default function WholesalerProducts() {
 
     const loadWishlist = async () => {
         try {
-            const response = await getWishlistItems(user.id)
+            // Use wholesaler ID from localStorage
+            const response = await getWishlistItems(wholesaler.id, 'wholesaler')
             if (response.status) {
                 setWishlistItems(response.data || [])
             }
@@ -96,8 +114,8 @@ export default function WholesalerProducts() {
 
     const handleWishlist = async (product) => {
         try {
-            if (!user?.id) {
-                toast.error('Please login')
+            if (!wholesaler?.id) {
+                toast.error('Please login as wholesaler')
                 return
             }
 
@@ -114,7 +132,7 @@ export default function WholesalerProducts() {
                     toast.success('Removed from wishlist')
                 }
             } else {
-                const response = await addToWishlist(user.id, product.id)
+                const response = await addToWishlist(wholesaler.id, product.id, 'wholesaler')
                 if (response.status) {
                     toast.success('Added to wishlist!')
                 }
@@ -154,8 +172,8 @@ export default function WholesalerProducts() {
 
     const handleAddToCart = async (product) => {
         try {
-            if (!user?.id) {
-                toast.error('Please login')
+            if (!wholesaler?.id) {
+                toast.error('Please login as wholesaler')
                 return
             }
 
@@ -165,11 +183,11 @@ export default function WholesalerProducts() {
             }
 
             const response = await addToCart(
-  user.id,
-  product.id,
-  1,
-  'wholesaler'
-)
+                wholesaler.id,
+                product.id,
+                1,
+                'wholesaler'
+            )
 
             if (response.status) {
                 toast.success(`${product.product_name} added to cart!`)
@@ -225,7 +243,7 @@ export default function WholesalerProducts() {
                     <div className="inline-flex items-center gap-3 bg-white rounded-full px-6 py-3 shadow-md border border-green-100 mb-4">
                         <ShoppingBag className="w-8 h-8 text-green-600" />
                         <h1 className="text-3xl font-bold text-gray-800">
-                            Shop by Category
+                            Speciality Rice Collection
                         </h1>
                     </div>
                     <p className="text-gray-600 mt-2">Browse and discover premium rice products from our collections</p>

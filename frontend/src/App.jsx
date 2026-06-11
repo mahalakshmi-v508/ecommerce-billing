@@ -1,7 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 
-import Header from './components/Header.jsx'
+import RoleHeader from './components/headers/RoleHeader.jsx'
 import Footer from './components/Footer.jsx'
 
 import Login from './pages/Login.jsx'
@@ -24,35 +24,35 @@ import ProtectedRoute from './routes/ProtectedRoute.jsx'
 import InvoicePreview from './pages/InvoicePreview.jsx'
 import ScrollToTop from './components/ScrollToTop.jsx'
 
-
+// Wholesaler Imports
 import WholesalerDashboard from './pages/wholesaler/WholesalerDashboard.jsx'
 import WholesalerProducts from './pages/wholesaler/WholesalerProducts.jsx'
 import WholesalerOrders from './pages/wholesaler/WholesalerOrders.jsx'
-
 import WholesalerHome from './pages/wholesaler/Home/Home.jsx'
-
 import WholesalerRegister from './pages/wholesaler/WholesalerRegister.jsx'
 import WholesalerLogin from './pages/wholesaler/WholesalerLogin.jsx'
 import WholesaleCart from './pages/wholesaler/WholesaleCart.jsx'
 import WholesalerPayment from './pages/wholesaler/WholesalePayment.jsx'
 import WholesaleInvoicePreview from './pages/wholesaler/InvoicePreview.jsx'
 import WholesalerWishlist from './pages/wholesaler/WholesalerWishlist.jsx'
+import WholesalerProfile from './pages/wholesaler/WholesalerProfile.jsx'
+
 function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
       <Toaster position="top-right" />
-      <Header />
+      <RoleHeader />
 
       <main className="min-h-[calc(100vh-200px)]">
-
         <Routes>
-
-          {/* AUTH */}
+          // ==================== PUBLIC ROUTES ====================
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/wholesaler-login" element={<WholesalerLogin />} />
+          <Route path="/wholesaler-register" element={<WholesalerRegister />} />
 
-          {/* HOME */}
+          // ==================== USER ROUTES ====================
           <Route
             path="/"
             element={
@@ -62,7 +62,6 @@ function App() {
             }
           />
 
-          {/* CATEGORIES */}
           <Route
             path="/categories"
             element={
@@ -72,7 +71,6 @@ function App() {
             }
           />
 
-          {/* PRODUCTS (CATEGORY WISE) */}
           <Route
             path="/products/:categoryId"
             element={
@@ -82,7 +80,6 @@ function App() {
             }
           />
 
-          {/* PRODUCT DETAILS */}
           <Route
             path="/product/:productId"
             element={
@@ -92,35 +89,24 @@ function App() {
             }
           />
 
-          {/* CART */}
           <Route
             path="/cart"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['user']}>
                 <Cart />
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/wholesaler/home"
-            element={
-              <ProtectedRoute allowedRoles={['wholesaler']}>
-                <WholesalerHome />
-              </ProtectedRoute>
-            }
-          />
 
-          {/* WISHLIST */}
           <Route
             path="/wishlist"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['user']}>
                 <Wishlist />
               </ProtectedRoute>
             }
           />
 
-          {/* ORDERS */}
           <Route
             path="/orders"
             element={
@@ -139,9 +125,6 @@ function App() {
             }
           />
 
-
-
-          {/* SEARCH */}
           <Route
             path="/search"
             element={
@@ -151,7 +134,6 @@ function App() {
             }
           />
 
-          {/* DEALS */}
           <Route
             path="/deals"
             element={
@@ -160,44 +142,107 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/wholesaler-register"
-            element={<WholesalerRegister />}
-          />
 
-          <Route
-            path="/wholesaler-login"
-            element={<WholesalerLogin />}
-          />
-          <Route
-            path="/wholesalercart"
-            element={<WholesaleCart />}
-          />
-          <Route
-            path="/wholesalerpayment"
-            element={<WholesalerPayment />}
-          />
-          {/* PROFILE */}
           <Route
             path="/profile"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['user', 'wholesaler']}>
                 <Profile />
               </ProtectedRoute>
             }
           />
 
-          {/* PAYMENT */}
           <Route
             path="/payment"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={['user']}>
                 <PaymentPage />
               </ProtectedRoute>
             }
           />
 
-          {/* ADMIN ROUTES */}
+          // ==================== WHOLESALER ROUTES ====================
+          <Route
+            path="/wholesaler/dashboard"
+            element={
+              <ProtectedRoute allowedRoles={['wholesaler']}>
+                <WholesalerDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/wholesaler/home"
+            element={
+              <ProtectedRoute allowedRoles={['wholesaler']}>
+                <WholesalerHome />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/wholesaler/products"
+            element={
+              <ProtectedRoute allowedRoles={['wholesaler']}>
+                <WholesalerProducts />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/wholesaler/orders"
+            element={
+              <ProtectedRoute allowedRoles={['wholesaler']}>
+                <WholesalerOrders />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/wholesaler/wishlist"
+            element={
+              <ProtectedRoute allowedRoles={['wholesaler']}>
+                <WholesalerWishlist />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/wholesalercart"
+            element={
+              <ProtectedRoute allowedRoles={['wholesaler']}>
+                <WholesaleCart />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/wholesalerpayment"
+            element={
+              <ProtectedRoute allowedRoles={['wholesaler']}>
+                <WholesalerPayment />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/wholesaler/profile"
+            element={
+              <ProtectedRoute allowedRoles={['wholesaler']}>
+                <WholesalerProfile />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/wholesaler/invoice/:invoiceNo"
+            element={
+              <ProtectedRoute allowedRoles={['wholesaler']}>
+                <WholesaleInvoicePreview />
+              </ProtectedRoute>
+            }
+          />
+
+          // ==================== ADMIN ROUTES ====================
           <Route
             path="/superadmin/dashboard"
             element={
@@ -215,14 +260,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/wholesaler/wishlist"
-            element={
-              <ProtectedRoute allowedRoles={['wholesaler']}>
-                <WholesalerWishlist />
-              </ProtectedRoute>
-            }
-          />
 
           <Route
             path="/cashier/dashboard"
@@ -233,46 +270,8 @@ function App() {
             }
           />
 
-          {/* whole saler */}
-          {/* 🆕 WHOLESALER ROUTES (இத அப்படியே காப்பி பண்ணி போடுங்க) */}
-          <Route
-            path="/wholesaler/dashboard"
-            element={
-              // 🔽 'user' role-aiyum inga inner elements paaka allow panrom
-              <ProtectedRoute allowedRoles={['wholesaler', 'user']}>
-                <WholesalerDashboard />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/wholesaler/products"
-            element={
-              <ProtectedRoute allowedRoles={['wholesaler', 'user']}> {/* 👈 'user' ஐச் சேர்க்கவும் */}
-                <WholesalerProducts />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/wholesaler/invoice/:invoiceNo"
-            element={
-              <ProtectedRoute allowedRoles={['wholesaler']}>
-                <WholesaleInvoicePreview />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/wholesaler/orders"
-            element={
-              <ProtectedRoute allowedRoles={['wholesaler', 'user']}> {/* 👈 'user' ஐச் சேர்க்கவும் */}
-                <WholesalerOrders />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* FALLBACK */}
+          // ==================== FALLBACK ROUTE ====================
           <Route path="*" element={<Navigate to="/login" replace />} />
-
         </Routes>
       </main>
 
