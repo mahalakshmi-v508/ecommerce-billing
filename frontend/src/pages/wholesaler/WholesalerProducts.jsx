@@ -29,8 +29,9 @@ export default function WholesalerProducts() {
     const [loading, setLoading] = useState(true)
     const [productsLoading, setProductsLoading] = useState(false)
     const [wishlistItems, setWishlistItems] = useState([])
+    const [selectedWeights, setSelectedWeights] = useState({})
 
-    // Get wholesaler from localStorage (NOT from useAuth)
+    // Get wholesaler from localStorage
     const [wholesaler, setWholesaler] = useState(null)
 
     // Load wholesaler from localStorage
@@ -47,11 +48,6 @@ export default function WholesalerProducts() {
         }
     }, [])
 
-    /*
-    |--------------------------------------------------------------------------
-    | LOAD INITIAL DATA
-    |--------------------------------------------------------------------------
-    */
     useEffect(() => {
         if (wholesaler?.id) {
             loadCategoriesAndProducts()
@@ -64,11 +60,6 @@ export default function WholesalerProducts() {
         }
     }, [wholesaler])
 
-    /*
-    |--------------------------------------------------------------------------
-    | DATA FETCHING & LOGIC
-    |--------------------------------------------------------------------------
-    */
     const loadCategoriesAndProducts = async () => {
         try {
             setLoading(true)
@@ -102,7 +93,6 @@ export default function WholesalerProducts() {
 
     const loadWishlist = async () => {
         try {
-            // Use wholesaler ID from localStorage
             const response = await getWishlistItems(wholesaler.id, 'wholesaler')
             if (response.status) {
                 setWishlistItems(response.data || [])
@@ -182,10 +172,13 @@ export default function WholesalerProducts() {
                 return
             }
 
+            const weight = selectedWeights[product.id] || 5
+            const finalQuantity = weight
+
             const response = await addToCart(
                 wholesaler.id,
                 product.id,
-                1,
+                finalQuantity,
                 'wholesaler'
             )
 
@@ -203,7 +196,7 @@ export default function WholesalerProducts() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50 flex items-center justify-center">
+            <div className="min-h-screen bg-white flex items-center justify-center">
                 <div className="text-center">
                     <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-green-600 border-t-transparent"></div>
                     <p className="mt-4 text-lg font-semibold text-green-600">Loading categories...</p>
@@ -223,16 +216,17 @@ export default function WholesalerProducts() {
 
     const getDisplayPrice = (product) => {
         const type = product.product_type;
+        const weight = selectedWeights[product.id] || 5
 
         if (type === "wholesale") {
-            return Number(product.wholesale_price || 0).toFixed(2);
+            return (Number(product.wholesale_price || 0) * weight).toFixed(2);
         }
 
         if (type === "both") {
-            return Number(product.wholesale_price || 0).toFixed(2);
+            return (Number(product.wholesale_price || 0) * weight).toFixed(2);
         }
 
-        return Number(product.price || 0).toFixed(2);
+        return (Number(product.price || 0) * weight).toFixed(2);
     };
 
     return (
@@ -240,13 +234,18 @@ export default function WholesalerProducts() {
             <div className="max-w-7xl mx-auto">
                 {/* Header Section */}
                 <div className="mb-8 text-center">
-                    <div className="inline-flex items-center gap-3 bg-white rounded-full px-6 py-3 shadow-md border border-green-100 mb-4">
-                        <ShoppingBag className="w-8 h-8 text-green-600" />
-                        <h1 className="text-3xl font-bold text-gray-800">
-                            Speciality Rice Collection
-                        </h1>
+                    <div className="inline-block mb-4">
+                        <span className="bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">
+                            Premium Collection
+                        </span>
                     </div>
-                    <p className="text-gray-600 mt-2">Browse and discover premium rice products from our collections</p>
+                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+                        Speciality Rice Collection
+                    </h1>
+                    <div className="w-20 h-0.5 bg-gradient-to-r from-green-600 to-emerald-600 mx-auto mb-4"></div>
+                    <p className="text-gray-600 max-w-2xl mx-auto">
+                        Browse and discover premium rice products from our collections
+                    </p>
                 </div>
 
                 {/* Category Selection Section */}
@@ -258,10 +257,10 @@ export default function WholesalerProducts() {
                                 <button
                                     key={category.id}
                                     onClick={() => handleCategoryClick(category.id, category.company_id)}
-                                    className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 focus:outline-none ${
+                                    className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 focus:outline-none ${
                                         isSelected
                                             ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-md'
-                                            : 'bg-transparent text-gray-600 hover:bg-green-50 hover:text-green-600'
+                                            : 'bg-white text-green-700 border border-green-600 hover:bg-gradient-to-r hover:from-green-600 hover:to-emerald-600 hover:text-white'
                                     }`}
                                 >
                                     {category.name}
@@ -298,8 +297,10 @@ export default function WholesalerProducts() {
                             <p className="text-gray-600">This category doesn't have any products yet. Try another category!</p>
                         </div>
                     ) : (
-                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
+                        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                             {allProducts.map((product) => {
+                                const selectedWeight = selectedWeights[product.id] || 5
+                                const finalPrice = (parseFloat(product.wholesale_price || product.price || 0) * selectedWeight).toFixed(2)
                                 const isInWishlist = wishlistItems.some(
                                     (item) => parseInt(item.product_id) === parseInt(product.id)
                                 )
@@ -308,15 +309,10 @@ export default function WholesalerProducts() {
                                 return (
                                     <div
                                         key={product.id}
-                                        className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-green-100 hover:border-green-300"
+                                        className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-green-300"
                                     >
                                         {/* Product Image */}
-                                        <div className="relative h-40 w-full overflow-hidden bg-gradient-to-br from-green-50 to-emerald-50">
-                                            {/* Rice Icon Decoration */}
-                                            <div className="absolute top-2 left-2 opacity-20">
-                                                <span className="text-2xl">🌾</span>
-                                            </div>
-
+                                        <div className="relative h-40 w-full overflow-hidden bg-gray-100">
                                             {/* Wishlist Button */}
                                             <button
                                                 onClick={() => handleWishlist(product)}
@@ -340,9 +336,9 @@ export default function WholesalerProducts() {
                                                 />
                                             ) : (
                                                 <div className="flex h-full flex-col items-center justify-center">
-                                                    <span className="text-4xl mb-2">🌾</span>
+                                                    <ShoppingBag className="w-10 h-10 text-gray-400 mb-2" />
                                                     <span className="text-xs text-gray-500">
-                                                        Rice Product
+                                                        No Image
                                                     </span>
                                                 </div>
                                             )}
@@ -360,22 +356,39 @@ export default function WholesalerProducts() {
                                                 </p>
                                             </div>
 
+                                            {/* Weight Selection */}
+                                            <div className="flex items-center gap-2 mb-4">
+                                                {[5, 10, 15, 30].map((weight) => {
+                                                    const active = (selectedWeights[product.id] || 5) === weight
+                                                    return (
+                                                        <button
+                                                            key={weight}
+                                                            type="button"
+                                                            onClick={() =>
+                                                                setSelectedWeights({
+                                                                    ...selectedWeights,
+                                                                    [product.id]: weight
+                                                                })
+                                                            }
+                                                            className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 border ${
+                                                                active
+                                                                    ? "bg-green-100 text-green-700 border-green-600 shadow-sm"
+                                                                    : "bg-white text-gray-600 border-gray-300 hover:border-green-600 hover:text-green-600"
+                                                            }`}
+                                                        >
+                                                            {weight}kg
+                                                        </button>
+                                                    )
+                                                })}
+                                            </div>
+
                                             {/* Price & Stock */}
-                                            <div className="flex items-center justify-between border-t border-green-100 pt-2 mb-3">
+                                            <div className="flex items-center justify-between border-t border-gray-100 pt-2 mb-3">
                                                 <div className="flex items-center gap-1">
                                                     <IndianRupee className="w-4 h-4 text-green-600" />
-                                                    <div>
-                                                        <span className="text-xl font-bold text-green-600">
-                                                            {getDisplayPrice(product)}
-                                                        </span>
-
-                                                        {(product.product_type === "wholesale" ||
-                                                          product.product_type === "both") && (
-                                                            <p className="text-[10px] text-gray-500">
-                                                                Min Qty : {product.min_wholesale_qty}
-                                                            </p>
-                                                        )}
-                                                    </div>
+                                                    <span className="text-xl font-bold text-green-600">
+                                                        {finalPrice}
+                                                    </span>
                                                 </div>
 
                                                 <span
@@ -395,9 +408,9 @@ export default function WholesalerProducts() {
                                             <button
                                                 onClick={() => handleAddToCart(product)}
                                                 disabled={isOutOfStock}
-                                                className={`w-full rounded-lg py-2 text-xs font-bold transition-all duration-200 flex items-center justify-center gap-2 uppercase ${
+                                                className={`w-full rounded-lg py-2 text-xs font-bold transition-all duration-300 flex items-center justify-center gap-2 uppercase ${
                                                     isOutOfStock
-                                                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200'
+                                                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                                                         : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 shadow-md hover:shadow-lg'
                                                 }`}
                                             >
@@ -412,8 +425,8 @@ export default function WholesalerProducts() {
                     )}
                 </div>
 
-                {/* Decorative Rice Field Footer */}
-                <div className="mt-12 pt-8 border-t border-green-100 text-center">
+                {/* Decorative Footer */}
+                <div className="mt-12 pt-8 border-t border-gray-100 text-center">
                     <div className="flex items-center justify-center gap-2 text-gray-500 text-sm">
                         <span className="text-green-600">🌾</span>
                         <span>Premium Quality Rice | Direct from Mills | Best Prices</span>
