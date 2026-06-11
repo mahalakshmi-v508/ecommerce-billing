@@ -130,7 +130,7 @@ export default function WholesaleInvoicePreview() {
   const { invoiceNo } = useParams()
   const [invoice, setInvoice] = useState(null)
   const [company, setCompany] = useState(null)
-  const color = "#2563eb"
+  const color = "#16a34a"
 
   useEffect(() => {
     api.get(`/invoice/get_invoice_by_id.php?id=${invoiceNo}`).then((res) => {
