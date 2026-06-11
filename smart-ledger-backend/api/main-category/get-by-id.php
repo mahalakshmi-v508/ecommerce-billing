@@ -18,15 +18,12 @@ if (!$id) {
     exit;
 }
 
-$result = mysqli_query($conn, "SELECT c.*, mc.name as main_category_name 
-    FROM categories c
-    LEFT JOIN main_categories mc ON mc.id = c.main_category_id
-    WHERE c.id='$id' AND c.is_deleted=0");
+$result = mysqli_query($conn, "SELECT * FROM main_categories WHERE id='$id'");
 
 if ($result && mysqli_num_rows($result) > 0) {
     $data = mysqli_fetch_assoc($result);
     echo json_encode(["status"=>true, "data"=>$data]);
 } else {
-    echo json_encode(["status"=>false, "message"=>"Sub Category not found"]);
+    echo json_encode(["status"=>false, "message"=>"Main Category not found"]);
 }
 ?>

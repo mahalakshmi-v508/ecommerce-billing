@@ -38,7 +38,8 @@ import PendingCashierRequests from "../pages/CashierRequests/PendingCashierReque
 import Notifications from "../pages/notifications/Notifications";
 
 import WholesalerRequests from "../../src/pages/WholesalerRequests/WholesalerRequests";
-
+import MainCategoryList from "../pages/MainCategoryForm/MainCategoryList";
+import MainCategoryForm from "../pages/MainCategoryForm/MainCategoryForm";
 export default function AppRoutes() {
   return (
     <BrowserRouter>
@@ -67,6 +68,7 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         >
+          
           <Route index element={<Dashboard />} />
         </Route>
         {/* <Route path="/" element={<Login />} /> */}
@@ -111,7 +113,17 @@ export default function AppRoutes() {
 
 <Route path="/cashier-requests" element={<PendingCashierRequests />}
 
+
+
+
+
 />
+
+
+
+<Route path="/main-category" element={<MainCategoryList />} />
+<Route path="/main-category/add" element={<MainCategoryForm />} />
+<Route path="/main-category/edit/:id" element={<MainCategoryForm />} />
 <Route
   path="/wholesaler-requests"
   element={<WholesalerRequests />}

@@ -1,11 +1,9 @@
 <?php
-// 🔥 CORS HEADERS
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
 
-// 🔥 PREFLIGHT
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     http_response_code(200);
     exit();
@@ -24,25 +22,21 @@ if (!$id) {
 mysqli_begin_transaction($conn);
 
 try {
-    // 🔥 1. DELETE PRODUCTS UNDER THIS CATEGORY
-    $res1 = mysqli_query($conn, "DELETE FROM products WHERE category_id = $id");
+    // First update categories to remove reference
+    mysqli_query($conn, "UPDATE categories SET main_category_id = NULL WHERE main_category_id = $id");
     
-    if (!$res1) {
-        throw new Exception("Product delete failed: " . mysqli_error($conn));
-    }
+    // Then delete main category
+    $result = mysqli_query($conn, "DELETE FROM main_categories WHERE id = $id");
     
-    // 🔥 2. DELETE CATEGORY (Soft delete - set is_deleted = 1)
-    $res2 = mysqli_query($conn, "UPDATE categories SET is_deleted = 1 WHERE id = $id");
-    
-    if (!$res2) {
-        throw new Exception("Category delete failed: " . mysqli_error($conn));
+    if (!$result) {
+        throw new Exception("Delete failed: " . mysqli_error($conn));
     }
     
     mysqli_commit($conn);
     
     echo json_encode([
         "status" => true,
-        "message" => "Category and related products deleted successfully"
+        "message" => "Main Category deleted successfully"
     ]);
     
 } catch (Exception $e) {

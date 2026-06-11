@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
@@ -26,7 +26,7 @@ if (!$id || !$status || !in_array($status, ['active', 'inactive'], true)) {
 
 $status = mysqli_real_escape_string($conn, $status);
 
-$update = mysqli_query($conn, "UPDATE categories SET status='$status' WHERE id='$id'");
+$update = mysqli_query($conn, "UPDATE main_categories SET status='$status' WHERE id='$id'");
 
 if ($update) {
     echo json_encode([
