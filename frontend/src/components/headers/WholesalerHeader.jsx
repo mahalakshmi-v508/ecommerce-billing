@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { Search, Heart, ShoppingBag, User, Menu, X, Package, LayoutDashboard, LogIn, UserPlus } from 'lucide-react'
+import { Search, Heart, ShoppingBag, User, Menu, X, Package, LogIn, UserPlus } from 'lucide-react'
 import logo from '../../assets/logo.png'
 import { getWishlistCount } from '../../services/wishlistService.js'
 import { getCartCount } from '../../services/cartService.js'
@@ -109,12 +109,6 @@ export default function WholesalerHeader() {
     setMobileMenuOpen(false)
   }
 
-  const handleUserView = () => {
-    localStorage.removeItem('bulk_order_email')
-    navigate('/')
-    setMobileMenuOpen(false)
-  }
-
   const handleLoginClick = () => {
     navigate('/wholesaler-login')
     setMobileMenuOpen(false)
@@ -141,27 +135,17 @@ export default function WholesalerHeader() {
             <img src={logo} alt="Fathima Rice Land" className="w-[150px] sm:w-[180px] h-auto object-contain" />
           </Link>
 
-          {/* DESKTOP NAVIGATION */}
+          {/* DESKTOP NAVIGATION - Removed Wishlist link */}
           <nav className="hidden items-center gap-6 lg:flex">
             <Link to="/wholesaler/dashboard" className="text-sm font-medium text-gray-700 hover:text-green-600 transition">
               Dashboard
             </Link>
             <Link to="/wholesaler/products" className="text-sm font-medium text-gray-700 hover:text-green-600 transition">
-              Products
+              Wholesaler Products
             </Link>
             <Link to="/wholesaler/orders" className="text-sm font-medium text-gray-700 hover:text-green-600 transition">
-              Orders
+              Wholesale Orders
             </Link>
-            <Link to="/wholesaler/wishlist" className="text-sm font-medium text-gray-700 hover:text-green-600 transition">
-              Wishlist
-            </Link>
-            <button
-              onClick={handleUserView}
-              className="flex items-center gap-1.5 text-sm font-medium text-white bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-1.5 rounded-full hover:from-amber-600 hover:to-orange-600 transition shadow-sm"
-            >
-              <LayoutDashboard className="w-4 h-4" />
-              User View
-            </button>
           </nav>
 
           {/* SEARCH BAR */}
@@ -180,7 +164,7 @@ export default function WholesalerHeader() {
 
           {/* RIGHT SIDE ICONS */}
           <div className="flex items-center gap-1 sm:gap-2">
-            {/* Wishlist - Only show if logged in */}
+            {/* Wishlist - Only show if logged in (Heart Icon only) */}
             {wholesaler && (
               <Link to="/wholesaler/wishlist" className="relative flex h-10 w-10 items-center justify-center text-gray-600 hover:text-green-600 transition">
                 <Heart className="h-5 w-5" strokeWidth={1.5} />
@@ -229,10 +213,10 @@ export default function WholesalerHeader() {
                       Dashboard
                     </Link>
                     <Link to="/wholesaler/products" onClick={() => setProfileMenuOpen(false)} className="block px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-green-600 transition">
-                      Products
+                     Wholesaler Products
                     </Link>
                     <Link to="/wholesaler/orders" onClick={() => setProfileMenuOpen(false)} className="block px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-green-600 transition">
-                      Orders
+                      Wholesaler Orders
                     </Link>
                     <Link to="/wholesaler/wishlist" onClick={() => setProfileMenuOpen(false)} className="block px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-green-600 transition">
                       Wishlist
@@ -244,12 +228,6 @@ export default function WholesalerHeader() {
                       Profile
                     </button>
                     <div className="border-t border-gray-100 my-1"></div>
-                    <button
-                      onClick={handleUserView}
-                      className="block w-full px-4 py-2.5 text-left text-sm text-amber-600 hover:bg-gray-50 transition"
-                    >
-                      Switch to User View
-                    </button>
                     <button
                       onClick={handleLogout}
                       className="block w-full px-4 py-2.5 text-left text-sm text-red-600 hover:bg-gray-50 transition"
@@ -289,7 +267,7 @@ export default function WholesalerHeader() {
           </div>
         </div>
 
-        {/* MOBILE DROPDOWN MENU */}
+        {/* MOBILE DROPDOWN MENU - Removed Wishlist link */}
         {mobileMenuOpen && (
           <div className="border-t border-gray-200 py-4 lg:hidden">
             <form onSubmit={handleSearch} className="mb-4">
@@ -311,13 +289,10 @@ export default function WholesalerHeader() {
                   Dashboard
                 </Link>
                 <Link to="/wholesaler/products" onClick={() => setMobileMenuOpen(false)} className="px-2 py-2.5 text-sm font-medium text-gray-700">
-                  Products
+                  Wholesaler Products
                 </Link>
                 <Link to="/wholesaler/orders" onClick={() => setMobileMenuOpen(false)} className="px-2 py-2.5 text-sm font-medium text-gray-700">
-                  Orders
-                </Link>
-                <Link to="/wholesaler/wishlist" onClick={() => setMobileMenuOpen(false)} className="px-2 py-2.5 text-sm font-medium text-gray-700">
-                  Wishlist
+                  Wholesaler Orders
                 </Link>
                 <Link to="/wholesalercart" onClick={() => setMobileMenuOpen(false)} className="px-2 py-2.5 text-sm font-medium text-gray-700">
                   Cart
@@ -329,12 +304,6 @@ export default function WholesalerHeader() {
                   Profile
                 </button>
                 <div className="border-t border-gray-100 my-1"></div>
-                <button
-                  onClick={handleUserView}
-                  className="px-2 py-2.5 text-left text-sm font-medium text-amber-600"
-                >
-                  Switch to User View
-                </button>
                 <button
                   onClick={handleLogout}
                   className="px-2 py-2.5 text-left text-sm text-red-600"

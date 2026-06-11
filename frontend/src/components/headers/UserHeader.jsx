@@ -89,9 +89,9 @@ export default function UserHeader() {
   }
 
   const handleBulkOrder = () => {
-    // Directly navigate to wholesaler dashboard
-    // No login page - admin handles registration via email
-    navigate('/wholesaler/dashboard')
+    // Open wholesaler dashboard in a new tab
+    const url = `${window.location.origin}/wholesaler/dashboard`
+    window.open(url, '_blank', 'noopener,noreferrer')
     setMobileMenuOpen(false)
     setProfileMenuOpen(false)
   }
