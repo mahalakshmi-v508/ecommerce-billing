@@ -1,5 +1,4 @@
 <?php
-
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -15,115 +14,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 include "../../config/db.php";
 
-/* GET JSON DATA */
+/* GET JSON DATA STREAM */
+$data = json_decode(file_get_contents("php://input"), true);
 
-$data = json_decode(
-    file_get_contents("php://input"),
-    true
-);
+/* REAL-TIME VALUES & SANITIZATION */
+$id       = isset($data['id']) ? intval($data['id']) : 0;
+$name     = isset($data['name']) ? mysqli_real_escape_string($conn, trim($data['name'])) : '';
+$email    = isset($data['email']) ? mysqli_real_escape_string($conn, trim($data['email'])) : '';
+$password = isset($data['password']) ? trim($data['password']) : '';
 
-/* VALUES */
-
-$id       = intval($data['id'] ?? 0);
-$name     = trim($data['name'] ?? '');
-$email    = trim($data['email'] ?? '');
-$password = trim($data['password'] ?? '');
-
-/* VALIDATION */
-
+/* STRICT ATTRIBUTE VALIDATION */
 if (!$id) {
-
     echo json_encode([
         "status" => false,
-        "message" => "User ID missing",
+        "message" => "User execution validation failed: ID target context sequence missing",
         "received" => $data
     ]);
-
     exit();
 }
 
 if (!$name || !$email) {
-
     echo json_encode([
         "status" => false,
-        "message" => "Name and Email required",
+        "message" => "Core validation failed: Profile Name and Email endpoint requirements missing",
         "received" => $data
     ]);
-
     exit();
 }
 
-/* CHECK USER EXISTS */
-
-$check = mysqli_query(
-    $conn,
-    "SELECT * FROM users WHERE id='$id'"
-);
-
+/* CHECK DATA EXISTENCE PRE-FLIGHT */
+$check = mysqli_query($conn, "SELECT id FROM users WHERE id='$id'");
 if (mysqli_num_rows($check) == 0) {
-
     echo json_encode([
         "status" => false,
-        "message" => "User not found"
+        "message" => "Target profile identity context not recognized within ledger footprint"
     ]);
-
     exit();
 }
 
-/* UPDATE */
-
+/* COMPILE EXECUTION PLAN */
 if (!empty($password)) {
-
-    $hashed =
-        password_hash(
-            $password,
-            PASSWORD_DEFAULT
-        );
-
-    $sql = "
-        UPDATE users
-        SET
-            name='$name',
-            email='$email',
-            password='$hashed'
-        WHERE id='$id'
-    ";
-
+    // Encrypted hash block parsing layer 
+    $hashed = password_hash($password, PASSWORD_DEFAULT);
+    $sql = "UPDATE users SET name='$name', email='$email', password='$hashed' WHERE id='$id'";
 } else {
-
-    $sql = "
-        UPDATE users
-        SET
-            name='$name',
-            email='$email'
-        WHERE id='$id'
-    ";
+    $sql = "UPDATE users SET name='$name', email='$email' WHERE id='$id'";
 }
 
-$update = mysqli_query(
-    $conn,
-    $sql
-);
+$update = mysqli_query($conn, $sql);
 
-/* RESPONSE */
-
+/* SYSTEM DISPATCH RESPONSE */
 if ($update) {
-
     echo json_encode([
         "status" => true,
-        "message" => "Profile updated successfully",
-        "affected_rows" =>
-            mysqli_affected_rows($conn),
+        "message" => "Profile updated successfully inside engine data repositories",
+        "affected_rows" => mysqli_affected_rows($conn),
         "user_id" => $id,
         "name" => $name,
         "email" => $email
     ]);
-
 } else {
-
     echo json_encode([
         "status" => false,
         "message" => mysqli_error($conn),
         "query" => $sql
     ]);
 }
+?>
