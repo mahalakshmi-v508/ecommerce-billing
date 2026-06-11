@@ -89,11 +89,17 @@ export default function UserHeader() {
   }
 
   const handleBulkOrder = () => {
-    // Directly navigate to wholesaler dashboard
-    // No login page - admin handles registration via email
-    navigate('/wholesaler/dashboard')
+    // Open wholesaler dashboard in a new tab
+    const url = `${window.location.origin}/wholesaler/dashboard`
+    window.open(url, '_blank', 'noopener,noreferrer')
     setMobileMenuOpen(false)
     setProfileMenuOpen(false)
+  }
+
+  const handleProfileClick = () => {
+    navigate('/profile')
+    setProfileMenuOpen(false)
+    setMobileMenuOpen(false)
   }
 
   return (
@@ -162,7 +168,7 @@ export default function UserHeader() {
               )}
             </Link>
 
-            {/* Profile Dropdown */}
+            {/* Profile Dropdown - Only Profile and Logout */}
             {user ? (
               <div ref={profileRef} className="relative hidden sm:block">
                 <button
@@ -180,35 +186,13 @@ export default function UserHeader() {
                       <p className="truncate text-xs text-gray-500">{user?.email}</p>
                     </div>
 
-                    <Link 
-                      to="/orders" 
-                      onClick={() => setProfileMenuOpen(false)} 
-                      className="block px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-green-600 transition"
-                    >
-                      My Orders
-                    </Link>
-                    <Link 
-                      to="/profile" 
-                      onClick={() => setProfileMenuOpen(false)} 
-                      className="block px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-green-600 transition"
+                    <button
+                      onClick={handleProfileClick}
+                      className="block w-full px-4 py-2.5 text-left text-sm text-gray-600 hover:bg-gray-50 hover:text-green-600 transition"
                     >
                       Profile
-                    </Link>
-                    <Link 
-                      to="/wishlist" 
-                      onClick={() => setProfileMenuOpen(false)} 
-                      className="block px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-green-600 transition"
-                    >
-                      Wishlist
-                    </Link>
-                    <div className="border-t border-gray-100 my-1"></div>
-                    <button
-                      onClick={handleBulkOrder}
-                      className="block w-full px-4 py-2.5 text-left text-sm text-green-600 hover:bg-gray-50 transition"
-                    >
-                      <Package className="w-4 h-4 inline mr-2" />
-                      Bulk Order
                     </button>
+                    <div className="border-t border-gray-100 my-1"></div>
                     <button
                       onClick={handleLogout}
                       className="block w-full px-4 py-2.5 text-left text-sm text-red-600 hover:bg-gray-50 transition"
@@ -273,16 +257,12 @@ export default function UserHeader() {
                 <Link to="/cart" onClick={() => setMobileMenuOpen(false)} className="px-2 py-2.5 text-sm font-medium text-gray-700">
                   Cart
                 </Link>
-                <Link to="/profile" onClick={() => setMobileMenuOpen(false)} className="px-2 py-2.5 text-sm font-medium text-gray-700">
-                  Profile
-                </Link>
                 <div className="border-t border-gray-100 my-1"></div>
                 <button
-                  onClick={handleBulkOrder}
-                  className="px-2 py-2.5 text-left text-sm font-medium text-green-600"
+                  onClick={handleProfileClick}
+                  className="px-2 py-2.5 text-left text-sm font-medium text-gray-700"
                 >
-                  <Package className="w-4 h-4 inline mr-2" />
-                  Bulk Order
+                  Profile
                 </button>
                 <button
                   onClick={handleLogout}
