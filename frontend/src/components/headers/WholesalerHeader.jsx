@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { Search, Heart, ShoppingBag, User, Menu, X, Package, LogIn, UserPlus } from 'lucide-react'
+import { Search, Heart, ShoppingBag, User, Menu, X, LogIn, UserPlus } from 'lucide-react'
 import logo from '../../assets/logo.png'
 import { getWishlistCount } from '../../services/wishlistService.js'
 import { getCartCount } from '../../services/cartService.js'
@@ -135,7 +135,7 @@ export default function WholesalerHeader() {
             <img src={logo} alt="Fathima Rice Land" className="w-[150px] sm:w-[180px] h-auto object-contain" />
           </Link>
 
-          {/* DESKTOP NAVIGATION - Removed Wishlist link */}
+          {/* DESKTOP NAVIGATION */}
           <nav className="hidden items-center gap-6 lg:flex">
             <Link to="/wholesaler/dashboard" className="text-sm font-medium text-gray-700 hover:text-green-600 transition">
               Dashboard
@@ -164,7 +164,7 @@ export default function WholesalerHeader() {
 
           {/* RIGHT SIDE ICONS */}
           <div className="flex items-center gap-1 sm:gap-2">
-            {/* Wishlist - Only show if logged in (Heart Icon only) */}
+            {/* Wishlist - Only show if logged in */}
             {wholesaler && (
               <Link to="/wholesaler/wishlist" className="relative flex h-10 w-10 items-center justify-center text-gray-600 hover:text-green-600 transition">
                 <Heart className="h-5 w-5" strokeWidth={1.5} />
@@ -188,7 +188,7 @@ export default function WholesalerHeader() {
               </Link>
             )}
 
-            {/* Profile Section */}
+            {/* Profile Section - Only Profile and Logout in dropdown */}
             {wholesaler ? (
               <div ref={profileRef} className="relative hidden sm:block">
                 <button
@@ -209,18 +209,6 @@ export default function WholesalerHeader() {
                       </span>
                     </div>
 
-                    <Link to="/wholesaler/dashboard" onClick={() => setProfileMenuOpen(false)} className="block px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-green-600 transition">
-                      Dashboard
-                    </Link>
-                    <Link to="/wholesaler/products" onClick={() => setProfileMenuOpen(false)} className="block px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-green-600 transition">
-                     Wholesaler Products
-                    </Link>
-                    <Link to="/wholesaler/orders" onClick={() => setProfileMenuOpen(false)} className="block px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-green-600 transition">
-                      Wholesaler Orders
-                    </Link>
-                    <Link to="/wholesaler/wishlist" onClick={() => setProfileMenuOpen(false)} className="block px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-green-600 transition">
-                      Wishlist
-                    </Link>
                     <button
                       onClick={handleProfileClick}
                       className="block w-full px-4 py-2.5 text-left text-sm text-gray-600 hover:bg-gray-50 hover:text-green-600 transition"
@@ -267,7 +255,7 @@ export default function WholesalerHeader() {
           </div>
         </div>
 
-        {/* MOBILE DROPDOWN MENU - Removed Wishlist link */}
+        {/* MOBILE DROPDOWN MENU */}
         {mobileMenuOpen && (
           <div className="border-t border-gray-200 py-4 lg:hidden">
             <form onSubmit={handleSearch} className="mb-4">
@@ -297,13 +285,13 @@ export default function WholesalerHeader() {
                 <Link to="/wholesalercart" onClick={() => setMobileMenuOpen(false)} className="px-2 py-2.5 text-sm font-medium text-gray-700">
                   Cart
                 </Link>
+                <div className="border-t border-gray-100 my-1"></div>
                 <button
                   onClick={handleProfileClick}
                   className="px-2 py-2.5 text-left text-sm font-medium text-gray-700"
                 >
                   Profile
                 </button>
-                <div className="border-t border-gray-100 my-1"></div>
                 <button
                   onClick={handleLogout}
                   className="px-2 py-2.5 text-left text-sm text-red-600"
