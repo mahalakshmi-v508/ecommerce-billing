@@ -36,7 +36,31 @@ export default function Wishlist() {
       }
       const response = await getWishlistItems(user.id)
       if(response.status){
-        setWishlistItems(response.data || [])
+        // லோக்கல் ஸ்டோரேஜ் டேட்டாவை எடுக்கிறோம்
+        const frontendWishlist = JSON.parse(localStorage.getItem('frontend_wishlist_weights')) || {}
+
+        const updatedWishlist = (response.data || []).map((item) => {
+          const pId = item.product_id || item.id;
+          const pName = item.product_name;
+
+          const savedWeightData = frontendWishlist[pId] || frontendWishlist[pName];
+          
+          // செலக்ட் பண்ண வெயிட் டெக்ஸ்ட் மற்றும் வேல்யூ
+          const assignedWeightText = savedWeightData?.text || '1kg';
+          const weightMultiplier = savedWeightData?.value || 1;
+
+          // ஒரிஜினல் விலையை வெயிட் வேல்யூவால் பெருக்குகிறோம்
+          const calculatedPrice = parseFloat(item.price || 0) * weightMultiplier;
+
+          return {
+            ...item,
+            selected_weight: assignedWeightText,
+            weight_value: weightMultiplier, // Add to Cart-க்கு அனுப்ப இதைச் சேமிக்கிறோம்
+            price: calculatedPrice // விலையை ஓவர்ரைட் செய்கிறோம்
+          }
+        })
+
+        setWishlistItems(updatedWishlist)
       }
     } catch(error){
       console.log(error)
@@ -46,11 +70,21 @@ export default function Wishlist() {
     }
   }
 
-  const handleRemove = async (wishlist_id) => {
+ const handleRemove = async (wishlist_id) => {
     setRemovingId(wishlist_id)
     try {
+      // டெலிட் செய்யப் போகும் ஐட்டத்தைக் கண்டுபிடிக்கிறோம்
+      const itemToRemove = wishlistItems.find(i => i.id === wishlist_id)
+
       const response = await removeFromWishlist(wishlist_id)
       if(response.status){
+        if (itemToRemove) {
+          const frontendWishlist = JSON.parse(localStorage.getItem('frontend_wishlist_weights')) || {}
+          delete frontendWishlist[itemToRemove.product_id]
+          if (itemToRemove.product_name) delete frontendWishlist[itemToRemove.product_name]
+          localStorage.setItem('frontend_wishlist_weights', JSON.stringify(frontendWishlist))
+        }
+
         toast.success('Removed from wishlist')
         await loadWishlist()
         window.dispatchEvent(new Event('wishlistUpdated'))
@@ -63,20 +97,36 @@ export default function Wishlist() {
     }
   }
 
-  const handleAddToCart = async (item) => {
+ const handleAddToCart = async (item) => {
     if (!user?.id) {
       toast.error('Please login to add items to cart')
       return
     }
 
     try {
-      const response = await addToCartService(user.id, item.product_id, 1)
+      // 1-க்கு பதிலாக item-ல் இருக்கும் weight_value-வை அனுப்புகிறோம்
+      const weightValue = item.weight_value || 1
+      const weightText = item.selected_weight || '1kg'
+
+      const response = await addToCartService(user.id, item.product_id, weightValue)
 
       if (response.status) {
+        // கார்ட் பக்கத்திலும் இந்த வெயிட் வேலை செய்ய கார்ட் ஸ்டோரேஜை அப்டேட் செய்கிறோம்
+        const existingFrontendCart = JSON.parse(localStorage.getItem('frontend_cart_weights')) || {}
+        existingFrontendCart[item.product_id] = { text: weightText, value: weightValue }
+        if (item.product_name) existingFrontendCart[item.product_name] = { text: weightText, value: weightValue }
+        localStorage.setItem('frontend_cart_weights', JSON.stringify(existingFrontendCart))
+
         toast.success(`${item.product_name} added to cart`)
         window.dispatchEvent(new Event('cartUpdated'))
 
         if (item.id) {
+          // விஷ்லிஸ்ட்டில் இருந்து நீக்கும்போது அதன் ஸ்டோரேஜ் க்ளீனப்
+          const frontendWishlist = JSON.parse(localStorage.getItem('frontend_wishlist_weights')) || {}
+          delete frontendWishlist[item.product_id]
+          if (item.product_name) delete frontendWishlist[item.product_name]
+          localStorage.setItem('frontend_wishlist_weights', JSON.stringify(frontendWishlist))
+
           await removeFromWishlist(item.id)
           await loadWishlist()
           window.dispatchEvent(new Event('wishlistUpdated'))
@@ -173,6 +223,7 @@ export default function Wishlist() {
                     </div>
 
                     {/* Meta Titles */}
+                 {/* Meta Titles */}
                     <div className="space-y-1">
                       <h3 className="text-sm font-semibold text-slate-800 tracking-tight group-hover:text-slate-900 transition-colors line-clamp-1">
                         {item.product_name}
@@ -181,6 +232,10 @@ export default function Wishlist() {
                         <span className="flex items-center font-bold text-slate-900 text-sm">
                           <IndianRupee className="w-3.5 h-3.5 stroke-[2.5]" />
                           {parseFloat(item.price || 0).toLocaleString('en-IN')}
+                        </span>
+                        {/* வெயிட் டெக்ஸ்ட்டை இங்கே டிஸ்ப்ளே செய்கிறோம் */}
+                        <span className="bg-slate-100 text-slate-600 px-2 py-0.5 rounded text-[11px] font-medium">
+                          {item.selected_weight || '1kg'}
                         </span>
                         <span className="text-slate-200">|</span>
                         <span className={`font-medium ${isInStock ? 'text-emerald-600' : 'text-slate-400'}`}>
