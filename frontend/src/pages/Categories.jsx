@@ -208,7 +208,7 @@ export default function Categories() {
             const response = await addToCart(
                 user.id,
                 product.id,
-                weightValue
+                1, // Quantity is always 1 since weight determines the actual amount
             )
 
             if (response.status) {

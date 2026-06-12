@@ -10,7 +10,7 @@ const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const roleTarget = {
   superadmin: '/superadmin/dashboard',
   admin: '/admin/dashboard',
-  cashier: '/cashier/dashboard',
+  // cashier: '/cashier/dashboard',
   user: '/',
 }
 
