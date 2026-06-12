@@ -1,12 +1,8 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Barcode from "react-barcode";
 import api from "../../services/api";
 
-/* ─── Toast Hook ─────────────────────────────────────────── */
-
-const body = new FormData();
 function useToast() {
   const [toasts, setToasts] = useState([]);
   const show = (type, title, msg) => {
@@ -36,10 +32,11 @@ function ToastPortal({ toasts, remove }) {
   );
 }
 
-/* ─── Main Component ─────────────────────────────────────── */
 export default function ProductForm() {
   const navigate = useNavigate();
+  const [mainCategories, setMainCategories] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [filteredCategories, setFilteredCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [barcodeKey, setBarcodeKey] = useState(0);
   const [gstEnabled, setGstEnabled] = useState(false);
@@ -47,22 +44,22 @@ export default function ProductForm() {
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
   const { toasts, show, remove } = useToast();
+  const [companyType, setCompanyType] = useState("");
 
- const [companyType, setCompanyType] = useState("");
-
-const [form, setForm] = useState({
-  name: "",
-  product_code: "",
-  image: "",
-  price: "",
-  wholesale_price: "",
-  min_wholesale_qty: "",
-  stock: "",
-  gst: "",
-  barcode: "",
-  category_id: "",
-  unit: ""
-});
+  const [form, setForm] = useState({
+    name: "",
+    product_code: "",
+    image: "",
+    price: "",
+    wholesale_price: "",
+    min_wholesale_qty: "",
+    stock: "",
+    gst: "",
+    barcode: "",
+    main_category_id: "",
+    category_id: "",
+    unit: ""
+  });
 
   const set = (field, val) => setForm(p => ({ ...p, [field]: val }));
 
@@ -78,17 +75,15 @@ const [form, setForm] = useState({
       if (!company_id) return;
       const res = await api.post("/company/get_company_by_id.php", { id: company_id });
       if (res.data.status) {
-  const company = res.data.data;
-
-  setCompanyType(company.business_type || "retail");
-
-  if (company.gst_type === "with_gst") {
-    setGstEnabled(true);
-  } else {
-    setGstEnabled(false);
-    set("gst", "");
-  }
-}
+        const company = res.data.data;
+        setCompanyType(company.business_type || "retail");
+        if (company.gst_type === "with_gst") {
+          setGstEnabled(true);
+        } else {
+          setGstEnabled(false);
+          set("gst", "");
+        }
+      }
     } catch (err) {
       console.error("GST fetch error:", err);
       setGstEnabled(false);
@@ -97,21 +92,48 @@ const [form, setForm] = useState({
     }
   };
 
+  const fetchMainCategories = async () => {
+    try {
+      const company_id = getCompanyId();
+      if (!company_id) return;
+      const res = await api.get(`/main-category/get-active.php?company_id=${company_id}`);
+      if (res.data.status) {
+        setMainCategories(res.data.data);
+      }
+    } catch (err) {
+      console.error("Main category fetch error:", err);
+    }
+  };
+
   const fetchCategories = async () => {
     try {
       const company_id = getCompanyId();
       if (!company_id) return;
       const res = await api.get(`/category/get_active_category.php?company_id=${company_id}`);
-      if (res.data.status) setCategories(res.data.data);
+      if (res.data.status) {
+        setCategories(res.data.data);
+      }
     } catch (err) {
       console.error("Category fetch error:", err);
     }
   };
 
   useEffect(() => {
+    fetchMainCategories();
     fetchCategories();
     fetchCompanyGST();
   }, []);
+
+  // Filter categories when main category changes
+  useEffect(() => {
+    if (form.main_category_id) {
+      const filtered = categories.filter(cat => cat.main_category_id == form.main_category_id);
+      setFilteredCategories(filtered);
+      set("category_id", ""); // Reset sub category selection
+    } else {
+      setFilteredCategories([]);
+    }
+  }, [form.main_category_id, categories]);
 
   const generateBarcode = () => {
     const code = "PRD" + Math.floor(100000 + Math.random() * 900000);
@@ -133,57 +155,28 @@ const [form, setForm] = useState({
       }
     };
   }, [imagePreview]);
-  for (let pair of body.entries()) {
-  console.log(pair[0], pair[1]);
-}
 
   const handleSubmit = async () => {
-    if (!form.name.trim())    { show("warn", "Missing Field", "Product name is required."); return; }
-    if (!form.category_id)    { show("warn", "Missing Field", "Please select a category."); return; }
-if (companyType === "retail") {
+    if (!form.name.trim()) { show("warn", "Missing Field", "Product name is required."); return; }
+    if (!form.category_id) { show("warn", "Missing Field", "Please select a category."); return; }
+    
+    if (companyType === "retail") {
+      if (!form.price) { show("warn", "Missing Field", "Retail price required"); return; }
+    }
 
-  if (!form.price) {
-    show("warn", "Missing Field", "Retail price required");
-    return;
-  }
+    if (companyType === "wholesale") {
+      if (!form.wholesale_price) { show("warn", "Missing Field", "Wholesale price required"); return; }
+      if (!form.min_wholesale_qty) { show("warn", "Missing Field", "Minimum wholesale qty required"); return; }
+    }
 
-}
-
-if (companyType === "wholesale") {
-
-  if (!form.wholesale_price) {
-    show("warn", "Missing Field", "Wholesale price required");
-    return;
-  }
-
-  if (!form.min_wholesale_qty) {
-    show("warn", "Missing Field", "Minimum wholesale qty required");
-    return;
-  }
-
-}
-
-if (companyType === "both") {
-
-  if (!form.price) {
-    show("warn", "Missing Field", "Retail price required");
-    return;
-  }
-
-  if (!form.wholesale_price) {
-    show("warn", "Missing Field", "Wholesale price required");
-    return;
-  }
-
-  if (!form.min_wholesale_qty) {
-    show("warn", "Missing Field", "Minimum wholesale qty required");
-    return;
-  }
-
-}    if (isNaN(Number(form.price)) || Number(form.price) < 0) { show("warn", "Invalid Price", "Please enter a valid price."); return; }
-    if (!form.stock)          { show("warn", "Missing Field", "Stock quantity is required."); return; }
+    if (companyType === "both") {
+      if (!form.price) { show("warn", "Missing Field", "Retail price required"); return; }
+      if (!form.wholesale_price) { show("warn", "Missing Field", "Wholesale price required"); return; }
+      if (!form.min_wholesale_qty) { show("warn", "Missing Field", "Minimum wholesale qty required"); return; }
+    }
+    
+    if (!form.stock) { show("warn", "Missing Field", "Stock quantity is required."); return; }
     if (isNaN(Number(form.stock)) || Number(form.stock) < 0) { show("warn", "Invalid Stock", "Please enter a valid stock quantity."); return; }
-    // if (!form.unit.trim())    { show("warn", "Missing Field", "Unit is required (e.g. kg, litre, piece)."); return; }
     if (gstEnabled && !form.gst) { show("warn", "Missing Field", "GST percentage is required."); return; }
     if (gstEnabled && (isNaN(Number(form.gst)) || Number(form.gst) < 0 || Number(form.gst) > 100)) {
       show("warn", "Invalid GST", "Please enter a valid GST percentage (0–100).");
@@ -197,17 +190,15 @@ if (companyType === "both") {
       body.append("product_code", form.product_code);
       body.append("category_id", form.category_id);
       body.append("company_id", getCompanyId());
-      body.append("price", form.price);
-      body.append("wholesale_price", form.wholesale_price);
-body.append("min_wholesale_qty", form.min_wholesale_qty);
+      body.append("price", form.price || 0);
+      body.append("wholesale_price", form.wholesale_price || 0);
+      body.append("min_wholesale_qty", form.min_wholesale_qty || 0);
       body.append("stock", form.stock);
       body.append("gst_percentage", gstEnabled ? form.gst : "");
       body.append("barcode", form.barcode);
       body.append("unit", form.unit);
       if (imageFile) {
         body.append("image", imageFile);
-      } else if (form.image) {
-        body.append("image", form.image);
       }
 
       const res = await api.post("/product/add.php", body);
@@ -252,7 +243,7 @@ body.append("min_wholesale_qty", form.min_wholesale_qty);
           position: relative; width: 100%; max-width: 560px;
           background: #fff; border-radius: 26px;
           border: 1px solid #e2e8f0;
-          box-shadow: 0 8px 40px rgba(37,99,235,0.1), 0 2px 8px rgba(0,0,0,0.04);
+          box-shadow: 0 8px 40px rgba(37,99,235,0.1);
           overflow: hidden;
           animation: pfUp 0.5s cubic-bezier(0.22,1,0.36,1) both;
         }
@@ -361,7 +352,6 @@ body.append("min_wholesale_qty", form.min_wholesale_qty);
         }
         .pf-input-wrap:focus-within .pf-prefix { border-right-color:#bfdbfe; background:#eff6ff; color:#3b82f6; }
 
-        /* GST disabled notice */
         .pf-gst-disabled {
           display:flex; align-items:center; gap:8px;
           padding:10px 14px; border-radius:12px;
@@ -369,7 +359,6 @@ body.append("min_wholesale_qty", form.min_wholesale_qty);
           font-size:12.5px; color:#94a3b8; font-weight:500;
         }
 
-        /* GST loading shimmer */
         .pf-skel {
           height:46px; border-radius:12px;
           background:linear-gradient(90deg,#f1f5f9 25%,#e2e8f0 50%,#f1f5f9 75%);
@@ -440,7 +429,6 @@ body.append("min_wholesale_qty", form.min_wholesale_qty);
         }
         @keyframes spin{to{transform:rotate(360deg)}}
 
-        /* GST badge */
         .pf-gst-badge {
           display:inline-flex; align-items:center; gap:5px;
           padding:3px 10px; border-radius:100px;
@@ -450,7 +438,6 @@ body.append("min_wholesale_qty", form.min_wholesale_qty);
         .pf-gst-badge.on  { background:#dcfce7; color:#15803d; border:1px solid #bbf7d0; }
         .pf-gst-badge.off { background:#fee2e2; color:#b91c1c; border:1px solid #fecaca; }
 
-        /* ── Toast ── */
         .pf-toast {
           pointer-events:auto; display:flex; align-items:center; gap:11px;
           min-width:280px; max-width:360px; padding:12px 15px; border-radius:15px;
@@ -472,9 +459,6 @@ body.append("min_wholesale_qty", form.min_wholesale_qty);
         .pf-toast-error   .pf-toast-title{color:#be123c;}
         .pf-toast-warn    .pf-toast-title{color:#92400e;}
         .pf-toast-msg{font-size:12px;margin:0;}
-        .pf-toast-success .pf-toast-msg{color:#16a34a;}
-        .pf-toast-error   .pf-toast-msg{color:#e11d48;}
-        .pf-toast-warn    .pf-toast-msg{color:#b45309;}
         .pf-toast-x{background:none;border:none;cursor:pointer;font-size:12px;opacity:0.4;transition:opacity 0.2s;flex-shrink:0;padding:2px;}
         .pf-toast-x:hover{opacity:0.9;}
         .pf-toast-bar{position:absolute;bottom:0;left:0;height:3px;animation:pfShrink 3.6s linear forwards;}
@@ -483,7 +467,6 @@ body.append("min_wholesale_qty", form.min_wholesale_qty);
         .pf-toast-warn    .pf-toast-bar{background:#fbbf24;}
         @keyframes pfShrink{from{width:100%}to{width:0%}}
 
-        /* GST slide-in animation */
         .pf-gst-field {
           animation: pfFadeIn 0.3s ease both;
         }
@@ -499,7 +482,6 @@ body.append("min_wholesale_qty", form.min_wholesale_qty);
         <div className="pf-card">
           <div className="pf-stripe" />
 
-          {/* Header */}
           <div className="pf-header">
             <div className="pf-header-icon">📦</div>
             <div className="pf-header-text">
@@ -509,8 +491,6 @@ body.append("min_wholesale_qty", form.min_wholesale_qty);
           </div>
 
           <div className="pf-body">
-
-            {/* ── Basic Info ── */}
             <p className="pf-section">Basic Info</p>
 
             <div className="pf-field">
@@ -523,59 +503,59 @@ body.append("min_wholesale_qty", form.min_wholesale_qty);
               </div>
             </div>
 
-            
-<div className="pf-field">
-  <label className="pf-label">
-    Product Code
-  </label>
-
-  <div className="pf-input-wrap">
-    <span className="pf-input-icon">🔢</span>
-
-    <input
-      className="pf-input"
-      placeholder="e.g. PRD001"
-      value={form.product_code}
-      onChange={e =>
-        set("product_code", e.target.value)
-      }
-    />
-  </div>
-</div>
-
-
+            <div className="pf-field">
+              <label className="pf-label">Product Code</label>
+              <div className="pf-input-wrap">
+                <span className="pf-input-icon">🔢</span>
+                <input className="pf-input" placeholder="e.g. PRD001"
+                  value={form.product_code}
+                  onChange={e => set("product_code", e.target.value)} />
+              </div>
+            </div>
 
             <div className="pf-field">
               <label className="pf-label">Product Image</label>
               <div className="pf-input-wrap">
                 <span className="pf-input-icon">🖼️</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="pf-input pf-file-input"
-                  onChange={handleImageChange}
-                />
+                <input type="file" accept="image/*" className="pf-input pf-file-input"
+                  onChange={handleImageChange} />
               </div>
               {imagePreview && (
                 <div style={{ marginTop: 10 }}>
-                  <img
-                    src={imagePreview}
-                    alt="Product preview"
-                    style={{ width: "100%", maxWidth: 260, borderRadius: 14, border: "1px solid #e2e8f0" }}
-                  />
+                  <img src={imagePreview} alt="Product preview"
+                    style={{ width: "100%", maxWidth: 260, borderRadius: 14, border: "1px solid #e2e8f0" }} />
                 </div>
               )}
             </div>
 
+            {/* Main Category Dropdown */}
             <div className="pf-field">
-              <label className="pf-label">Category <span style={{color:"#ef4444"}}>*</span></label>
+              <label className="pf-label">Main Category</label>
+              <div className="pf-select-wrap pf-input-wrap">
+                <span className="pf-input-icon">📁</span>
+                <select className="pf-select"
+                  value={form.main_category_id}
+                  onChange={e => set("main_category_id", e.target.value)}>
+                  <option value="">Select main category…</option>
+                  {mainCategories.map(mc => (
+                    <option key={mc.id} value={mc.id}>{mc.name}</option>
+                  ))}
+                </select>
+                <span className="pf-select-arrow">▾</span>
+              </div>
+            </div>
+
+            {/* Sub Category Dropdown */}
+            <div className="pf-field">
+              <label className="pf-label">Sub Category <span style={{color:"#ef4444"}}>*</span></label>
               <div className="pf-select-wrap pf-input-wrap">
                 <span className="pf-input-icon">🗂️</span>
                 <select className="pf-select"
                   value={form.category_id}
-                  onChange={e => set("category_id", e.target.value)}>
-                  <option value="">Select a category…</option>
-                  {categories.map(c => (
+                  onChange={e => set("category_id", e.target.value)}
+                  disabled={!form.main_category_id}>
+                  <option value="">{form.main_category_id ? "Select sub category…" : "Select main category first"}</option>
+                  {filteredCategories.map(c => (
                     <option key={c.id} value={c.id}>{c.name}</option>
                   ))}
                 </select>
@@ -583,105 +563,52 @@ body.append("min_wholesale_qty", form.min_wholesale_qty);
               </div>
             </div>
 
-            {/* ── Pricing & Stock ── */}
             <p className="pf-section" style={{marginTop:"1.25rem"}}>Pricing & Stock</p>
 
-           <div className="pf-grid-2">
+            <div className="pf-grid-2">
+              {(companyType === "retail" || companyType === "both") && (
+                <div>
+                  <label className="pf-label">Retail Price (₹)</label>
+                  <div className="pf-input-wrap">
+                    <span className="pf-prefix">₹</span>
+                    <input type="number" className="pf-input" value={form.price}
+                      placeholder="0.00" onChange={(e)=>set("price",e.target.value)} />
+                  </div>
+                </div>
+              )}
 
-  {(companyType === "retail" || companyType === "both") && (
-    <div>
-      <label className="pf-label">
-        Retail Price (₹)
-      </label>
+              {(companyType === "wholesale" || companyType === "both") && (
+                <>
+                  <div>
+                    <label className="pf-label">Wholesale Price (₹)</label>
+                    <div className="pf-input-wrap">
+                      <span className="pf-prefix">₹</span>
+                      <input type="number" className="pf-input" value={form.wholesale_price}
+                        placeholder="0.00" onChange={(e)=>set("wholesale_price",e.target.value)} />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="pf-label">Min Wholesale Qty</label>
+                    <div className="pf-input-wrap">
+                      <span className="pf-input-icon">📦</span>
+                      <input type="number" className="pf-input" value={form.min_wholesale_qty}
+                        placeholder="10" onChange={(e)=>set("min_wholesale_qty",e.target.value)} />
+                    </div>
+                  </div>
+                </>
+              )}
 
-      <div className="pf-input-wrap">
-        <span className="pf-prefix">₹</span>
-
-        <input
-          type="number"
-          className="pf-input"
-          value={form.price}
-          placeholder="0.00"
-          onChange={(e)=>set("price",e.target.value)}
-        />
-      </div>
-    </div>
-  )}
-
-  {(companyType === "wholesale" || companyType === "both") && (
-    <>
-      <div>
-        <label className="pf-label">
-          Wholesale Price (₹)
-        </label>
-
-        <div className="pf-input-wrap">
-          <span className="pf-prefix">₹</span>
-
-          <input
-            type="number"
-            className="pf-input"
-            value={form.wholesale_price}
-            placeholder="0.00"
-            onChange={(e)=>set("wholesale_price",e.target.value)}
-          />
-        </div>
-      </div>
-
-      <div>
-        <label className="pf-label">
-          Min Wholesale Qty
-        </label>
-
-        <div className="pf-input-wrap">
-          <span className="pf-input-icon">📦</span>
-
-          <input
-            type="number"
-            className="pf-input"
-            value={form.min_wholesale_qty}
-            placeholder="10"
-            onChange={(e)=>set("min_wholesale_qty",e.target.value)}
-          />
-        </div>
-      </div>
-    </>
-  )}
-
-  <div>
-    <label className="pf-label">
-      Stock Qty
-    </label>
-
-    <div className="pf-input-wrap">
-      <span className="pf-input-icon">📦</span>
-
-      <input
-        type="number"
-        className="pf-input"
-        value={form.stock}
-        placeholder="0"
-        onChange={(e)=>set("stock",e.target.value)}
-      />
-    </div>
-  </div>
-
-</div>
-{/* 
-            <div className="pf-field">
-              <label className="pf-label">Unit <span style={{color:"#ef4444"}}>*</span></label>
-              <div className="pf-input-wrap">
-                <span className="pf-input-icon">📏</span>
-                <input
-                  className="pf-input"
-                  placeholder="e.g. kg / litre / piece"
-                  value={form.unit}
-                  onChange={e => set("unit", e.target.value)}
-                />
+              <div>
+                <label className="pf-label">Stock Qty</label>
+                <div className="pf-input-wrap">
+                  <span className="pf-input-icon">📦</span>
+                  <input type="number" className="pf-input" value={form.stock}
+                    placeholder="0" onChange={(e)=>set("stock",e.target.value)} />
+                </div>
               </div>
-            </div> */}
+            </div>
 
-            {/* ── GST (conditional) ── */}
+            {/* GST Section */}
             <div className="pf-field">
               <label className="pf-label">
                 GST
@@ -697,15 +624,9 @@ body.append("min_wholesale_qty", form.min_wholesale_qty);
               ) : gstEnabled ? (
                 <div className="pf-input-wrap pf-gst-field">
                   <span className="pf-input-icon" style={{fontWeight:700, fontSize:13, color:"#64748b"}}>%</span>
-                  <input
-                    type="number"
-                    className="pf-input"
-                    placeholder="Enter GST % (e.g. 18)"
-                    value={form.gst}
-                    min="0"
-                    max="100"
-                    onChange={e => set("gst", e.target.value)}
-                  />
+                  <input type="number" className="pf-input" placeholder="Enter GST % (e.g. 18)"
+                    value={form.gst} min="0" max="100"
+                    onChange={e => set("gst", e.target.value)} />
                 </div>
               ) : (
                 <div className="pf-gst-disabled">
@@ -715,7 +636,7 @@ body.append("min_wholesale_qty", form.min_wholesale_qty);
               )}
             </div>
 
-            {/* ── Barcode ── */}
+            {/* Barcode Section */}
             <div className="pf-divider" />
             <p className="pf-section">Barcode</p>
 
@@ -725,8 +646,7 @@ body.append("min_wholesale_qty", form.min_wholesale_qty);
                 <div className="pf-input-wrap">
                   <span className="pf-input-icon">｜｜</span>
                   <input className="pf-input" placeholder="Enter or auto-generate"
-                    value={form.barcode}
-                    onChange={e => set("barcode", e.target.value)} />
+                    value={form.barcode} onChange={e => set("barcode", e.target.value)} />
                 </div>
               </div>
               <button className="pf-gen-btn" onClick={generateBarcode}>⚡ Auto</button>
@@ -742,15 +662,9 @@ body.append("min_wholesale_qty", form.min_wholesale_qty);
             <div className="pf-divider" />
 
             <button className="pf-submit" onClick={handleSubmit} disabled={loading || gstLoading}>
-              {loading
-                ? <><div className="pf-spinner" /> Saving product…</>
-                : <>💾 Save Product</>
-              }
+              {loading ? <><div className="pf-spinner" /> Saving product…</> : <>💾 Save Product</>}
             </button>
-            <button className="pf-cancel" onClick={() => navigate("/products")}>
-              Cancel
-            </button>
-
+            <button className="pf-cancel" onClick={() => navigate("/products")}>Cancel</button>
           </div>
         </div>
       </div>

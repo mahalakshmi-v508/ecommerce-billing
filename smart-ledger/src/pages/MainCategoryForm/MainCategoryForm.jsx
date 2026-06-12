@@ -15,6 +15,7 @@ export default function MainCategoryForm() {
     status: 'active'
   });
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(false);
 
   useEffect(() => {
     if (isEditMode) {
@@ -23,14 +24,25 @@ export default function MainCategoryForm() {
   }, [id]);
 
   const fetchMainCategory = async () => {
+    setFetching(true);
     try {
       const response = await api.get(`/main-category/get-by-id.php?id=${id}`);
       if (response.data.status) {
-        setFormData(response.data.data);
+        setFormData({
+          name: response.data.data.name || '',
+          description: response.data.data.description || '',
+          status: response.data.data.status || 'active'
+        });
+      } else {
+        toast.error('Failed to load main category');
+        navigate('/main-category');
       }
     } catch (error) {
       console.error('Error fetching main category:', error);
       toast.error('Failed to load main category');
+      navigate('/main-category');
+    } finally {
+      setFetching(false);
     }
   };
 
@@ -43,12 +55,28 @@ export default function MainCategoryForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!formData.name.trim()) {
+      toast.error('Category name is required');
+      return;
+    }
+    
     setLoading(true);
 
     try {
-      const companyId = JSON.parse(localStorage.getItem('user'))?.company_id;
+      const user = JSON.parse(localStorage.getItem('user'));
+      const companyId = user?.company_id;
+      
+      if (!companyId) {
+        toast.error('Company information not found');
+        return;
+      }
+      
       const payload = {
-        ...formData,
+        id: isEditMode ? parseInt(id) : undefined,
+        name: formData.name.trim(),
+        description: formData.description.trim(),
+        status: formData.status,
         company_id: companyId
       };
 
@@ -60,20 +88,30 @@ export default function MainCategoryForm() {
 
       if (response.data.status) {
         toast.success(isEditMode ? 'Main Category updated successfully!' : 'Main Category added successfully!');
-        navigate('/main-category');
+        setTimeout(() => {
+          navigate('/main-category');
+        }, 1500);
       } else {
         toast.error(response.data.message || 'Operation failed');
       }
     } catch (error) {
       console.error('Error saving main category:', error);
-      toast.error('Something went wrong');
+      toast.error(error.response?.data?.message || 'Something went wrong');
     } finally {
       setLoading(false);
     }
   };
 
+  if (fetching) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent"></div>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-6">
+    <div className="p-6 min-h-screen bg-gray-50">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-6">
@@ -105,6 +143,7 @@ export default function MainCategoryForm() {
               placeholder="e.g., Rice, Oils, Vegetables"
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
               required
+              autoFocus
             />
           </div>
 
@@ -121,6 +160,9 @@ export default function MainCategoryForm() {
               placeholder="Enter category description..."
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition resize-none"
             />
+            <p className="text-xs text-gray-400 mt-1">
+              {formData.description.length}/500 characters
+            </p>
           </div>
 
           {/* Status */}
@@ -129,7 +171,7 @@ export default function MainCategoryForm() {
               Status
             </label>
             <div className="flex gap-4">
-              <label className="flex items-center gap-2">
+              <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="radio"
                   name="status"
@@ -140,7 +182,7 @@ export default function MainCategoryForm() {
                 />
                 <span className="text-sm text-gray-700">Active</span>
               </label>
-              <label className="flex items-center gap-2">
+              <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="radio"
                   name="status"
@@ -159,7 +201,7 @@ export default function MainCategoryForm() {
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
