@@ -17,31 +17,17 @@ $data = json_decode(file_get_contents("php://input"), true);
 
 $id = intval($data['id'] ?? 0);
 $name = trim($data['name'] ?? '');
-$main_category_id = intval($data['main_category_id'] ?? 0);
-$status = trim($data['status'] ?? 'active');
 
-if (!$id || !$name || !$main_category_id) {
-    echo json_encode(["status"=>false, "message"=>"ID, Name & Main Category required"]);
+if (!$id || !$name) {
+    echo json_encode(["status"=>false,"message"=>"ID & Name required"]);
     exit;
 }
 
-// Check if main category exists
-$mainCatCheck = mysqli_query($conn, "SELECT id FROM main_categories WHERE id='$main_category_id'");
-if (mysqli_num_rows($mainCatCheck) == 0) {
-    echo json_encode(["status"=>false, "message"=>"Invalid Main Category"]);
-    exit;
-}
-
-$sql = "UPDATE categories 
-        SET name='$name', 
-            main_category_id='$main_category_id',
-            status='$status',
-            updated_at = CURRENT_TIMESTAMP 
-        WHERE id='$id'";
+$sql = "UPDATE categories SET name='$name' WHERE id='$id'";
 
 if ($conn->query($sql)) {
-    echo json_encode(["status"=>true, "message"=>"Sub Category updated successfully"]);
+    echo json_encode(["status"=>true,"message"=>"Updated"]);
 } else {
-    echo json_encode(["status"=>false, "message"=>$conn->error]);
+    echo json_encode(["status"=>false,"message"=>$conn->error]);
 }
 ?>

@@ -1,4 +1,5 @@
 ﻿<?php
+
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
@@ -18,7 +19,7 @@ $status = trim($data['status'] ?? '');
 
 if (!$id || !$status || !in_array($status, ['active', 'inactive'], true)) {
     echo json_encode([
-        "status" => false,
+        "success" => false,
         "message" => "Invalid data"
     ]);
     exit;
@@ -30,12 +31,12 @@ $update = mysqli_query($conn, "UPDATE categories SET status='$status' WHERE id='
 
 if ($update) {
     echo json_encode([
-        "status" => true,
-        "message" => "Status updated successfully"
+        "success" => true,
+        "message" => "Status updated"
     ]);
 } else {
     echo json_encode([
-        "status" => false,
+        "success" => false,
         "message" => mysqli_error($conn)
     ]);
 }

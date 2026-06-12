@@ -1,9 +1,11 @@
 <?php
+// 🔥 CORS HEADERS
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Access-Control-Allow-Methods: GET, OPTIONS");
+header("Access-Control-Allow-Methods: POST, OPTIONS");
 
+// 🔥 PREFLIGHT
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     http_response_code(200);
     exit();
@@ -14,19 +16,14 @@ include __DIR__ . '/../../config/db.php';
 $id = $_GET['id'] ?? 0;
 
 if (!$id) {
-    echo json_encode(["status"=>false, "message"=>"ID required"]);
+    echo json_encode(["status"=>false,"message"=>"ID required"]);
     exit;
 }
 
-$result = mysqli_query($conn, "SELECT c.*, mc.name as main_category_name 
-    FROM categories c
-    LEFT JOIN main_categories mc ON mc.id = c.main_category_id
-    WHERE c.id='$id' AND c.is_deleted=0");
+$result = mysqli_query($conn, "SELECT * FROM categories 
+WHERE id='$id' AND is_deleted=0");
 
-if ($result && mysqli_num_rows($result) > 0) {
-    $data = mysqli_fetch_assoc($result);
-    echo json_encode(["status"=>true, "data"=>$data]);
-} else {
-    echo json_encode(["status"=>false, "message"=>"Sub Category not found"]);
-}
+$data = mysqli_fetch_assoc($result);
+
+echo json_encode(["status"=>true,"data"=>$data]);
 ?>
