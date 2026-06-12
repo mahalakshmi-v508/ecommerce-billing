@@ -9,10 +9,12 @@ import {
   Building2,
   Settings,
   ShieldCheck,
-   AlertCircle ,
-   User,
+  AlertCircle,
+  User,
   LogOut,
-  CreditCard
+  CreditCard,
+  Layers,
+  FolderTree  // ← For Sub Category icon
 } from "lucide-react";
 import { Bell } from "lucide-react";
 import api from "../services/api";
@@ -22,11 +24,11 @@ export default function MainLayout() {
   const location = useLocation();
   const [hoveredPath, setHoveredPath] = useState(null);
 
-  // 🔥 GET USER
+  // GET USER
   const user = JSON.parse(localStorage.getItem("user"));
   const role = user?.role;
 
-  // 🔥 LOGOUT
+  // LOGOUT
   const handleLogout = () => {
     localStorage.clear();
     navigate("/");
@@ -53,68 +55,59 @@ export default function MainLayout() {
       console.error("Unread fetch error:", err);
     }
   };
-useEffect(() => {
-  fetchUnread();
-}, [location.pathname]);
+  
+  useEffect(() => {
+    fetchUnread();
+  }, [location.pathname]);
 
-window.refreshNotificationCount = fetchUnread;
+  window.refreshNotificationCount = fetchUnread;
 
-  // 🔥 ROLE BASED MENU
+  // ROLE BASED MENU
   const menuItems = [
-    // COMMON
-    // { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard size={20} /> },
-
     // ADMIN ONLY
     ...(role === "admin"
       ? [
-            { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard size={20} /> },
-
-          { name: "Category", path: "/category", icon: <Package size={20} /> },
+          { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard size={20} /> },
+          { name: "Main Category", path: "/main-category", icon: <Layers size={20} /> },
+          { name: "Sub Category", path: "/category", icon: <FolderTree size={20} /> },  // ← Changed from "Category" to "Sub Category"
           { name: "Products", path: "/products", icon: <Package size={20} /> },
-          // { name: "Billing", path: "/billing", icon: <ReceiptText size={20} /> },
           { name: "Reports", path: "/reports", icon: <BarChart3 size={20} /> },
           { name: "Cashiers", path: "/cashier", icon: <Building2 size={20} /> },
           { name: "Profile", path: "/profile", icon: <Settings size={20} /> },
           { name: "Customer", path: "/customer", icon: <User size={20} /> },
           { name: "Credit Settings", path: "/credit-settings", icon: <CreditCard size={20} /> }
-          
         ]
       : []),
 
     // SUPERADMIN ONLY
-   // SUPERADMIN ONLY
-...(role === "superadmin"
-  ? [
-      {
-        name: "Company",
-        path: "/company",
-        icon: <Building2 size={20} />
-      },
-
-      {
-        name: "Cashier Requests",
-        path: "/cashier-requests",
-        icon: <Building2 size={20} />
-      },
-
-      // 🔥 NEW
-      {
-        name: "Wholesaler Requests",
-        path: "/wholesaler-requests",
-        icon: <ShieldCheck size={20} />
-      }
-    ]
-  : []),
+    ...(role === "superadmin"
+      ? [
+          {
+            name: "Company",
+            path: "/company",
+            icon: <Building2 size={20} />
+          },
+          {
+            name: "Cashier Requests",
+            path: "/cashier-requests",
+            icon: <Building2 size={20} />
+          },
+          {
+            name: "Wholesaler Requests",
+            path: "/wholesaler-requests",
+            icon: <ShieldCheck size={20} />
+          }
+        ]
+      : []),
 
     // CASHIER ONLY
     ...(role === "cashier"
       ? [
-            { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard size={20} /> },
-
+          { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard size={20} /> },
           { name: "Billing", path: "/billing", icon: <ReceiptText size={20} /> },
           { name: "Reports", path: "/reports", icon: <BarChart3 size={20} /> },
-          { name: "Pending Invoice", path: "/payment-pending", icon: <AlertCircle  size={20} /> },
-          { name: "Pending Invoice History", path: "/paymentpending-history", icon: <AlertCircle  size={20} /> }
+          { name: "Pending Invoice", path: "/payment-pending", icon: <AlertCircle size={20} /> },
+          { name: "Pending Invoice History", path: "/paymentpending-history", icon: <AlertCircle size={20} /> }
         ]
       : [])
   ];
@@ -123,96 +116,86 @@ window.refreshNotificationCount = fetchUnread;
     <div className="flex h-screen bg-[#f0f4f9] overflow-hidden">
 
       {/* SIDEBAR */}
-    <motion.div
-  initial={{ x: -100, opacity: 0 }}
-  animate={{ x: 0, opacity: 1 }}
-  className="w-72 m-4 rounded-3xl bg-gradient-to-br from-[#1f8cff] to-[#4338ca] p-6 text-white shadow-2xl flex flex-col"
->
-
-  {/* LOGO */}
-  <div className="flex items-center gap-3 mb-6">
-    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center">
-      <ShieldCheck size={22} color="#1f8cff" />
-    </div>
-    <h2 className="text-xl font-bold">
-      Smart<span className="opacity-80">Ledger</span>
-    </h2>
-  </div>
-
-  {/* 🔥 SCROLLABLE MENU */}
-  <div className="flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-white/30">
-
-    <nav className="space-y-2">
-      {menuItems.map((item) => {
-        const isActive = location.pathname === item.path;
-
-        return (
-          <motion.div
-            key={item.path}
-            onClick={() => navigate(item.path)}
-            whileHover={{ scale: 1.02, x: 5 }}
-            className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer ${
-              isActive ? "bg-white text-blue-600" : "text-white/80"
-            }`}
-          >
-            {item.icon}
-            {item.name}
-          </motion.div>
-        );
-      })}
-    </nav>
-
-  </div>
-
-  {/* 🔥 FIXED USER PROFILE */}
-  <div className="mt-4 pt-4 border-t border-white/20">
-
-    <div className="flex items-center gap-3 bg-white/10 p-3 rounded-xl">
-
-      <div className="w-10 h-10 rounded-full bg-white text-blue-600 flex items-center justify-center font-bold">
-        {user?.name?.charAt(0)?.toUpperCase() || "U"}
-      </div>
-
-      <div className="flex-1 overflow-hidden">
-        <p className="text-sm font-bold truncate">{user?.name}</p>
-        <p className="text-xs text-white/70 truncate">{user?.email}</p>
-        <p className="text-[10px] text-white/40">{user?.role}</p>
-      </div>
-
-      <button
-  onClick={() => {
-    setUnreadCount(0);
-    navigate("/notifications");
-  }}
-  title="Notifications"
-  className="relative bg-white/5 hover:bg-white/10 p-2 rounded-lg"
->
-        <Bell size={16} />
-        {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
-            {unreadCount > 9 ? '9+' : unreadCount}
-          </span>
-        )}
-      </button>
-
-      <button
-        onClick={handleLogout}
-        className="bg-red-500 hover:bg-red-600 p-2 rounded-lg"
+      <motion.div
+        initial={{ x: -100, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        className="w-72 m-4 rounded-3xl bg-gradient-to-br from-[#1f8cff] to-[#4338ca] p-6 text-white shadow-2xl flex flex-col"
       >
-        <LogOut size={16} />
-      </button>
+        {/* LOGO */}
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center">
+            <ShieldCheck size={22} color="#1f8cff" />
+          </div>
+          <h2 className="text-xl font-bold">
+            Smart<span className="opacity-80">Ledger</span>
+          </h2>
+        </div>
 
-    </div>
+        {/* SCROLLABLE MENU */}
+        <div className="flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-white/30">
+          <nav className="space-y-2">
+            {menuItems.map((item) => {
+              const isActive = location.pathname === item.path;
 
-  </div>
+              return (
+                <motion.div
+                  key={item.path}
+                  onClick={() => navigate(item.path)}
+                  whileHover={{ scale: 1.02, x: 5 }}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer ${
+                    isActive ? "bg-white text-blue-600" : "text-white/80 hover:bg-white/10"
+                  }`}
+                >
+                  {item.icon}
+                  {item.name}
+                </motion.div>
+              );
+            })}
+          </nav>
+        </div>
 
-</motion.div>
+        {/* FIXED USER PROFILE */}
+        <div className="mt-4 pt-4 border-t border-white/20">
+          <div className="flex items-center gap-3 bg-white/10 p-3 rounded-xl">
+            <div className="w-10 h-10 rounded-full bg-white text-blue-600 flex items-center justify-center font-bold">
+              {user?.name?.charAt(0)?.toUpperCase() || "U"}
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <p className="text-sm font-bold truncate">{user?.name}</p>
+              <p className="text-xs text-white/70 truncate">{user?.email}</p>
+              <p className="text-[10px] text-white/40">{user?.role}</p>
+            </div>
+
+            <button
+              onClick={() => {
+                setUnreadCount(0);
+                navigate("/notifications");
+              }}
+              title="Notifications"
+              className="relative bg-white/5 hover:bg-white/10 p-2 rounded-lg"
+            >
+              <Bell size={16} />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </button>
+
+            <button
+              onClick={handleLogout}
+              className="bg-red-500 hover:bg-red-600 p-2 rounded-lg"
+            >
+              <LogOut size={16} />
+            </button>
+          </div>
+        </div>
+      </motion.div>
 
       {/* MAIN CONTENT */}
       <main className="flex-1 p-4 overflow-auto">
         <Outlet />
       </main>
-
     </div>
   );
 }
