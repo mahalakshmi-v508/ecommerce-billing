@@ -33,10 +33,10 @@ export default function Cart() {
 
   // Load cart when user changes
   useEffect(() => {
-    if (user?.id) loadCart()
+    if (user?.id) loadCart(true) // ஃபர்ஸ்ட் டைம் மட்டும் லோடிங் ஸ்பின்னர் காட்ட true அனுப்புறோம்
 
     const handleCartRefresh = () => {
-      if (user?.id) loadCart()
+      if (user?.id) loadCart(false) // மத்த நேரத்துல சைலண்டா பேக்ரவுண்ட்ல அப்டேட் ஆகும்
     }
 
     window.addEventListener('cartUpdated', handleCartRefresh)
@@ -44,15 +44,14 @@ export default function Cart() {
     return () => {
       window.removeEventListener('cartUpdated', handleCartRefresh)
     }
-  }, [user?.id]) // ✅ Fixed dependency
+  }, [user?.id])
 
-  const loadCart = async () => {
+  const loadCart = async (showSpinner = false) => {
     try {
-      setLoading(true)
+      if (showSpinner) setLoading(true)
       if (!user?.id) return
 
       const response = await getCartItems(user.id)
-      console.log('Cart Response:', response)
 
       if (response.status) {
         const frontendWeights = JSON.parse(localStorage.getItem('frontend_cart_weights')) || {}
@@ -61,14 +60,11 @@ export default function Cart() {
           const pId = item.product_id || item.id
           const pName = item.product_name
 
-          // Get saved weight data from localStorage
           const savedWeightData = frontendWeights[pId] || frontendWeights[pName]
           
-          // Weight text (e.g., '1/2kg') and its value (e.g., 0.5)
           const assignedWeightText = savedWeightData?.text || item.weight || '1kg'
           const weightMultiplier = savedWeightData?.value || 1
 
-          // Calculate price based on weight multiplier
           const basePrice = parseFloat(item.base_price || item.price || 0)
           const calculatedPrice = basePrice * weightMultiplier
 
@@ -87,26 +83,37 @@ export default function Cart() {
     } catch (error) {
       console.log(error)
     } finally {
-      setLoading(false)
+      if (showSpinner) setLoading(false)
     }
   }
 
+  // ✨ முக்கிய மாற்றம்: பேஜ் ரிஃப்ரெஷ் ஆகாமல் குவாண்டிட்டியை மாற்றும் மேஜிக் ஃபங்க்ஷன்
   const handleQuantity = async (cart_id, currentQty, type) => {
     let newQty = type === 'increase' ? currentQty + 1 : currentQty - 1
 
-    if (newQty < 1) {
-      return
-    }
+    if (newQty < 1) return
+
+    // 1. API ரெஸ்பான்ஸ் வர்றதுக்கு முன்னாடியே ஸ்கிரீன்ல குவாண்டிட்டியை உடனே மாத்துறோம் (Optimistic UI)
+    setCartItems(prevItems => 
+      prevItems.map(item => 
+        item.id === cart_id ? { ...item, quantity: newQty } : item
+      )
+    )
 
     setUpdatingId(cart_id)
     try {
       const response = await updateCartQuantity(cart_id, newQty)
       if (response.status) {
-        await loadCart()
+        // 2. பேக்ரவுண்ட்ல மட்டும் டேட்டாவை சிங்க் பண்றோம் (லோடிங் ஸ்பின்னர் வராது)
+        await loadCart(false)
         window.dispatchEvent(new Event('cartUpdated'))
+      } else {
+        // ஒருவேளை API ஃபெயில் ஆனா பழைய குவாண்டிட்டிக்கே மாத்திடுவோம்
+        await loadCart(false)
       }
     } catch (error) {
       console.log(error)
+      await loadCart(false)
     } finally {
       setUpdatingId(null)
     }
@@ -117,14 +124,14 @@ export default function Cart() {
     try {
       const response = await removeFromCart(cart_id)
       if (response.status) {
-        // Remove weight from localStorage when item is removed
         const frontendWeights = JSON.parse(localStorage.getItem('frontend_cart_weights')) || {}
         if (pId && frontendWeights[pId]) {
           delete frontendWeights[pId]
           localStorage.setItem('frontend_cart_weights', JSON.stringify(frontendWeights))
         }
 
-        await loadCart()
+        // ஐட்டம் டெலீட் ஆகும்போது மட்டும் ஸ்மூத்தா பேக்ரவுண்ட்ல லோட் பண்ணிக்கலாம்
+        await loadCart(false)
         window.dispatchEvent(new Event('cartUpdated'))
       }
     } catch (error) {
@@ -135,8 +142,7 @@ export default function Cart() {
   }
 
   const subtotal = cartItems.reduce(
-    (sum, item) =>
-      sum + Number(item.price || 0) * Number(item.quantity || 0),
+    (sum, item) => sum + Number(item.price || 0) * Number(item.quantity || 0),
     0
   )
 
@@ -161,7 +167,7 @@ export default function Cart() {
     <div className="min-h-screen bg-white text-slate-900 py-12 px-4 md:px-12 font-sans selection:bg-blue-50">
       <div className="max-w-6xl mx-auto">
         
-        {/* Sleek Blue-Accented Header */}
+        {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-slate-100 pb-6 mb-10 gap-4 animate-fade-in-down">
           <div className="space-y-1">
             <div className="flex items-center gap-1.5 text-xs font-semibold tracking-[0.2em] text-[#0B3B2E] uppercase">
@@ -181,7 +187,6 @@ export default function Cart() {
         </div>
 
         {cartItems.length === 0 ? (
-          /* Empty State */
           <div className="text-center py-24 border border-slate-100 rounded-3xl bg-slate-50/40 max-w-md mx-auto p-8 animate-fade-in-up">
             <ShoppingBag className="w-6 h-6 text-slate-300 mx-auto mb-4 stroke-[1.5]" />
             <h2 className="text-base font-medium text-slate-700 mb-1">Your bag is empty</h2>
@@ -194,7 +199,6 @@ export default function Cart() {
             </button>
           </div>
         ) : (
-          /* Main Checkout Layout */
           <div className="grid lg:grid-cols-3 gap-12 items-start">
             
             {/* Left Side: Cart Items */}
@@ -207,10 +211,8 @@ export default function Cart() {
                 return (
                   <div
                     key={uniqueKey}
-                    style={{ animationDelay: `${index * 60}ms` }}
                     className="group relative bg-white border border-slate-200/80 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-6 transition-all duration-200 hover:border-slate-300 shadow-sm hover:shadow-md animate-item-pop"
                   >
-                    {/* Product Image & Details */}
                     <div className="flex items-center gap-5 w-full sm:w-auto">
                       <div className="relative w-24 h-24 rounded-xl overflow-hidden bg-slate-50 border border-slate-100 flex-shrink-0">
                         {item.image ? (
@@ -226,7 +228,6 @@ export default function Cart() {
                         )}
                       </div>
 
-                      {/* Title, Weight, Price */}
                       <div className="space-y-1.5">
                         <h3 className="text-sm font-semibold text-slate-800 tracking-tight line-clamp-1 group-hover:text-[#0B3B2E] transition-colors">
                           {item.product_name}
@@ -251,28 +252,23 @@ export default function Cart() {
                     {/* Quantity Controls */}
                     <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-100">
                       
-                      {/* Quantity Buttons */}
                       <div className="flex items-center bg-white border border-slate-200 rounded-xl p-1 shadow-sm relative group-hover:border-slate-300 transition-colors">
                         <button
                           onClick={() => handleQuantity(item.id, parseInt(item.quantity || 1), 'decrease')}
-                          disabled={isUpdating || parseInt(item.quantity || 1) <= 1}
+                          disabled={parseInt(item.quantity || 1) <= 1}
                           className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-[#0B3B2E] hover:bg-green-50 disabled:opacity-30 disabled:hover:bg-transparent transition-all"
                         >
                           <Minus className="w-3.5 h-3.5 stroke-[2.5]" />
                         </button>
 
                         <div className="w-10 text-center text-xs font-bold text-slate-800">
-                          {isUpdating ? (
-                            <div className="w-3 h-3 border border-blue-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-                          ) : (
-                            item.quantity
-                          )}
+                          {/* இப்போ இங்க ஸ்பின்னர் வராது, நம்பர் மட்டும் உடனே மாறும் */}
+                          {item.quantity}
                         </div>
 
                         <button
                           onClick={() => handleQuantity(item.id, parseInt(item.quantity || 1), 'increase')}
-                          disabled={isUpdating}
-                          className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-[#0B3B2E] hover:bg-blue-50/50 disabled:opacity-30 transition-all"
+                          className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-[#0B3B2E] hover:bg-blue-50/50 transition-all"
                         >
                           <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
                         </button>
@@ -306,13 +302,12 @@ export default function Cart() {
             </div>
 
             {/* Right Side: Order Summary */}
-            <div className="lg:col-span-1 animate-fade-in-up" style={{ animationDelay: '150ms' }}>
+            <div className="lg:col-span-1">
               <div className="border border-slate-200/80 rounded-2xl p-6 bg-white shadow-sm sticky top-8 space-y-6">
                 <h2 className="text-sm font-bold tracking-wider uppercase text-slate-400 pb-2 border-b border-slate-100 flex items-center gap-2">
                   Summary Invoice
                 </h2>
 
-                {/* Price Breakdown */}
                 <div className="space-y-3.5 text-xs">
                   <div className="flex justify-between text-slate-500">
                     <span>Subtotal Base ({itemCount} units)</span>
@@ -335,7 +330,6 @@ export default function Cart() {
                     </span>
                   </div>
                   
-                  {/* Free Shipping Progress Message */}
                   {deliveryFee > 0 && (
                     <div className="bg-amber-50 rounded-lg p-3 mt-2">
                       <p className="text-xs text-amber-700">
@@ -360,7 +354,6 @@ export default function Cart() {
                   </div>
                 </div>
 
-                {/* Action Buttons */}
                 <div className="space-y-3 pt-2">
                   <button
                     onClick={() =>
@@ -388,7 +381,7 @@ export default function Cart() {
                   >
                     <CreditCard className="w-4 h-4" />
                     Proceed to Settlement
-                    <ArrowRight className="w-3.5 h-3.5 ml-0.5 animate-pulse" />
+                    <ArrowRight className="w-3.5 h-3.5 ml-0.5" />
                   </button>
 
                   <button
@@ -399,7 +392,6 @@ export default function Cart() {
                   </button>
                 </div>
 
-                {/* Security Guarantee */}
                 <div className="pt-2 flex items-center gap-2.5 text-[11px] text-slate-400 border-t border-slate-100">
                   <ShieldCheck className="w-4 h-4 text-blue-500 flex-shrink-0" />
                   <span>Encrypted end-to-end ledger verification system.</span>
@@ -427,7 +419,6 @@ export default function Cart() {
         .animate-fade-in-down { animation: fadeInDown 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .animate-fade-in-up { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .animate-item-pop { 
-          opacity: 0;
           animation: itemPop 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
         }
       `}</style>
