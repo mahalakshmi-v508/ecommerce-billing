@@ -160,44 +160,66 @@ export default function WholesalerProducts() {
         })
     }
 
-  const handleAddToCart = async (product) => {
-        try {
-            if (!wholesaler?.id) {
-                toast.error('Please login as wholesaler')
-                return
+   const handleAddToCart = async (product) => {
+    try {
+        if (!wholesaler?.id) {
+            toast.error('Please login as wholesaler')
+            return
+        }
+
+        if (parseInt(product.stock) <= 0) {
+            toast.error('Out of stock')
+            return
+        }
+
+        const weightValue = selectedWeights[product.id] || 5
+        const weightText = `${weightValue}kg`
+
+        // 1kg rate
+        const basePrice = parseFloat(
+            product.wholesale_price || product.price || 0
+        )
+
+        const response = await addToCart(
+            wholesaler.id,
+            product.id,
+            1,
+            'wholesaler'
+        )
+
+        if (response.status) {
+
+            // Save weight for cart page
+            const wholesalerCartWeights = JSON.parse(
+                localStorage.getItem('wholesaler_cart_weights')
+            ) || {}
+
+            wholesalerCartWeights[product.id] = {
+                text: weightText,
+                value: weightValue,
+                basePrice: basePrice
             }
 
-            if (parseInt(product.stock) <= 0) {
-                toast.error('Out of stock')
-                return
-            }
-
-            // Default weight choice is 5 if nothing is selected
-            const weight = selectedWeights[product.id] || 5
-            const finalQuantity = weight
-
-            // 🌟 இங்கேயும் ஒரு கிலோவுக்கான சரியான பேஸ் விலையை எடுக்கிறோம்
-            const basePrice = parseFloat(product.wholesale_price || product.price || 0)
-
-            const response = await addToCart(
-                wholesaler.id,
-                product.id,
-                finalQuantity,
-                'wholesaler',
-                basePrice // ஒருவேளை உங்கள் addToCart function விலையை ஒரு பேராமீட்டராக ஏற்றுக்கொண்டால் இதைப் பயன்படுத்தலாம்
+            localStorage.setItem(
+                'wholesaler_cart_weights',
+                JSON.stringify(wholesalerCartWeights)
             )
 
-            if (response.status) {
-                toast.success(`${product.product_name} (${weight}kg) added to cart!`)
-                window.dispatchEvent(new Event('cartUpdated'))
-            } else {
-                toast.error(response.message || 'Failed to add to cart')
-            }
-        } catch (error) {
-            console.error(error)
-            toast.error('Error adding to cart')
+            toast.success(
+                `${product.product_name} (${weightText}) added to cart`
+            )
+
+            window.dispatchEvent(new Event('cartUpdated'))
+
+        } else {
+            toast.error(response.message || 'Failed to add to cart')
         }
+
+    } catch(error) {
+        console.log(error)
+        toast.error('Error adding cart')
     }
+}
 
     if (loading) {
         return (
@@ -218,6 +240,21 @@ export default function WholesalerProducts() {
             />
         )
     }
+
+    const getDisplayPrice = (product) => {
+        const type = product.product_type;
+        const weight = selectedWeights[product.id] || 5
+
+        if (type === "wholesale") {
+            return (Number(product.wholesale_price || 0) * weight).toFixed(2);
+        }
+
+        if (type === "both") {
+            return (Number(product.wholesale_price || 0) * weight).toFixed(2);
+        }
+
+        return (Number(product.price || 0) * weight).toFixed(2);
+    };
 
     return (
         <div className="min-h-screen bg-white py-8 px-4">
@@ -290,11 +327,7 @@ export default function WholesalerProducts() {
                         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                             {allProducts.map((product) => {
                                 const selectedWeight = selectedWeights[product.id] || 5
-                                
-                                // Price checking logic matching wholesale type
-                                const basePrice = parseFloat(product.wholesale_price || product.price || 0)
-                                const finalPrice = (basePrice * selectedWeight).toFixed(2)
-                                
+                                const finalPrice = (parseFloat(product.wholesale_price || product.price || 0) * selectedWeight).toFixed(2)
                                 const isInWishlist = wishlistItems.some(
                                     (item) => parseInt(item.product_id) === parseInt(product.id)
                                 )
@@ -303,10 +336,11 @@ export default function WholesalerProducts() {
                                 return (
                                     <div
                                         key={product.id}
-                                        className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-green-300 animate-fadeIn"
+                                        className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-green-300"
                                     >
                                         {/* Product Image */}
                                         <div className="relative h-40 w-full overflow-hidden bg-gray-100">
+                                            {/* Wishlist Button */}
                                             <button
                                                 onClick={() => handleWishlist(product)}
                                                 className={`absolute right-2 top-2 z-10 flex h-8 w-8 items-center justify-center rounded-full transition-all duration-200 shadow-md ${
@@ -330,68 +364,70 @@ export default function WholesalerProducts() {
                                             ) : (
                                                 <div className="flex h-full flex-col items-center justify-center">
                                                     <ShoppingBag className="w-10 h-10 text-gray-400 mb-2" />
-                                                    <span className="text-xs text-gray-500">No Image</span>
+                                                    <span className="text-xs text-gray-500">
+                                                        No Image
+                                                    </span>
                                                 </div>
                                             )}
                                         </div>
 
                                         {/* Product Details */}
-                                        <div className="p-4 space-y-3">
-                                            <div>
-                                                <h3 className="text-base font-semibold text-gray-800 line-clamp-1 group-hover:text-green-600 transition-colors">
+                                        <div className="p-3">
+                                            <div className="mb-2">
+                                                <h3 className="text-base font-semibold text-gray-800 line-clamp-2 group-hover:text-green-600 transition-colors">
                                                     {product.product_name}
                                                 </h3>
-                                                <p className="text-[11px] text-gray-500 mt-0.5">
+
+                                                <p className="text-[11px] text-gray-500 mt-1">
                                                     SKU: {product.product_code || 'N/A'}
                                                 </p>
                                             </div>
 
-                                            {/* Weight Selection Section (From categories style) */}
-                                            <div>
-                                                <label className="text-xs font-semibold text-gray-500 block mb-1.5">Select Weight:</label>
-                                                <div className="flex items-center gap-1.5 flex-wrap">
-                                                    {[5, 10, 15, 30].map((weight) => {
-                                                        const active = selectedWeight === weight
-                                                        return (
-                                                            <button
-                                                                key={weight}
-                                                                type="button"
-                                                                onClick={() =>
-                                                                    setSelectedWeights({
-                                                                        ...selectedWeights,
-                                                                        [product.id]: weight
-                                                                    })
-                                                                }
-                                                                className={`px-2.5 py-1.5 rounded-md text-xs font-bold transition-all duration-300 border ${
-                                                                    active
-                                                                        ? "bg-green-600 text-white border-green-600 shadow-sm scale-105"
-                                                                        : "bg-gray-50 text-gray-600 border-gray-200 hover:border-green-600 hover:text-green-600"
-                                                                }`}
-                                                            >
-                                                                {weight}kg
-                                                            </button>
-                                                        )
-                                                    })}
-                                                </div>
+                                            {/* Weight Selection */}
+                                            <div className="flex items-center gap-2 mb-4">
+                                                {[5, 10, 15, 30].map((weight) => {
+                                                    const active = (selectedWeights[product.id] || 5) === weight
+                                                    return (
+                                                        <button
+                                                            key={weight}
+                                                            type="button"
+                                                            onClick={() =>
+                                                                setSelectedWeights({
+                                                                    ...selectedWeights,
+                                                                    [product.id]: weight
+                                                                })
+                                                            }
+                                                            className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 border ${
+                                                                active
+                                                                    ? "bg-green-100 text-green-700 border-green-600 shadow-sm"
+                                                                    : "bg-white text-gray-600 border-gray-300 hover:border-green-600 hover:text-green-600"
+                                                            }`}
+                                                        >
+                                                            {weight}kg
+                                                        </button>
+                                                    )
+                                                })}
                                             </div>
 
                                             {/* Price & Stock */}
-                                            <div className="flex items-center justify-between border-t border-gray-100 pt-3">
-                                                <div className="flex items-center gap-0.5">
+                                            <div className="flex items-center justify-between border-t border-gray-100 pt-2 mb-3">
+                                                <div className="flex items-center gap-1">
                                                     <IndianRupee className="w-4 h-4 text-green-600" />
-                                                    <span className="text-xl font-black text-green-600">
+                                                    <span className="text-xl font-bold text-green-600">
                                                         {finalPrice}
                                                     </span>
                                                 </div>
 
                                                 <span
-                                                    className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                                                    className={`inline-flex items-center rounded-full px-2 py-1 text-[10px] font-semibold ${
                                                         !isOutOfStock
                                                             ? 'bg-green-100 text-green-700'
                                                             : 'bg-red-100 text-red-700'
                                                     }`}
                                                 >
-                                                    {!isOutOfStock ? `${product.stock} kg left` : 'Sold Out'}
+                                                    {!isOutOfStock
+                                                        ? `${product.stock} in stock`
+                                                        : 'Sold Out'}
                                                 </span>
                                             </div>
 
@@ -399,10 +435,10 @@ export default function WholesalerProducts() {
                                             <button
                                                 onClick={() => handleAddToCart(product)}
                                                 disabled={isOutOfStock}
-                                                className={`w-full rounded-lg py-2.5 text-xs font-bold transition-all duration-300 flex items-center justify-center gap-2 uppercase tracking-wider ${
+                                                className={`w-full rounded-lg py-2 text-xs font-bold transition-all duration-300 flex items-center justify-center gap-2 uppercase ${
                                                     isOutOfStock
                                                         ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                                        : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 shadow-md'
+                                                        : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 shadow-md hover:shadow-lg'
                                                 }`}
                                             >
                                                 <CartIcon className="w-4 h-4" />
