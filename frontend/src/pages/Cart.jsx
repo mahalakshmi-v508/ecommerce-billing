@@ -12,7 +12,7 @@ import {
   ArrowRight,
   ChevronLeft,
   TrendingUp,
-  Scale // Weight-க்கு ஒரு icon காமிக்க
+  Scale
 } from 'lucide-react'
 
 import {
@@ -31,13 +31,12 @@ export default function Cart() {
   const [removingId, setRemovingId] = useState(null)
   const [updatingId, setUpdatingId] = useState(null)
 
+  // Load cart when user changes
   useEffect(() => {
-    if (user?.id) {
-      loadCart()
-    }
+    if (user?.id) loadCart()
 
     const handleCartRefresh = () => {
-      if (user?.id) loadCart();
+      if (user?.id) loadCart()
     }
 
     window.addEventListener('cartUpdated', handleCartRefresh)
@@ -45,10 +44,13 @@ export default function Cart() {
     return () => {
       window.removeEventListener('cartUpdated', handleCartRefresh)
     }
-  }, [user])
+  }, [user?.id]) // ✅ Fixed dependency
 
- const loadCart = async () => {
+  const loadCart = async () => {
     try {
+      setLoading(true)
+      if (!user?.id) return
+
       const response = await getCartItems(user.id)
       console.log('Cart Response:', response)
 
@@ -56,25 +58,25 @@ export default function Cart() {
         const frontendWeights = JSON.parse(localStorage.getItem('frontend_cart_weights')) || {}
 
         const updatedCart = (response.data || []).map((item) => {
-          const pId = item.product_id || item.id;
-          const pName = item.product_name;
+          const pId = item.product_id || item.id
+          const pName = item.product_name
 
-          // லோக்கல் ஸ்டோரேஜில் இருந்து டேட்டாவை எடுக்கிறோம்
-          const savedWeightData = frontendWeights[pId] || frontendWeights[pName];
+          // Get saved weight data from localStorage
+          const savedWeightData = frontendWeights[pId] || frontendWeights[pName]
           
-          // வெயிட் டெக்ஸ்ட் (e.g., '1/2kg') மற்றும் அதன் வேல்யூ (e.g., 0.5)
-          const assignedWeightText = savedWeightData?.text || item.weight || '1kg';
-          const weightMultiplier = savedWeightData?.value || 1; // Default 1kg
+          // Weight text (e.g., '1/2kg') and its value (e.g., 0.5)
+          const assignedWeightText = savedWeightData?.text || item.weight || '1kg'
+          const weightMultiplier = savedWeightData?.value || 1
 
-          // ஒரிஜினல் பேஸ் பிரைஸை வெயிட் வேல்யூவால் பெருக்குகிறோம் (e.g., 540 * 0.5 = 270)
-          const calculatedPrice = parseFloat(item.price || 0) * weightMultiplier;
+          // Calculate price based on weight multiplier
+          const basePrice = parseFloat(item.base_price || item.price || 0)
+          const calculatedPrice = basePrice * weightMultiplier
 
           return {
             ...item,
             product_id: pId,
             company_id: item.company_id ?? user?.company_id ?? 0,
             selected_weight: assignedWeightText,
-            // இங்க ஒரிஜினல் விலைக்குப் பதிலா கணக்கிடப்பட்ட விலையை ஓவர்ரைட் பண்றோம்
             price: calculatedPrice 
           }
         })
@@ -88,6 +90,7 @@ export default function Cart() {
       setLoading(false)
     }
   }
+
   const handleQuantity = async (cart_id, currentQty, type) => {
     let newQty = type === 'increase' ? currentQty + 1 : currentQty - 1
 
@@ -114,7 +117,7 @@ export default function Cart() {
     try {
       const response = await removeFromCart(cart_id)
       if (response.status) {
-        // Cart-ல் இருந்து நீக்கும் போது localStorage-ல் இருந்தும் அந்த weight-ஐ clean செய்கிறோம்
+        // Remove weight from localStorage when item is removed
         const frontendWeights = JSON.parse(localStorage.getItem('frontend_cart_weights')) || {}
         if (pId && frontendWeights[pId]) {
           delete frontendWeights[pId]
@@ -131,19 +134,20 @@ export default function Cart() {
     }
   }
 
-  const total = cartItems.reduce(
+  const subtotal = cartItems.reduce(
     (sum, item) =>
-      sum + parseFloat(item.price || 0) * parseInt(item.quantity || 0),
+      sum + Number(item.price || 0) * Number(item.quantity || 0),
     0
   )
-
-  const gstAmount = total * 0.18
-  const grandTotal = total + gstAmount
 
   const itemCount = cartItems.reduce(
-    (sum, item) => sum + parseInt(item.quantity || 0),
+    (sum, item) => sum + Number(item.quantity || 0),
     0
   )
+
+  const gstAmount = subtotal * 0.18
+  const deliveryFee = subtotal >= 2000 ? 0 : 50
+  const grandTotal = subtotal + gstAmount + deliveryFee
 
   if (loading) {
     return (
@@ -177,28 +181,28 @@ export default function Cart() {
         </div>
 
         {cartItems.length === 0 ? (
-          /* High-End Minimal Empty State */
+          /* Empty State */
           <div className="text-center py-24 border border-slate-100 rounded-3xl bg-slate-50/40 max-w-md mx-auto p-8 animate-fade-in-up">
             <ShoppingBag className="w-6 h-6 text-slate-300 mx-auto mb-4 stroke-[1.5]" />
             <h2 className="text-base font-medium text-slate-700 mb-1">Your bag is empty</h2>
             <p className="text-xs text-slate-400 max-w-xs mx-auto mb-8">Once you discover products you love, they'll be managed right here.</p>
-           <button
-  onClick={() => navigate('/products')}
-  className="inline-block px-6 py-3 bg-[#0B3B2E] text-white text-[11px] font-semibold tracking-widest uppercase rounded-xl hover:bg-[#D4AF37] hover:text-[#112E24] transition-all duration-300 shadow-sm"
->
-  Explore Products
-</button>
+            <button
+              onClick={() => navigate('/products')}
+              className="inline-block px-6 py-3 bg-[#0B3B2E] text-white text-[11px] font-semibold tracking-widest uppercase rounded-xl hover:bg-[#D4AF37] hover:text-[#112E24] transition-all duration-300 shadow-sm"
+            >
+              Explore Products
+            </button>
           </div>
         ) : (
-          /* Main Checkout Studio Layout */
+          /* Main Checkout Layout */
           <div className="grid lg:grid-cols-3 gap-12 items-start">
             
-            {/* Left Side: Dynamic Luxury Cart Items */}
+            {/* Left Side: Cart Items */}
             <div className="lg:col-span-2 space-y-4">
               {cartItems.map((item, index) => {
-                const uniqueKey = item.product_id || item.id || index;
-                const isUpdating = updatingId === item.id;
-                const isRemoving = removingId === item.id;
+                const uniqueKey = item.product_id || item.id || index
+                const isUpdating = updatingId === item.id
+                const isRemoving = removingId === item.id
 
                 return (
                   <div
@@ -206,8 +210,7 @@ export default function Cart() {
                     style={{ animationDelay: `${index * 60}ms` }}
                     className="group relative bg-white border border-slate-200/80 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-6 transition-all duration-200 hover:border-slate-300 shadow-sm hover:shadow-md animate-item-pop"
                   >
-                    
-                    {/* Visual Segment & Identification */}
+                    {/* Product Image & Details */}
                     <div className="flex items-center gap-5 w-full sm:w-auto">
                       <div className="relative w-24 h-24 rounded-xl overflow-hidden bg-slate-50 border border-slate-100 flex-shrink-0">
                         {item.image ? (
@@ -223,13 +226,12 @@ export default function Cart() {
                         )}
                       </div>
 
-                      {/* Title Specs, Weight and Dynamic Price Elements */}
+                      {/* Title, Weight, Price */}
                       <div className="space-y-1.5">
                         <h3 className="text-sm font-semibold text-slate-800 tracking-tight line-clamp-1 group-hover:text-[#0B3B2E] transition-colors">
                           {item.product_name}
                         </h3>
                         
-                        {/* --- DISPLAYING SELECTED WEIGHT FRONTEND VALUE --- */}
                         <div className="inline-flex items-center gap-1 bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md text-[11px] font-medium border border-slate-200">
                           <Scale className="w-3 h-3 text-[#0B3B2E]" />
                           <span>Weight: {item.selected_weight}</span>
@@ -246,10 +248,10 @@ export default function Cart() {
                       </div>
                     </div>
 
-                    {/* Operational Core (Controls + Accumulated Subtotals) */}
+                    {/* Quantity Controls */}
                     <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-100">
                       
-                      {/* Premium Quantizer Core */}
+                      {/* Quantity Buttons */}
                       <div className="flex items-center bg-white border border-slate-200 rounded-xl p-1 shadow-sm relative group-hover:border-slate-300 transition-colors">
                         <button
                           onClick={() => handleQuantity(item.id, parseInt(item.quantity || 1), 'decrease')}
@@ -276,7 +278,7 @@ export default function Cart() {
                         </button>
                       </div>
 
-                      {/* Precise Accumulation Summary */}
+                      {/* Item Total */}
                       <div className="text-right min-w-[80px]">
                         <div className="flex items-center justify-end font-bold text-slate-900 text-sm tracking-tight">
                           <IndianRupee className="w-3.5 h-3.5 stroke-[2.5]" />
@@ -284,11 +286,11 @@ export default function Cart() {
                         </div>
                       </div>
 
-                      {/* Dismissal Action Button */}
+                      {/* Remove Button */}
                       <button
                         onClick={() => handleRemove(item.id, item.product_id)}
                         disabled={isRemoving}
-                        title="Remove piece"
+                        title="Remove item"
                         className="w-8 h-8 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50/60 flex items-center justify-center transition-all disabled:opacity-40"
                       >
                         {isRemoving ? (
@@ -297,38 +299,59 @@ export default function Cart() {
                           <Trash2 className="w-4 h-4 stroke-[1.8]" />
                         )}
                       </button>
-
                     </div>
-
                   </div>
-                );
+                )
               })}
             </div>
 
-            {/* Right Side: Invoice Widget */}
+            {/* Right Side: Order Summary */}
             <div className="lg:col-span-1 animate-fade-in-up" style={{ animationDelay: '150ms' }}>
               <div className="border border-slate-200/80 rounded-2xl p-6 bg-white shadow-sm sticky top-8 space-y-6">
                 <h2 className="text-sm font-bold tracking-wider uppercase text-slate-400 pb-2 border-b border-slate-100 flex items-center gap-2">
                   Summary Invoice
                 </h2>
 
-                {/* Ledger Breakdown Rows */}
+                {/* Price Breakdown */}
                 <div className="space-y-3.5 text-xs">
                   <div className="flex justify-between text-slate-500">
                     <span>Subtotal Base ({itemCount} units)</span>
-                    <span className="font-semibold text-slate-800">₹{total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
-                  </div>
-                  <div className="flex justify-between text-slate-500">
-                    <span>Logistics Dispatch</span>
-                    <span className="text-[#0B3B2E] font-semibold uppercase tracking-wider text-[10px] bg-blue-50 px-2 py-0.5 rounded-md">Complimentary</span>
-                  </div>
-                  <div className="flex justify-between text-slate-500">
-                    <span>Tax Assessment (GST 18%)</span>
-                    <span className="font-semibold text-slate-800">₹{gstAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                    <span className="font-semibold text-slate-800">
+                      ₹{subtotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                    </span>
                   </div>
                   
+                  <div className="flex justify-between text-slate-500">
+                    <span>Delivery Fee</span>
+                    <span className={`font-semibold ${deliveryFee === 0 ? 'text-green-600' : 'text-slate-800'}`}>
+                      {deliveryFee === 0 ? "FREE" : `₹${deliveryFee.toLocaleString('en-IN')}`}
+                    </span>
+                  </div>
+                  
+                  <div className="flex justify-between text-slate-500">
+                    <span>Tax (GST 18%)</span>
+                    <span className="font-semibold text-slate-800">
+                      ₹{gstAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                  
+                  {/* Free Shipping Progress Message */}
+                  {deliveryFee > 0 && (
+                    <div className="bg-amber-50 rounded-lg p-3 mt-2">
+                      <p className="text-xs text-amber-700">
+                        🚚 Add ₹{(2000 - subtotal).toLocaleString('en-IN')} more to get FREE Delivery!
+                      </p>
+                      <div className="w-full bg-amber-200 rounded-full h-1.5 mt-2">
+                        <div 
+                          className="bg-amber-600 h-1.5 rounded-full transition-all duration-300"
+                          style={{ width: `${(subtotal / 2000) * 100}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  
                   <div className="border-t border-slate-100 my-4 pt-4 flex justify-between items-baseline">
-                    <span className="text-sm font-bold text-slate-900">Grand Valuation</span>
+                    <span className="text-sm font-bold text-slate-900">Grand Total</span>
                     <div className="text-right">
                       <span className="text-2xl font-black tracking-tight text-[#0B3B2E]">
                         ₹{grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
@@ -337,15 +360,16 @@ export default function Cart() {
                   </div>
                 </div>
 
-                {/* Royal Blue Settlement Action Triggers */}
+                {/* Action Buttons */}
                 <div className="space-y-3 pt-2">
                   <button
                     onClick={() =>
                       navigate('/payment', {
                         state: {
                           totalAmount: grandTotal,
-                          subTotal: total,
+                          subTotal: subtotal,
                           gstAmount: gstAmount,
+                          deliveryFee: deliveryFee,
                           cartItems: cartItems.map((item) => ({
                             id: item.id,
                             product_id: item.product_id,
@@ -353,15 +377,16 @@ export default function Cart() {
                             price: item.price,
                             quantity: item.quantity,
                             company_id: item.company_id,
-                            weight: item.selected_weight // Payment screen-க்கும் weight பாஸ் ஆகிறது!
+                            weight: item.selected_weight
                           })),
                           company_id: cartItems[0]?.company_id ?? user?.company_id ?? 0,
                           cashier_id: user?.cashier_id ?? user?.id ?? 0,
                         }
                       })
                     }
-                    className="w-full bg-[#0B3B2E] text-white py-3.5 rounded-xl font-semibold text-xs tracking-widest uppercase hover:bg-[#D4AF37] hover:text-[#112E24] transition-all shadow-md active:scale-[0.99] flex items-center justify-center gap-2"                  >
-                    <CreditCard className="w-4 h-4 " />
+                    className="w-full bg-[#0B3B2E] text-white py-3.5 rounded-xl font-semibold text-xs tracking-widest uppercase hover:bg-[#D4AF37] hover:text-[#112E24] transition-all shadow-md active:scale-[0.99] flex items-center justify-center gap-2"
+                  >
+                    <CreditCard className="w-4 h-4" />
                     Proceed to Settlement
                     <ArrowRight className="w-3.5 h-3.5 ml-0.5 animate-pulse" />
                   </button>
@@ -370,23 +395,22 @@ export default function Cart() {
                     onClick={() => navigate('/products')}
                     className="w-full bg-white border border-slate-200 text-slate-600 py-3 rounded-xl font-semibold text-xs tracking-wider uppercase hover:text-[#0B3B2E] hover:border-blue-200 transition-all flex items-center justify-center gap-2"
                   >
-                    Continue Acquisition
+                    Continue Shopping
                   </button>
                 </div>
 
-                {/* Micro Guarantee Label */}
+                {/* Security Guarantee */}
                 <div className="pt-2 flex items-center gap-2.5 text-[11px] text-slate-400 border-t border-slate-100">
                   <ShieldCheck className="w-4 h-4 text-blue-500 flex-shrink-0" />
                   <span>Encrypted end-to-end ledger verification system.</span>
                 </div>
               </div>
             </div>
-
           </div>
         )}
       </div>
 
-      {/* Modern CSS Animation Block */}
+      {/* CSS Animations */}
       <style>{`
         @keyframes fadeInDown {
           from { opacity: 0; transform: translateY(-12px); }

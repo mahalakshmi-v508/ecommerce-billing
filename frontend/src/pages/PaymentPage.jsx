@@ -29,6 +29,8 @@ export default function PaymentPage() {
   const cartItems = location.state?.cartItems || []
   const subTotal = location.state?.subTotal || 0
   const gstAmount = location.state?.gstAmount || 0
+  const deliveryFee = totalAmount >= 2000 ? 0 : 50;
+const finalAmount = totalAmount + deliveryFee;
 
   const companyId = location.state?.company_id ?? cartItems[0]?.company_id ?? parseInt(user?.company_id || 0)
   const cashierId = location.state?.cashier_id ?? parseInt(user?.cashier_id ?? user?.id ?? 0)
@@ -70,20 +72,28 @@ export default function PaymentPage() {
       }))
 
       const payload = {
-        company_id: companyId,
-        customer_id: parseInt(user?.id || 21),
-        customer_name: user?.name || 'Guest',
-        customer_phone: user?.phone || '9876543210',
-        cashier_id: cashierId,
-        products,
-        sub_total: subTotal,
-        gst_total: gstAmount,
-        total_amount: totalAmount,
-        payment_method: paymentMethod,
-        payment_type: paymentMethod === 'credit' ? 'credit' : 'cash',
-        gst_type: 'with_gst',
-        paid_amount: paymentMethod === 'credit' ? 0 : totalAmount,
-      }
+  company_id: companyId,
+  customer_id: parseInt(user?.id || 21),
+  customer_name: user?.name || 'Guest',
+  customer_phone: user?.phone || '9876543210',
+  cashier_id: cashierId,
+  products,
+  sub_total: subTotal,
+  gst_total: gstAmount,
+
+  // ✅ ADD THIS
+  delivery_fee: deliveryFee,
+
+  // ❗ total must include delivery fee
+  total_amount: finalAmount,
+
+  // ❗ paid amount also must include delivery fee
+  paid_amount: paymentMethod === 'credit' ? 0 : finalAmount,
+
+  payment_method: paymentMethod,
+  payment_type: paymentMethod === 'credit' ? 'credit' : 'cash',
+  gst_type: 'with_gst',
+}
 
       const response = await createInvoice(payload)
 
