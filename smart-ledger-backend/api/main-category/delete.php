@@ -14,34 +14,34 @@ include __DIR__ . '/../../config/db.php';
 $data = json_decode(file_get_contents("php://input"), true);
 $id = intval($data['id'] ?? 0);
 
-if (!$id) {
-    echo json_encode(["status" => false, "message" => "ID required"]);
+if (empty($id)) {
+    echo json_encode(["status" => false, "message" => "Category ID is required"]);
     exit;
 }
 
+// Start transaction
 mysqli_begin_transaction($conn);
 
 try {
-    // Soft delete products under this category
-    mysqli_query($conn, "UPDATE products SET is_deleted = 1 WHERE category_id = $id");
+    // First, update categories to remove main_category reference
+    mysqli_query($conn, "UPDATE categories SET main_category_id = NULL WHERE main_category_id = $id");
     
-    // Soft delete category
-    $result = mysqli_query($conn, "UPDATE categories SET is_deleted = 1 WHERE id = $id");
+    // Soft delete main category
+    $sql = "UPDATE main_categories SET is_deleted = 1 WHERE id = $id";
     
-    if (!$result) {
-        throw new Exception("Delete failed: " . mysqli_error($conn));
+    if (!mysqli_query($conn, $sql)) {
+        throw new Exception("Failed to delete main category");
     }
     
     mysqli_commit($conn);
     
     echo json_encode([
         "status" => true,
-        "message" => "Category deleted successfully"
+        "message" => "Main category deleted successfully"
     ]);
     
 } catch (Exception $e) {
     mysqli_rollback($conn);
-    
     echo json_encode([
         "status" => false,
         "message" => $e->getMessage()

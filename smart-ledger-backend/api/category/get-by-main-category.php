@@ -11,23 +11,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 
 include __DIR__ . '/../../config/db.php';
 
-$company_id = $_GET['company_id'] ?? '';
+$main_category_id = intval($_GET['main_category_id'] ?? 0);
+$company_id = intval($_GET['company_id'] ?? 0);
 
-$query = "
-    SELECT c.*, 
-           mc.name as main_category_name,
-           mc.id as main_category_id
-    FROM categories c
-    LEFT JOIN main_categories mc ON c.main_category_id = mc.id AND mc.is_deleted = 0
-    WHERE c.is_deleted = 0
-";
-
-if (!empty($company_id)) {
-    $company_id = mysqli_real_escape_string($conn, $company_id);
-    $query .= " AND c.company_id = '$company_id'";
+if (!$main_category_id || !$company_id) {
+    echo json_encode(["status" => false, "message" => "Main category ID and Company ID required"]);
+    exit;
 }
 
-$query .= " ORDER BY c.id DESC";
+$query = "
+    SELECT id, name, status
+    FROM categories
+    WHERE main_category_id = $main_category_id
+    AND company_id = $company_id
+    AND is_deleted = 0
+    AND status = 'active'
+    ORDER BY name ASC
+";
 
 $result = mysqli_query($conn, $query);
 $data = [];
