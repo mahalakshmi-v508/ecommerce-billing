@@ -10,29 +10,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 
 include __DIR__ . '/../../config/db.php';
 
-$category_id = isset($_GET['category_id']) ? intval($_GET['category_id']) : 0;
+$company_id = isset($_GET['company_id']) ? intval($_GET['company_id']) : 0;
 
-if (!$category_id) {
-    echo json_encode(["status" => false, "message" => "Category ID required"]);
+if (empty($company_id)) {
+    echo json_encode(["status" => false, "message" => "Company ID required"]);
     exit;
 }
 
-$query = "SELECT id, product_name, product_code, price, stock, image 
-          FROM products 
-          WHERE category_id = $category_id 
+$query = "SELECT id, name, description FROM main_categories 
+          WHERE company_id = $company_id 
           AND is_deleted = 0 
           AND status = 'active' 
-          ORDER BY id DESC";
+          ORDER BY name ASC";
 
 $result = mysqli_query($conn, $query);
-$products = [];
+$mainCategories = [];
 
 while ($row = mysqli_fetch_assoc($result)) {
-    $products[] = $row;
+    $mainCategories[] = $row;
 }
 
 echo json_encode([
     "status" => true,
-    "data" => $products
+    "data" => $mainCategories
 ]);
 ?>

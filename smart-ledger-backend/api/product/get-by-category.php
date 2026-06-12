@@ -17,6 +17,7 @@ if (!$category_id) {
     exit;
 }
 
+// Simple query - only products
 $query = "SELECT id, product_name, product_code, price, stock, image 
           FROM products 
           WHERE category_id = $category_id 

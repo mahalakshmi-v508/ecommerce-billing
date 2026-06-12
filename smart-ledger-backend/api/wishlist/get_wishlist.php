@@ -1,5 +1,4 @@
 <?php
-
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json");
 
@@ -53,6 +52,7 @@ mysqli_stmt_close($stmt);
 
 echo json_encode([
     "status" => true,
-    "data" => $data
+    "data" => $data,
+    "count" => count($data)  // 🔥 Add count to response
 ]);
 ?>
