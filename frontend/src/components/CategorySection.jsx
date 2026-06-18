@@ -1,93 +1,84 @@
-import { useEffect, useState } from 'react';
-import api from '../services/api';
-import { useAuth } from '../context/AuthContext';
+import { useEffect, useState } from 'react'
+import { getActiveCategories } from '../services/categoryService.js'
+import { useAuth } from '../context/AuthContext.jsx'
 
 export default function CategorySection({ selectedCategory, onCategoryChange, loading }) {
-    const { user } = useAuth();
-    const [mainCategories, setMainCategories] = useState([]);
-    const [expandedMainCat, setExpandedMainCat] = useState(null);
-    const [loadingCategories, setLoadingCategories] = useState(true);
+  const { user } = useAuth()
+  const [categories, setCategories] = useState([])
+  const [loadingCategories, setLoadingCategories] = useState(true)
 
-    useEffect(() => {
-        fetchMainCategoriesWithSub();
-    }, [user]);
+  useEffect(() => {
+    loadCategories()
+  }, [user])
 
-    const fetchMainCategoriesWithSub = async () => {
-        try {
-            if (!user?.company_id) return;
-            setLoadingCategories(true);
-            const response = await api.get(`/main-category/get-active.php?company_id=${user.company_id}`);
-            if (response.data.status) {
-                setMainCategories(response.data.data);
-                if (response.data.data.length > 0 && !selectedCategory) {
-                    // Auto select first sub category if available
-                    setExpandedMainCat(response.data.data[0].id);
-                }
-            }
-        } catch (error) {
-            console.error('Error fetching categories:', error);
-        } finally {
-            setLoadingCategories(false);
-        }
-    };
-
-    if (loading || loadingCategories) {
-        return (
-            <div className="animate-pulse">
-                <div className="h-10 bg-slate-800 rounded-lg w-full mb-4"></div>
-                <div className="flex gap-2 overflow-x-auto pb-4">
-                    {[1, 2, 3, 4, 5].map(i => (
-                        <div key={i} className="h-10 w-24 bg-slate-800 rounded-full flex-shrink-0"></div>
-                    ))}
-                </div>
-            </div>
-        );
+  const loadCategories = async () => {
+    try {
+      if (!user?.company_id) return
+      setLoadingCategories(true)
+      const response = await getActiveCategories(user.company_id)
+      if (response.status) {
+        setCategories(response.data || [])
+      }
+    } catch (error) {
+      console.error('Failed to load categories:', error)
+    } finally {
+      setLoadingCategories(false)
     }
+  }
 
-    return (
-        <div className="mb-8">
-            <div className="space-y-4">
-                {mainCategories.map((mainCat) => (
-                    <div key={mainCat.id} className="border-b border-slate-700 pb-3">
-                        {/* Main Category Header */}
-                        <button
-                            onClick={() => setExpandedMainCat(expandedMainCat === mainCat.id ? null : mainCat.id)}
-                            className="w-full flex items-center justify-between px-4 py-3 bg-slate-800/50 rounded-xl hover:bg-slate-800 transition-colors"
-                        >
-                            <div className="flex items-center gap-3">
-                                <span className="text-xl">📁</span>
-                                <span className="font-semibold text-white">{mainCat.name}</span>
-                                <span className="text-xs text-slate-400">
-                                    ({mainCat.sub_category_count || 0} sub categories)
-                                </span>
-                            </div>
-                            <span className="text-slate-400 text-xl">
-                                {expandedMainCat === mainCat.id ? '▼' : '▶'}
-                            </span>
-                        </button>
+  return (
+    <div className="mb-12">
+      <div className="mb-4">
+        <h2 className="text-2xl font-bold text-slate-900">Categories</h2>
+        <p className="text-sm text-slate-600">Browse by category</p>
+      </div>
 
-                        {/* Sub Categories (visible when expanded) */}
-                        {expandedMainCat === mainCat.id && (
-                            <div className="mt-2 ml-4 pl-4 border-l-2 border-slate-700">
-                                <div className="flex flex-wrap gap-2">
-                                    <button
-                                        onClick={() => onCategoryChange(null)}
-                                        className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
-                                            !selectedCategory
-                                                ? 'bg-indigo-600 text-white shadow-lg'
-                                                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-                                        }`}
-                                    >
-                                        All Products
-                                    </button>
-                                    {/* Note: You need to fetch sub categories separately */}
-                                    {/* This is placeholder - you'll need a separate API for sub categories */}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                ))}
+      {/* Category Scroll */}
+      <div className="overflow-x-auto pb-4">
+        <div className="flex gap-3 min-w-min">
+          {/* All Categories Button */}
+          <button
+            onClick={() => onCategoryChange(null)}
+            className={`flex-shrink-0 rounded-lg px-6 py-3 font-semibold text-sm transition whitespace-nowrap ${
+              selectedCategory === null
+                ? 'bg-indigo-600 text-white'
+                : 'border border-slate-200 bg-white text-slate-700 hover:border-indigo-300'
+            }`}
+          >
+            All Products
+          </button>
+
+          {/* Categories */}
+          {loadingCategories ? (
+            <div className="flex gap-3">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div
+                  key={i}
+                  className="h-12 w-32 rounded-lg bg-slate-200 flex-shrink-0 animate-pulse"
+                />
+              ))}
             </div>
+          ) : (
+            categories.map((category) => {
+              const categoryKey = String(category.id)
+              const isSelected = selectedCategory !== null && String(selectedCategory) === categoryKey
+              return (
+                <button
+                  key={categoryKey}
+                  onClick={() => onCategoryChange(categoryKey)}
+                  className={`flex-shrink-0 rounded-lg px-6 py-3 font-semibold text-sm transition whitespace-nowrap ${
+                    isSelected
+                      ? 'bg-indigo-600 text-white'
+                      : 'border border-slate-200 bg-white text-slate-700 hover:border-indigo-300'
+                  }`}
+                >
+                  {category.name}
+                </button>
+              )
+            })
+          )}
         </div>
-    );
+      </div>
+    </div>
+  )
 }

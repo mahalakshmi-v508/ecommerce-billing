@@ -1,4 +1,65 @@
-import { useState, useEffect } from "react";
+// import { useState } from "react";
+// import { useNavigate } from "react-router-dom";
+// import api from "../../services/api";
+
+// export default function CategoryForm() {
+//   const navigate = useNavigate();
+
+//   const [name, setName] = useState("");
+
+  
+
+
+//   const handleSubmit = async () => {
+//   const user = JSON.parse(localStorage.getItem("user"));
+//   const company_id = Number(user?.company_id);
+
+//   if (!name || !company_id) {
+//     alert("Name & Company required");
+//     return;
+//   }
+
+//   try {
+//     const res = await api.post("/category/create.php", {
+//       name,
+//       company_id,
+//     });
+
+//     if (res.data.status) {
+//       alert("Category Added ✅");
+//       navigate("/category");
+//     } else {
+//       alert(res.data.message);
+//     }
+//   } catch (err) {
+//     console.error(err);
+//     alert("Server error");
+//   }
+// };
+
+//   return (
+//     <div className="max-w-lg bg-white p-6 rounded shadow">
+//       <h2 className="text-xl font-bold mb-4">Add Category</h2>
+
+//       <input
+//         type="text"
+//         placeholder="Category Name"
+//         className="w-full p-3 border mb-4"
+//         value={name}
+//         onChange={(e) => setName(e.target.value)}
+//       />
+
+//       <button
+//         onClick={handleSubmit}
+//         className="bg-green-600 text-white w-full p-3 rounded"
+//       >
+//         Save Category
+//       </button>
+//     </div>
+//   );
+// }
+
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 
@@ -42,39 +103,9 @@ function ToastPortal({ toasts, remove }) {
 export default function CategoryForm() {
   const navigate = useNavigate();
   const [name, setName] = useState("");
-  const [mainCategoryId, setMainCategoryId] = useState("");
-  const [mainCategories, setMainCategories] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [fetching, setFetching] = useState(true);
   const [charCount, setCharCount] = useState(0);
   const { toasts, show, remove } = useToast();
-
-  const getCompanyId = () => {
-    const user = JSON.parse(localStorage.getItem("user"));
-    return Number(user?.company_id);
-  };
-
-  // Fetch main categories for dropdown
-  const fetchMainCategories = async () => {
-    try {
-      const company_id = getCompanyId();
-      if (!company_id) return;
-      
-      const res = await api.get(`/main-category/get-active.php?company_id=${company_id}`);
-      if (res.data.status) {
-        setMainCategories(res.data.data);
-      }
-    } catch (err) {
-      console.error("Error fetching main categories:", err);
-      show("error", "Error", "Failed to load main categories");
-    } finally {
-      setFetching(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchMainCategories();
-  }, []);
 
   const handleChange = (e) => {
     setName(e.target.value);
@@ -83,7 +114,7 @@ export default function CategoryForm() {
 
   const handleSubmit = async () => {
     const user = JSON.parse(localStorage.getItem("user"));
-    const company_id = getCompanyId();
+    const company_id = Number(user?.company_id);
 
     if (!name.trim()) {
       show("warn", "Missing field", "Category name is required.");
@@ -96,14 +127,7 @@ export default function CategoryForm() {
 
     setLoading(true);
     try {
-      const payload = { 
-        name: name.trim(), 
-        company_id,
-        main_category_id: mainCategoryId || null
-      };
-      
-      const res = await api.post("/category/create.php", payload);
-      
+      const res = await api.post("/category/create.php", { name: name.trim(), company_id });
       if (res.data.status) {
         show("success", "Category added!", `"${name.trim()}" has been created.`);
         setTimeout(() => navigate("/category"), 2000);
@@ -135,6 +159,7 @@ export default function CategoryForm() {
           overflow: hidden;
         }
 
+        /* Decorative background shapes */
         .cf-bg-ring {
           position: absolute;
           border-radius: 50%;
@@ -158,14 +183,18 @@ export default function CategoryForm() {
           pointer-events: none;
         }
 
+        /* Card */
         .cf-card {
           position: relative;
           width: 100%;
-          max-width: 520px;
+          max-width: 480px;
           background: #ffffff;
           border-radius: 26px;
           border: 1px solid rgba(226,232,240,0.8);
-          box-shadow: 0 20px 60px rgba(37,99,235,0.1);
+          box-shadow:
+            0 0 0 1px rgba(255,255,255,0.9) inset,
+            0 20px 60px rgba(37,99,235,0.1),
+            0 4px 16px rgba(0,0,0,0.04);
           overflow: hidden;
           animation: cfSlideUp 0.5s cubic-bezier(0.22,1,0.36,1) both;
         }
@@ -174,6 +203,7 @@ export default function CategoryForm() {
           to   { opacity:1; transform:translateY(0) scale(1); }
         }
 
+        /* Accent stripe at top */
         .cf-stripe {
           height: 5px;
           background: linear-gradient(90deg, #1d4ed8, #6366f1, #3b82f6, #1d4ed8);
@@ -185,6 +215,7 @@ export default function CategoryForm() {
           100% { background-position: 200% 0%; }
         }
 
+        /* Header section */
         .cf-header {
           padding: 2rem 2rem 1.5rem;
           display: flex;
@@ -214,16 +245,19 @@ export default function CategoryForm() {
           font-weight: 400;
         }
 
+        /* Divider */
         .cf-hr {
           height: 1px;
           background: #f1f5f9;
           margin: 0 2rem;
         }
 
+        /* Body */
         .cf-body {
           padding: 1.75rem 2rem 2rem;
         }
 
+        /* Label row */
         .cf-label-row {
           display: flex;
           align-items: center;
@@ -245,11 +279,12 @@ export default function CategoryForm() {
         }
         .cf-char.active { color: #3b82f6; }
 
-        .cf-input-group, .cf-select-group {
+        /* Input group */
+        .cf-input-group {
           position: relative;
           margin-bottom: 1.5rem;
         }
-        .cf-input-prefix, .cf-select-prefix {
+        .cf-input-prefix {
           position: absolute;
           left: 0; top: 0; bottom: 0;
           width: 48px;
@@ -261,7 +296,7 @@ export default function CategoryForm() {
           transition: all 0.25s;
           border-radius: 14px 0 0 14px;
         }
-        .cf-input, .cf-select {
+        .cf-input {
           width: 100%;
           padding: 14px 16px 14px 60px;
           border-radius: 14px;
@@ -275,39 +310,26 @@ export default function CategoryForm() {
           box-sizing: border-box;
           transition: all 0.25s;
         }
-        .cf-select {
-          appearance: none;
-          cursor: pointer;
-        }
         .cf-input::placeholder { color: #c4cdd6; font-weight: 400; }
-        .cf-input:hover, .cf-select:hover {
+        .cf-input:hover {
           border-color: #bfdbfe;
           background: #f0f6ff;
         }
-        .cf-input:focus, .cf-select:focus {
+        .cf-input:focus {
           border-color: #3b82f6;
           background: #fff;
           box-shadow: 0 0 0 4px rgba(59,130,246,0.1);
         }
-        .cf-input:focus ~ .cf-input-prefix,
-        .cf-select:focus ~ .cf-select-prefix {
+        .cf-input:focus ~ .cf-input-prefix {
           color: #3b82f6;
           border-right-color: #bfdbfe;
         }
-        .cf-select-arrow {
-          position: absolute;
-          right: 16px;
-          top: 50%;
-          transform: translateY(-50%);
-          pointer-events: none;
-          color: #94a3b8;
-          font-size: 12px;
-        }
-        .cf-select-group:focus-within .cf-select-prefix {
+        .cf-input-group:focus-within .cf-input-prefix {
           color: #3b82f6;
           border-right-color: #bfdbfe;
         }
 
+        /* Suggestion chips */
         .cf-chips {
           display: flex;
           flex-wrap: wrap;
@@ -341,6 +363,7 @@ export default function CategoryForm() {
           background: #eff6ff;
         }
 
+        /* Submit button */
         .cf-btn {
           width: 100%;
           padding: 15px;
@@ -350,19 +373,27 @@ export default function CategoryForm() {
           font-family: 'Plus Jakarta Sans', sans-serif;
           font-size: 15px;
           font-weight: 700;
+          letter-spacing: 0.01em;
           background: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #3b82f6 100%);
           color: #fff;
-          box-shadow: 0 4px 18px rgba(37,99,235,0.38);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
+          box-shadow: 0 4px 18px rgba(37,99,235,0.38), 0 1px 3px rgba(37,99,235,0.15);
+          position: relative;
+          overflow: hidden;
+          display: flex; align-items: center; justify-content: center; gap: 8px;
           transition: all 0.25s;
+        }
+        .cf-btn::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, transparent 60%);
+          pointer-events: none;
         }
         .cf-btn:hover:not(:disabled) {
           transform: translateY(-2px);
-          box-shadow: 0 10px 28px rgba(37,99,235,0.45);
+          box-shadow: 0 10px 28px rgba(37,99,235,0.45), 0 2px 6px rgba(37,99,235,0.2);
         }
+        .cf-btn:active:not(:disabled) { transform: translateY(0); }
         .cf-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
         .cf-btn-cancel {
@@ -387,23 +418,11 @@ export default function CategoryForm() {
           border-top-color: #fff;
           border-radius: 50%;
           animation: spin 0.7s linear infinite;
+          flex-shrink: 0;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        .cf-skeleton {
-          height: 52px;
-          border-radius: 14px;
-          background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
-          background-size: 200% 100%;
-          animation: skeleton 1.4s ease infinite;
-          margin-bottom: 1.5rem;
-        }
-        @keyframes skeleton {
-          0% { background-position: 200% 0; }
-          100% { background-position: -200% 0; }
-        }
-
-        /* Toast styles */
+        /* ── Toast styles ── */
         .cf-toast {
           pointer-events: auto;
           display: flex;
@@ -415,7 +434,7 @@ export default function CategoryForm() {
           border-radius: 16px;
           position: relative;
           overflow: hidden;
-          box-shadow: 0 8px 30px rgba(0,0,0,0.13);
+          box-shadow: 0 8px 30px rgba(0,0,0,0.13), 0 2px 6px rgba(0,0,0,0.06);
           animation: cfToastIn 0.4s cubic-bezier(0.22,1,0.36,1) both;
           font-family: 'Plus Jakarta Sans', sans-serif;
         }
@@ -423,9 +442,18 @@ export default function CategoryForm() {
           from { opacity:0; transform:translateX(60px) scale(0.9); }
           to   { opacity:1; transform:translateX(0) scale(1); }
         }
-        .cf-toast-success { background:#f0fdf4; border:1px solid #bbf7d0; }
-        .cf-toast-error   { background:#fff1f2; border:1px solid #fecdd3; }
-        .cf-toast-warn    { background:#fffbeb; border:1px solid #fde68a; }
+        .cf-toast-success {
+          background: #f0fdf4;
+          border: 1px solid #bbf7d0;
+        }
+        .cf-toast-error {
+          background: #fff1f2;
+          border: 1px solid #fecdd3;
+        }
+        .cf-toast-warn {
+          background: #fffbeb;
+          border: 1px solid #fde68a;
+        }
         .cf-toast-icon {
           width: 32px; height: 32px;
           border-radius: 10px;
@@ -434,25 +462,33 @@ export default function CategoryForm() {
           font-weight: 800;
           flex-shrink: 0;
         }
-        .cf-toast-success .cf-toast-icon { background:#dcfce7; color:#16a34a; }
-        .cf-toast-error   .cf-toast-icon { background:#ffe4e6; color:#e11d48; }
-        .cf-toast-warn    .cf-toast-icon { background:#fef9c3; color:#b45309; }
+        .cf-toast-success .cf-toast-icon { background: #dcfce7; color: #16a34a; }
+        .cf-toast-error   .cf-toast-icon { background: #ffe4e6; color: #e11d48; }
+        .cf-toast-warn    .cf-toast-icon { background: #fef9c3; color: #b45309; }
         .cf-toast-content { flex: 1; }
-        .cf-toast-title { font-size: 13px; font-weight: 700; margin: 0 0 2px; }
-        .cf-toast-success .cf-toast-title { color:#15803d; }
-        .cf-toast-error   .cf-toast-title { color:#be123c; }
-        .cf-toast-warn    .cf-toast-title { color:#92400e; }
-        .cf-toast-msg { font-size: 12px; margin: 0; }
+        .cf-toast-title {
+          font-size: 13px; font-weight: 700; margin: 0 0 2px;
+        }
+        .cf-toast-success .cf-toast-title { color: #15803d; }
+        .cf-toast-error   .cf-toast-title { color: #be123c; }
+        .cf-toast-warn    .cf-toast-title { color: #92400e; }
+        .cf-toast-msg {
+          font-size: 12px; margin: 0; font-weight: 400;
+        }
+        .cf-toast-success .cf-toast-msg { color: #16a34a; }
+        .cf-toast-error   .cf-toast-msg { color: #e11d48; }
+        .cf-toast-warn    .cf-toast-msg { color: #b45309; }
         .cf-toast-x {
           background: none; border: none; cursor: pointer;
-          font-size: 13px; opacity: 0.4;
-          padding: 2px;
+          font-size: 13px; opacity: 0.4; transition: opacity 0.2s;
+          flex-shrink: 0; padding: 2px;
         }
         .cf-toast-x:hover { opacity: 0.9; }
         .cf-toast-progress {
           position: absolute;
           bottom: 0; left: 0;
           height: 3px;
+          border-radius: 0 0 16px 16px;
           animation: cfShrink 3.8s linear forwards;
         }
         .cf-toast-success .cf-toast-progress { background: #4ade80; }
@@ -467,6 +503,7 @@ export default function CategoryForm() {
       <ToastPortal toasts={toasts} remove={remove} />
 
       <div className="cf-page">
+        {/* BG decorations */}
         <div className="cf-bg-ring cf-bg-ring-1" />
         <div className="cf-bg-ring cf-bg-ring-2" />
         {[...Array(8)].map((_, i) => (
@@ -478,58 +515,37 @@ export default function CategoryForm() {
         ))}
 
         <div className="cf-card">
+          {/* Animated top stripe */}
           <div className="cf-stripe" />
 
+          {/* Header */}
           <div className="cf-header">
             <div className="cf-icon-box">🏷️</div>
             <div className="cf-header-text">
-              <h1>Add Sub Category</h1>
-              <p>Create a new category under a main category</p>
+              <h1>Add Category</h1>
+              <p>Organise your products under a new category</p>
             </div>
           </div>
 
           <div className="cf-hr" />
 
+          {/* Body */}
           <div className="cf-body">
 
-            {/* Main Category Dropdown */}
+            {/* Input */}
             <div className="cf-label-row">
-              <span className="cf-label">Main Category (Optional)</span>
-            </div>
-            {fetching ? (
-              <div className="cf-skeleton" />
-            ) : (
-              <div className="cf-select-group">
-                <div className="cf-select-prefix">📁</div>
-                <select 
-                  className="cf-select"
-                  value={mainCategoryId}
-                  onChange={(e) => setMainCategoryId(e.target.value)}
-                >
-                  <option value="">-- Select Main Category --</option>
-                  {mainCategories.map(mc => (
-                    <option key={mc.id} value={mc.id}>{mc.name}</option>
-                  ))}
-                </select>
-                <span className="cf-select-arrow">▼</span>
-              </div>
-            )}
-
-            {/* Category Name Input */}
-            <div className="cf-label-row">
-              <span className="cf-label">Sub Category Name <span style={{color:"#ef4444"}}>*</span></span>
+              <span className="cf-label">Category Name</span>
               <span className={`cf-char ${charCount > 0 ? "active" : ""}`}>{charCount}/50</span>
             </div>
             <div className="cf-input-group">
               <input
                 type="text"
                 className="cf-input"
-                placeholder="e.g. Basmati Rice, Sunflower Oil..."
+                placeholder="e.g. Electronics, Beverages…"
                 value={name}
                 maxLength={50}
                 onChange={handleChange}
                 onKeyDown={e => e.key === "Enter" && handleSubmit()}
-                autoFocus
               />
               <div className="cf-input-prefix">#</div>
             </div>
@@ -537,14 +553,14 @@ export default function CategoryForm() {
             {/* Quick-fill suggestion chips */}
             <div className="cf-chips">
               <span className="cf-chip-label">Quick suggestions</span>
-              {["Basmati Rice", "Sunflower Oil", "Fresh Vegetables", "Organic Products", "Packaged Foods", "Dairy Items"].map(s => (
+              {["Electronics", "Beverages", "Snacks", "Dairy", "Bakery", "Stationery"].map(s => (
                 <button key={s} className="cf-chip" onClick={() => { setName(s); setCharCount(s.length); }}>
                   {s}
                 </button>
               ))}
             </div>
 
-            {/* Buttons */}
+            {/* CTA */}
             <button className="cf-btn" onClick={handleSubmit} disabled={loading}>
               {loading
                 ? <><div className="cf-spinner" /> Saving…</>
